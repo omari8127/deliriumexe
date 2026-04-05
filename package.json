@@ -1,0 +1,15 @@
+{
+  "name": "abarrotes-el-rosal",
+  "version": "1.0.0",
+  "description": "Tienda de abarrotes multi-página con mega-menú",
+  "private": true,
+  "scripts": {
+    "dev": "serve -l 3000 .",
+    "start": "serve -l 3000 ."
+  },
+  "devDependencies": {
+    "serve": "^14.2.1"
+  },
+  "author": "El Rosal",
+  "license": "MIT"
+}
