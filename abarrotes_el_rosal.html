@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body>
+<body class="page-home">
 
   <header>
     <div class="header-inner">
@@ -19,7 +19,7 @@
       <div class="search-bar">
         <input type="text" id="search-input" placeholder="Busca tus productos aquí"
           oninput="searchProducts(this.value)">
-        <button>🔍</button>
+        <button onclick="searchProducts(document.getElementById('search-input').value, true)">🔍</button>
       </div>
       <div class="header-actions">
         <div class="header-action"><span class="icon">📋</span>Mis Pedidos</div>
@@ -33,14 +33,14 @@
   <nav>
     <div class="nav-inner">
       <span class="nav-link dept">Departamentos</span>
-      <span class="nav-link" onclick="showCat('lacteos')">Lácteos</span>
-      <span class="nav-link" onclick="showCat('bebidas')">Bebidas</span>
-      <span class="nav-link" onclick="showCat('despensa')">Despensa</span>
-      <span class="nav-link" onclick="showCat('limpieza')">Limpieza</span>
-      <span class="nav-link" onclick="showCat('botanas')">Botanas</span>
-      <span class="nav-link" onclick="showCat('carnes')">Carnes</span>
-      <span class="nav-link" onclick="showCat('frutas')">Frutas y Verduras</span>
-      <span class="nav-link" onclick="showCat('panaderia')">Panadería</span>
+      <span class="nav-link" onclick="selectCategory('lacteos')">Lácteos</span>
+      <span class="nav-link" onclick="selectCategory('bebidas')">Bebidas</span>
+      <span class="nav-link" onclick="selectCategory('despensa')">Despensa</span>
+      <span class="nav-link" onclick="selectCategory('limpieza')">Limpieza</span>
+      <span class="nav-link" onclick="selectCategory('botanas')">Botanas</span>
+      <span class="nav-link" onclick="selectCategory('cerveza')">Cerveza</span>
+      <span class="nav-link" onclick="selectCategory('frutas')">Frutas y Verduras</span>
+      <span class="nav-link" onclick="selectCategory('panaderia')">Panadería</span>
       <div class="nav-sucursal">📍 Selecciona tu sucursal</div>
     </div>
   </nav>
@@ -71,7 +71,8 @@
     </div>
   </div>
 
-  <div class="ticker">Precios válidos del 3 al 6 de abril de 2026 · Pedido mínimo $150 · Entrega 1–2 hrs · WhatsApp:
+  <div class="ticker">Envío a domicilio dentro de 18 cuadras de la Anexa 20 de Noviembre · Horario de atención: 9:00 am
+    a 9:00 pm · Entregas rápidas el mismo día · WhatsApp:
     664-394-4760</div>
 
   <div class="cat-strip">
@@ -119,7 +120,7 @@
   </div>
 
   <button class="float-cart" onclick="toggleCart()">🛒 Mi carrito <div class="float-badge" id="float-count">0</div>
-    </button>
+  </button>
 
   <div class="cart-overlay" id="cart-overlay" onclick="outsideClose(event)">
     <div class="cart-drawer">
@@ -143,7 +144,8 @@
   </div>
 
   <footer><strong>Abarrotes El Rosal</strong> · Tijuana, Baja California · WhatsApp:
-    <strong>664-394-4760</strong><br>Precios válidos del 3 al 6 de abril de 2026. Pedido mínimo $150.</footer>
+    <strong>664-394-4760</strong><br>Precios válidos del 3 al 6 de abril de 2026. Pedido mínimo $150.
+  </footer>
 
   <!-- Scripts -->
   <script src="data/productos.js"></script>

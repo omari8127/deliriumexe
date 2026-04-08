@@ -4,15 +4,22 @@
 
 let cart = JSON.parse(localStorage.getItem('cart')) || {};
 let qtys = {};
-let currentCat = 'all';
+// State for frutas: { [id]: { mode: 'kg'|'unit', val: number } }
+let frutaModes = {};
+let activeFilters = {
+  cats: [],
+  brands: [],
+  price: 1000,
+  sort: 'relevance'
+};
 
 // INICIALIZACIÓN
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof allProducts !== 'undefined') {
-    allProducts.forEach(p => { if(!qtys[p.id]) qtys[p.id] = 1; });
+    allProducts.forEach(p => { if (!qtys[p.id]) qtys[p.id] = 1; });
     initDropdown();
     updateCartUI();
-    
+
     // Identificar en qué página estamos
     if (document.querySelector('.page-home')) initHome();
     if (document.querySelector('.page-productos')) initProductos();
@@ -39,99 +46,236 @@ function initDropdown() {
   });
 }
 
+function closeDropdown() {
+  const menu = document.getElementById('dept-menu');
+  if (menu) menu.classList.remove('active');
+}
+
+// Nueva función unificada para departamentos
+function selectCategory(id) {
+  closeDropdown();
+
+  const isProductosPage = document.querySelector('.page-productos');
+  const isHomePage = document.querySelector('.page-home') || document.querySelector('.page-abarrotes-el-rosal'); // Handle both home variants
+
+  if (isProductosPage) {
+    // Si ya estamos en productos, solo filtramos
+    showCat(id);
+    // Actualizar URL sin recargar para que sea consistente
+    const newUrl = id === 'all' ? 'productos.html' : `productos.html?cat=${id}`;
+    window.history.pushState({ cat: id }, '', newUrl);
+  } else {
+    // Si estamos en otra página, navegamos a productos con el parámetro
+    window.location.href = id === 'all' ? 'productos.html' : `productos.html?cat=${id}`;
+  }
+}
+
 // --- HOME PAGE LOGIC ---
 function initHome() {
   buildCatStrip('cat-strip-home');
   renderFeatured(8);
+  initHeroCarousel();
 }
 
-// --- PRODUCTOS PAGE LOGIC ---
+let slideIndex = 0;
+let slideInterval;
+
+function initHeroCarousel() {
+  const slides = document.querySelectorAll('.carousel-slide');
+  if (slides.length === 0) return;
+
+  startSlideShow();
+}
+
+function startSlideShow() {
+  stopSlideShow();
+  slideInterval = setInterval(() => {
+    moveSlide(1);
+  }, 5000);
+}
+
+function stopSlideShow() {
+  clearInterval(slideInterval);
+}
+
+function moveSlide(n) {
+  const slides = document.querySelectorAll('.carousel-slide');
+  const dots = document.querySelectorAll('.dot');
+
+  slides[slideIndex].classList.remove('active');
+  dots[slideIndex].classList.remove('active');
+
+  slideIndex = (slideIndex + n + slides.length) % slides.length;
+
+  slides[slideIndex].classList.add('active');
+  dots[slideIndex].classList.add('active');
+
+  startSlideShow(); // Reset timer
+}
+
+function currentSlide(n) {
+  const slides = document.querySelectorAll('.carousel-slide');
+  const dots = document.querySelectorAll('.dot');
+
+  slides[slideIndex].classList.remove('active');
+  dots[slideIndex].classList.remove('active');
+
+  slideIndex = n;
+
+  slides[slideIndex].classList.add('active');
+  dots[slideIndex].classList.add('active');
+
+  startSlideShow(); // Reset timer
+}
+
+
+// --- PRODUCTOS & PROMOCIONES (ECOMMERCE LOGIC) ---
 function initProductos() {
   const params = new URLSearchParams(window.location.search);
   const cat = params.get('cat');
   const q = params.get('q');
 
-  if (document.getElementById('cat-strip')) buildCatStrip('cat-strip');
-  
-  if (cat) {
-    showCat(cat);
-  } else if (q) {
-    document.getElementById('search-input').value = q;
-    searchProducts(q);
-  } else {
-    buildMain();
-  }
-}
+  initEcommerceFilters();
 
-// --- PROMOCIONES PAGE LOGIC ---
-let promoFilters = { cat: 'all', price: 500 };
+  if (cat) {
+    // If arriving with a category, pre-check it
+    const checkbox = document.querySelector(`.cat-check[value="${cat}"]`);
+    if (checkbox) checkbox.checked = true;
+  }
+
+  if (q) {
+    document.getElementById('search-input').value = q;
+  }
+
+  updateFilters();
+}
 
 function initPromociones() {
-  const filterCatContainer = document.getElementById('filter-categories');
-  if (!filterCatContainer) return;
-
-  // Build category filters
-  let h = `<div class="filter-item active" onclick="setPromoCat('all', this)">Todas</div>`;
-  h += categories.map(c => `<div class="filter-item" onclick="setPromoCat('${c.id}', this)">${c.label}</div>`).join('');
-  filterCatContainer.innerHTML = h;
-
-  renderPromociones();
+  initEcommerceFilters();
+  // Only show items with oldPrice initially
+  updateFilters(true);
 }
 
-function setPromoCat(id, el) {
-  promoFilters.cat = id;
-  document.querySelectorAll('.filter-item').forEach(i => i.classList.remove('active'));
-  el.classList.add('active');
-  renderPromociones();
+function initEcommerceFilters() {
+  // 1. Build Categories
+  const catContainer = document.getElementById('filter-cats');
+  const deptContainer = document.getElementById('filter-depts');
+  if (catContainer) {
+    catContainer.innerHTML = categories.map(c => `
+      <label class="filter-opt">
+        <input type="checkbox" class="cat-check" value="${c.id}" onchange="updateFilters()">
+        ${c.label}
+      </label>
+    `).join('');
+  }
+  if (deptContainer) {
+    deptContainer.innerHTML = categories.map(c => `
+      <label class="filter-opt">
+        <input type="checkbox" class="cat-check" value="${c.id}" onchange="updateFilters()">
+        ${c.label}
+      </label>
+    `).join('');
+  }
+
+  // 2. Build Brands (Extracted from names)
+  const brands = [...new Set(allProducts.map(p => extractBrand(p.name)))].sort();
+  const brandContainer = document.getElementById('filter-brands');
+  if (brandContainer) {
+    brandContainer.innerHTML = brands.map(b => `
+      <label class="filter-opt">
+        <input type="checkbox" class="brand-check" value="${b}" onchange="updateFilters()">
+        ${b}
+      </label>
+    `).join('');
+  }
 }
 
-function updatePriceFilter(val) {
-  promoFilters.price = val;
-  document.getElementById('price-max-label').textContent = val >= 500 ? '$500+' : '$' + val;
-  renderPromociones();
+function extractBrand(name) {
+  // Simple extraction: first word usually works for this catalog
+  const firstWord = name.split(' ')[0];
+  // Exceptions or cleanup if needed
+  if (["Jugo", "Agua", "Aceite", "Frijol", "Sopa", "Queso", "Leche"].includes(firstWord)) {
+    return name.split(' ')[1] || 'S/M';
+  }
+  return firstWord;
 }
 
-function renderPromociones() {
-  const grid = document.getElementById('promo-grid');
-  const noRes = document.getElementById('no-results');
-  if (!grid) return;
+function updateFilters(isPromoPage = false) {
+  // Sync state from UI
+  activeFilters.cats = Array.from(document.querySelectorAll('.cat-check:checked')).map(cb => cb.value);
+  activeFilters.brands = Array.from(document.querySelectorAll('.brand-check:checked')).map(cb => cb.value);
+  const slider = document.getElementById('side-price-slider');
+  if (slider) {
+    activeFilters.price = parseInt(slider.value);
+    document.getElementById('side-price-max').textContent = activeFilters.price >= 1000 ? '$500+' : '$' + activeFilters.price;
+  }
+  const sortSel = document.getElementById('sort-select');
+  if (sortSel) activeFilters.sort = sortSel.value;
 
-  const discounted = allProducts.filter(p => {
-    const isPromo = p.oldPrice !== null;
-    const matchesCat = promoFilters.cat === 'all' || p.cat === promoFilters.cat;
-    const matchesPrice = p.price <= promoFilters.price;
-    return isPromo && matchesCat && matchesPrice;
+  // Search query
+  const q = document.getElementById('search-input')?.value.toLowerCase() || '';
+
+  // Filter
+  let filtered = allProducts.filter(p => {
+    const matchesCat = activeFilters.cats.length === 0 || activeFilters.cats.includes(p.cat);
+    const matchesBrand = activeFilters.brands.length === 0 || activeFilters.brands.includes(extractBrand(p.name));
+    const matchesPrice = p.price <= activeFilters.price;
+    const matchesPromo = !isPromoPage || p.oldPrice !== null;
+    const matchesSearch = !q || (p.name + p.cat).toLowerCase().includes(q);
+    return matchesCat && matchesBrand && matchesPrice && matchesPromo && matchesSearch;
   });
 
-  if (discounted.length === 0) {
-    grid.innerHTML = '';
-    noRes.style.display = 'block';
+  // Sort
+  if (activeFilters.sort === 'price-asc') filtered.sort((a, b) => a.price - b.price);
+  else if (activeFilters.sort === 'price-desc') filtered.sort((a, b) => b.price - a.price);
+  else if (activeFilters.sort === 'discount') filtered.sort((a, b) => {
+    const discA = a.oldPrice ? (a.oldPrice - a.price) : 0;
+    const discB = b.oldPrice ? (b.oldPrice - b.price) : 0;
+    return discB - discA;
+  });
+
+  // Render
+  const container = document.getElementById('main-content') || document.getElementById('promo-grid');
+  const countEl = document.getElementById('results-count');
+  const noRes = document.getElementById('no-results');
+
+  if (countEl) countEl.textContent = `${filtered.length} PRODUCTOS`;
+
+  if (!container) return;
+
+  if (filtered.length === 0) {
+    container.innerHTML = '';
+    if (noRes) noRes.style.display = 'block';
   } else {
-    grid.innerHTML = discounted.map(p => cardHTML(p)).join('');
-    noRes.style.display = 'none';
+    container.innerHTML = filtered.map(p => cardHTML(p)).join('');
+    if (noRes) noRes.style.display = 'none';
   }
+}
+
+function resetFilters() {
+  document.querySelectorAll('.cat-check, .brand-check').forEach(cb => cb.checked = false);
+  const slider = document.getElementById('side-price-slider');
+  if (slider) slider.value = 1000;
+  const sortSel = document.getElementById('sort-select');
+  if (sortSel) sortSel.value = 'relevance';
+  updateFilters(document.querySelector('.page-promociones') !== null);
 }
 
 // --- CATALOG RENDERING ---
 function buildCatStrip(containerId) {
   const s = document.getElementById(containerId);
   if (!s) return;
-  let h = `<div class="cat-chip active" id="chip-all" style="background:#333" onclick="showCat('all',this)"><span class="ico">🏪</span><span class="lbl">Todos</span></div>`;
-  h += categories.map(c => `<div class="cat-chip" id="chip-${c.id}" style="background:${c.color}" onclick="showCat('${c.id}',this)"><span class="ico">${c.emoji}</span><span class="lbl">${c.label}</span></div>`).join('');
+  let h = `<div class="cat-chip active" id="chip-all" style="background:#333" onclick="selectCategory('all')"><span class="ico">🏪</span><span class="lbl">Todos</span></div>`;
+  h += categories.map(c => `<div class="cat-chip" id="chip-${c.id}" style="background:${c.color}" onclick="selectCategory('${c.id}')"><span class="ico">${c.emoji}</span><span class="lbl">${c.label}</span></div>`).join('');
   s.innerHTML = h;
 }
 
-function showCat(id, el) {
-  currentCat = id;
-  document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
-  const target = el || document.getElementById('chip-' + id);
-  if (target) target.classList.add('active');
-  
-  if (document.getElementById('search-input')) document.getElementById('search-input').value = '';
-  if (document.getElementById('search-results')) document.getElementById('search-results').style.display = 'none';
-  if (document.getElementById('main-content')) document.getElementById('main-content').style.display = '';
-  
-  buildMain();
+function showCat(id) {
+  // Compatibility shim for existing calls
+  document.querySelectorAll('.cat-check').forEach(cb => {
+    cb.checked = (id === 'all' || cb.value === id);
+  });
+  updateFilters(document.querySelector('.page-promociones') !== null);
 }
 
 function buildMain() {
@@ -161,72 +305,293 @@ function renderFeatured(limit) {
 }
 
 function cardHTML(p) {
-  const badge = p.badge ? `<div class="prod-badge" style="background:${/^-\d/.test(p.badge) ? '#CC1F1F' : p.badge === 'Fresco' ? '#1a7a2e' : '#1A4FA0'}">${p.badge}</div>` : '';
+  const isPromoPage = document.querySelector('.page-promociones') !== null;
+  const discount = p.oldPrice ? Math.round((1 - p.price / p.oldPrice) * 100) : 0;
+  const badge = discount > 0 ? `<div class="prod-badge">-${discount}%</div>` : (p.badge ? `<div class="prod-badge">${p.badge}</div>` : '');
+
   const imgPart = p.img
     ? `<img src="${p.img}" alt="${p.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="prod-emoji" style="display:none">${p.emoji}</span>`
     : `<span class="prod-emoji">${p.emoji}</span>`;
-    
+
+  // ── Frutas y Verduras: segmented control de Kg/Unidades ──
+  if (p.cat === 'frutas') {
+    if (!frutaModes[p.id]) frutaModes[p.id] = { mode: 'kg', val: 0.5 };
+    const fm = frutaModes[p.id];
+    const displayVal = fm.mode === 'kg' ? fm.val.toFixed(1) : fm.val;
+    const suffix    = fm.mode === 'kg' ? 'kg' : 'pzas';
+    return `
+    <div class="prod-card">
+      ${badge}
+      <a href="producto-detalle.html?id=${p.id}" class="prod-img-wrap">${imgPart}</a>
+      <a href="producto-detalle.html?id=${p.id}" class="prod-name">${p.name}</a>
+
+      <div class="prod-price-area">
+        ${p.oldPrice ? `<div class="prod-price-old">$${p.oldPrice.toFixed(2)}</div>` : '<div class="prod-price-old" style="visibility:hidden">$0.00</div>'}
+        <div class="prod-price">$${p.price.toFixed(2)}</div>
+      </div>
+
+      <div class="frutas-seg-ctrl" id="seg-${p.id}">
+        <button class="seg-btn${fm.mode === 'kg'   ? ' seg-active' : ''}" onclick="setFrutaMode(${p.id},'kg')">Kilogramos</button>
+        <button class="seg-btn${fm.mode === 'unit' ? ' seg-active' : ''}" onclick="setFrutaMode(${p.id},'unit')">Unidades</button>
+      </div>
+
+      <div class="frutas-qty-row">
+        <button class="frutas-qty-btn" onclick="changeFrutaQty(${p.id},-1)">−</button>
+        <span class="frutas-qty-val" id="frutas-qty-${p.id}">${displayVal}</span>
+        <span class="frutas-qty-sfx" id="frutas-sfx-${p.id}">${suffix}</span>
+        <button class="frutas-qty-btn" onclick="changeFrutaQty(${p.id},1)">+</button>
+      </div>
+
+      <button class="add-btn${cart[p.id] ? ' added' : ''}" id="abtn-${p.id}" onclick="addToCart(${p.id})">${cart[p.id] ? '✓ Agregado' : 'AGREGAR'}</button>
+    </div>`;
+  }
+
+  // ── Resto de categorías (comportamiento original) ──
   return `
     <div class="prod-card">
       ${badge}
       <a href="producto-detalle.html?id=${p.id}" class="prod-img-wrap">${imgPart}</a>
       <a href="producto-detalle.html?id=${p.id}" class="prod-name">${p.name}</a>
-      <div class="prod-unit">${p.unit}</div>
-      ${p.oldPrice ? `<div class="prod-price-old">$${p.oldPrice.toFixed(2)}</div>` : ''}
-      <div class="prod-price">$${p.price.toFixed(2)}</div>
-      <div class="prod-qty">
-        <button onclick="changeQty(${p.id},-1)">-</button>
-        <span id="qty-${p.id}">${qtys[p.id] || 1}</span>
-        <button onclick="changeQty(${p.id},1)">+</button>
+      
+      <div class="prod-price-area">
+        ${p.oldPrice ? `<div class="prod-price-old">$${p.oldPrice.toFixed(2)}</div>` : '<div class="prod-price-old" style="visibility:hidden">$0.00</div>'}
+        <div class="prod-price">$${p.price.toFixed(2)}</div>
       </div>
+
+      <div class="prod-qty-row">
+        <div class="prod-qty-ctrl">
+          <button onclick="changeQty(${p.id},-1)">-</button>
+          <span id="qty-${p.id}">${qtys[p.id] || 1}</span>
+          <button onclick="changeQty(${p.id},1)">+</button>
+        </div>
+      </div>
+
       <button class="add-btn${cart[p.id] ? ' added' : ''}" id="abtn-${p.id}" onclick="addToCart(${p.id})">${cart[p.id] ? '✓ Agregado' : 'AGREGAR'}</button>
     </div>`;
+}
+
+function setUnitType(id, type, el) {
+  const parent = el.parentElement;
+  parent.querySelectorAll('.unit-opt').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── FRUTAS Y VERDURAS: segmented control logic ──────────────────────
+function setFrutaMode(id, mode) {
+  if (!frutaModes[id]) frutaModes[id] = { mode: 'kg', val: 0.5 };
+  const prev = frutaModes[id];
+
+  if (mode === 'kg' && prev.mode === 'unit') {
+    // Convert units → kg (1 pza ≈ 0.1 kg, minimum 0.1)
+    frutaModes[id] = { mode: 'kg', val: Math.max(0.1, Math.round(prev.val * 0.1 * 10) / 10) };
+  } else if (mode === 'unit' && prev.mode === 'kg') {
+    // Convert kg → units (round, minimum 1)
+    frutaModes[id] = { mode: 'unit', val: Math.max(1, Math.round(prev.val * 10)) };
+  } else {
+    frutaModes[id].mode = mode;
+  }
+
+  // Update segmented buttons
+  const seg = document.getElementById('seg-' + id);
+  if (seg) {
+    seg.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('seg-active'));
+    const idx = mode === 'kg' ? 0 : 1;
+    seg.querySelectorAll('.seg-btn')[idx].classList.add('seg-active');
+  }
+
+  // Update display
+  _updateFrutaDisplay(id);
+}
+
+function changeFrutaQty(id, dir) {
+  if (!frutaModes[id]) frutaModes[id] = { mode: 'kg', val: 0.5 };
+  const fm = frutaModes[id];
+
+  if (fm.mode === 'kg') {
+    fm.val = Math.max(0.1, Math.round((fm.val + dir * 0.1) * 10) / 10);
+  } else {
+    fm.val = Math.max(1, fm.val + dir);
+  }
+
+  _updateFrutaDisplay(id);
+}
+
+function _updateFrutaDisplay(id) {
+  const fm = frutaModes[id];
+  const valEl = document.getElementById('frutas-qty-' + id);
+  const sfxEl = document.getElementById('frutas-sfx-' + id);
+  if (valEl) valEl.textContent = fm.mode === 'kg' ? fm.val.toFixed(1) : fm.val;
+  if (sfxEl) sfxEl.textContent = fm.mode === 'kg' ? 'kg' : 'pzas';
 }
 
 // --- PRODUCT DETAIL LOGIC ---
 function renderDetalle(id) {
   const p = allProducts.find(x => x.id === id);
   const container = document.getElementById('detalle-content');
-  if (!p || !container) return;
+  if (!container) return;
+
+  if (!p) {
+    container.innerHTML = `<div class="section-wrap"><p style="padding:2rem;text-align:center;color:#666">Producto no encontrado. <a href="productos.html" style="color:var(--blue);text-decoration:underline">Ver catálogo</a></p></div>`;
+    return;
+  }
 
   const catRaw = categories.find(c => c.id === p.cat);
-  
+
   container.innerHTML = `
-    <div class="breadcrumbs">
-      <a href="index.html">Inicio</a> > <a href="productos.html?cat=${p.cat}">${catRaw ? catRaw.label : 'Productos'}</a> > <span>${p.name}</span>
+    <div class="breadcrumb-nav">
+      <a href="index.html">Inicio</a> <span>›</span> 
+      <a href="productos.html?cat=${p.cat}">${catRaw ? catRaw.label : 'Productos'}</a> <span>›</span> 
+      <span class="curr">${p.name}</span>
     </div>
-    <div class="detalle-img-wrap">
-      ${p.img ? `<img src="${p.img}" alt="${p.name}">` : `<span class="prod-emoji">${p.emoji}</span>`}
-    </div>
-    <div class="detalle-info">
-      <span class="ref">Referencia: #${1000 + p.id}</span>
-      <h1>${p.name}</h1>
-      <div class="price">$${p.price.toFixed(2)}</div>
-      <div class="detalle-buy">
-        <div class="qty-selector">
-          <button onclick="changeQty(${p.id},-1,true)">-</button>
-          <span id="det-qty-${p.id}">${qtys[p.id] || 1}</span>
-          <button onclick="changeQty(${p.id},1,true)">+</button>
+    
+    <div class="detalle-grid">
+      <div class="detalle-left">
+        <div class="detalle-img-card">
+          ${p.img ? `<img src="${p.img}" alt="${p.name}">` : `<span class="prod-emoji">${p.emoji}</span>`}
+          <div class="carousel-nav">
+            <button class="c-prev">❮</button>
+            <div class="c-dots"><span class="c-dot active"></span><span class="c-dot"></span><span class="c-dot"></span></div>
+            <button class="c-next">❯</button>
+          </div>
         </div>
-        <button class="btn-add-main" onclick="addToCart(${p.id})">AGREGAR AL CARRITO</button>
+        <div class="detalle-thumbs">
+          <img src="${p.img || ''}" class="active" onerror="this.style.display='none'">
+          <div class="thumb-placeholder">📊</div>
+          <div class="thumb-placeholder">🥗</div>
+        </div>
       </div>
-    </div>
-    <div class="detalle-desc">
-      <h2>Descripción del producto</h2>
-      <p>${p.desc || 'Este producto cumple con los más altos estándares de calidad de Abarrotes El Rosal. Ideal para el consumo diario en tu hogar.'}</p>
+      
+      <div class="detalle-right">
+        <div class="detalle-ref">Referencia: ${777000 + p.id}</div>
+        <h1 class="detalle-title">${p.name}</h1>
+        <div class="detalle-main-price">$${p.price.toFixed(2)}</div>
+        
+        <div class="detalle-actions">
+          <div class="detalle-qty-wrap">
+            <div class="detalle-qty">
+              <button onclick="changeQty(${p.id},-1,true)">-</button>
+              <span id="det-qty-${p.id}">${qtys[p.id] || 1}</span>
+              <button onclick="changeQty(${p.id},1,true)">+</button>
+            </div>
+            ${p.cat === 'frutas' ? '<div style="display: flex; align-items: center; font-size: 0.85rem; color: #666; font-weight: 700; margin-left:10px;">KILOGRAMOS/UNIDADES</div>' : ''}
+          </div>
+          <button class="btn-buy-now" onclick="addToCart(${p.id})">AGREGAR</button>
+        </div>
+
+        <div class="detalle-replacement">
+          <h3>Si no está en stock, remplázalo por:</h3>
+          <div class="replacement-grid" id="replacement-grid"></div>
+        </div>
+      </div>
     </div>
   `;
 
-  // Related products
-  const related = allProducts.filter(x => x.cat === p.cat && x.id !== p.id).slice(0, 6);
-  document.getElementById('related-grid').innerHTML = related.map(x => cardHTML(x)).join('');
+  // Similar products for replacements & related
+  const similar = allProducts.filter(x => x.cat === p.cat && x.id !== p.id);
+
+  // Replacements (first 2)
+  const replGrid = document.getElementById('replacement-grid');
+  if (replGrid) {
+    replGrid.innerHTML = similar.slice(0, 2).map(x => `
+      <div class="repl-item" onclick="window.location.href='producto-detalle.html?id=${x.id}'">
+        ${x.badge ? `<div class="repl-badge">${x.badge}</div>` : ''}
+        <img src="${x.img}" alt="${x.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span class="repl-emoji" style="display:none">${x.emoji}</span>
+        <div class="repl-item-info">
+          <div class="repl-name">${x.name}</div>
+          <div class="repl-price">$${x.price.toFixed(2)}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+  // Related products bottom
+  const relatedGrid = document.getElementById('related-grid');
+  if (relatedGrid) {
+    relatedGrid.innerHTML = similar.slice(0, 6).map(x => cardHTML(x)).join('');
+  }
+}
+
+function updateCartUI() {
+  const items = Object.values(cart);
+  const count = items.reduce((sum, item) => sum + item.qty, 0);
+  const subtotal = items.reduce((sum, item) => sum + (item.oldPrice || item.price) * item.qty, 0);
+  const total    = items.reduce((sum, item) => sum + item.price * item.qty, 0);
+  const savings  = subtotal - total;
+
+  const countEl = document.getElementById('hdr-count');
+  if (countEl) countEl.innerText = count;
+
+  const totalEl = document.getElementById('hdr-total');
+  if (totalEl) totalEl.innerText = `$${total.toFixed(2)}`;
+
+  const floatCountEl = document.getElementById('float-count');
+  if (floatCountEl) floatCountEl.innerText = count;
+
+  const cb = document.getElementById('cart-body');
+  const cf = document.getElementById('cart-footer');
+
+  if (!cb) return;
+
+  if (!items.length) {
+    cb.innerHTML = '<div class="cart-empty">Tu carrito está vacío 🛒</div>';
+    if (cf) cf.style.display = 'none';
+    return;
+  }
+
+  cb.innerHTML = items.map(i => {
+    const isFruta    = i.unitLabel !== undefined;
+    const qtyLabel   = isFruta ? `${i.qty} ${i.unitLabel}` : i.qty;
+    const brand      = extractBrand(i.name);
+    const imgHtml    = i.img
+      ? `<img src="${i.img}" alt="${i.name}" onerror="this.style.display='none'">`
+      : `<span style="font-size:2rem">${i.emoji || '📦'}</span>`;
+    const oldPriceHtml = i.oldPrice
+      ? `<span class="cr-old-price">$${(i.oldPrice * i.qty).toFixed(2)}</span>` : '';
+    return `
+    <div class="cr-item">
+      <div class="cr-img">${imgHtml}</div>
+      <div class="cr-info">
+        <div class="cr-brand">${brand}</div>
+        <div class="cr-name">${i.name}</div>
+        <div class="cr-qty-row">
+          <button class="cr-qty-btn" onclick="cartQty('${i.id}',-1)">−</button>
+          <span class="cr-qty-val">${qtyLabel}</span>
+          <button class="cr-qty-btn" onclick="cartQty('${i.id}',1)">+</button>
+        </div>
+        <div class="cr-prices">
+          ${oldPriceHtml}
+          <span class="cr-price">$${(i.price * i.qty).toFixed(2)}</span>
+        </div>
+      </div>
+      <button class="cr-delete" onclick="cartQty('${i.id}', -9999)" title="Eliminar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6l-1 14H6L5 6"/>
+          <path d="M10 11v6M14 11v6"/>
+          <path d="M9 6V4h6v2"/>
+        </svg>
+      </button>
+    </div>`;
+  }).join('');
+
+  if (cf) {
+    cf.style.display = 'block';
+    const subEl = document.getElementById('cart-subtotal');
+    const savEl = document.getElementById('cart-savings');
+    const totEl = document.getElementById('cart-total-val');
+    const savRow = document.getElementById('cart-savings-row');
+    if (subEl) subEl.textContent = `$${subtotal.toFixed(2)}`;
+    if (totEl) totEl.textContent = `$${total.toFixed(2)}`;
+    if (savEl) savEl.textContent = `-$${savings.toFixed(2)}`;
+    if (savRow) savRow.style.display = savings > 0 ? 'flex' : 'none';
+  }
 }
 
 // --- CART LOGIC ---
 function changeQty(id, delta, isDetalle = false) {
   qtys[id] = (qtys[id] || 1) + delta;
   if (qtys[id] < 1) qtys[id] = 1;
-  
+
   if (isDetalle) {
     const elDet = document.getElementById('det-qty-' + id);
     if (elDet) elDet.textContent = qtys[id];
@@ -238,70 +603,52 @@ function changeQty(id, delta, isDetalle = false) {
 
 function addToCart(id) {
   const p = allProducts.find(x => x.id === id);
-  const qty = qtys[id] || 1;
-  
-  if (cart[id]) {
-    cart[id].qty += qty;
+
+  if (p.cat === 'frutas') {
+    // Use frutas segmented-control state
+    if (!frutaModes[id]) frutaModes[id] = { mode: 'kg', val: 0.5 };
+    const fm = frutaModes[id];
+    const qty    = fm.val;
+    const suffix = fm.mode === 'kg' ? 'kg' : 'pzas';
+    const key    = id + '_' + fm.mode;   // separate cart slot per mode
+
+    if (cart[key]) {
+      cart[key].qty = Math.round((cart[key].qty + qty) * 10) / 10;
+    } else {
+      cart[key] = { ...p, id: key, qty, unitLabel: suffix };
+    }
   } else {
-    cart[id] = { ...p, qty };
+    const qty = qtys[id] || 1;
+    if (cart[id]) {
+      cart[id].qty += qty;
+    } else {
+      cart[id] = { ...p, qty };
+    }
   }
-  
+
   saveCart();
   updateCartUI();
-  
+  _animateFloatCart();   // 🎯 bounce animation
+
   const btn = document.getElementById('abtn-' + id);
   if (btn) {
     btn.classList.add('added');
     btn.textContent = '✓ Agregado';
+    setTimeout(() => {
+      btn.classList.remove('added');
+      btn.textContent = 'AGREGAR';
+    }, 1500);
   }
-}
-
-function updateCartUI() {
-  const items = Object.values(cart);
-  const count = items.reduce((a, i) => a + i.qty, 0);
-  const total = items.reduce((a, i) => a + i.price * i.qty, 0);
-
-  const ids = ['hdr-count', 'float-count'];
-  ids.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = count;
-  });
-
-  const ht = document.getElementById('hdr-total');
-  if (ht) ht.textContent = total.toFixed(2);
-
-  const cb = document.getElementById('cart-body');
-  const cf = document.getElementById('cart-footer');
-  const dt = document.getElementById('drawer-total');
-
-  if (!cb) return;
-
-  if (!items.length) {
-    cb.innerHTML = '<div class="cart-empty">Tu carrito está vacío 🛒</div>';
-    if (cf) cf.style.display = 'none';
-    return;
-  }
-
-  cb.innerHTML = items.map(i => `
-    <div class="cart-row">
-      <div class="cart-row-name">${i.name}</div>
-      <div class="cart-row-qty">
-        <button onclick="cartQty(${i.id},-1)">-</button>
-        <span>${i.qty}</span>
-        <button onclick="cartQty(${i.id},1)">+</button>
-      </div>
-      <div class="cart-row-price">$${(i.price * i.qty).toFixed(2)}</div>
-    </div>
-  `).join('');
-
-  if (cf) cf.style.display = 'block';
-  if (dt) dt.textContent = '$' + total.toFixed(2);
 }
 
 function cartQty(id, delta) {
   if (!cart[id]) return;
-  cart[id].qty += delta;
-  if (cart[id].qty <= 0) delete cart[id];
+  if (delta <= -9999) {
+    delete cart[id]; // trash button = full delete
+  } else {
+    cart[id].qty += delta;
+    if (cart[id].qty <= 0) delete cart[id];
+  }
   saveCart();
   updateCartUI();
 }
@@ -311,11 +658,23 @@ function saveCart() {
 }
 
 function toggleCart() {
-  document.getElementById('cart-overlay').classList.toggle('open');
+  const overlay = document.getElementById('cart-overlay');
+  if (overlay) overlay.classList.toggle('open');
 }
 
 function outsideClose(e) {
   if (e.target === document.getElementById('cart-overlay')) toggleCart();
+}
+
+// Bounce the floating cart button
+function _animateFloatCart() {
+  const btn = document.getElementById('float-cart-btn') || document.querySelector('.float-cart');
+  if (!btn) return;
+  btn.classList.remove('bounce');
+  // Force reflow to restart animation
+  void btn.offsetWidth;
+  btn.classList.add('bounce');
+  btn.addEventListener('animationend', () => btn.classList.remove('bounce'), { once: true });
 }
 
 function sendWA() {
@@ -330,24 +689,45 @@ function sendWA() {
   window.open('https://wa.me/526643944760?text=' + encodeURIComponent(msg), '_blank');
 }
 
-function searchProducts(q) {
-  const main = document.getElementById('main-content');
+function searchProducts(q, forceDetail = false) {
+  const main = document.getElementById('main-content') ||
+    document.getElementById('detalle-content') ||
+    document.getElementById('promo-container') ||
+    document.getElementById('featured-section');
   const sr = document.getElementById('search-results');
   const sg = document.getElementById('search-grid');
-  
+
   if (!q.trim()) {
     if (sr) sr.style.display = 'none';
     if (main) main.style.display = '';
     return;
   }
 
+  const res = allProducts.filter(p => (p.name + p.cat).toLowerCase().includes(q.toLowerCase()));
+
+  if (forceDetail && res.length > 0) {
+    const bestMatch = res.find(p => p.name.toLowerCase().startsWith(q.toLowerCase())) || res[0];
+    window.location.href = `producto-detalle.html?id=${bestMatch.id}`;
+    return;
+  }
+
+  if (!sr || !sg) {
+    if (event && event.type === 'input') return;
+    window.location.href = `productos.html?q=${encodeURIComponent(q)}${forceDetail ? '&jump=true' : ''}`;
+    return;
+  }
+
   if (main) main.style.display = 'none';
   if (sr) sr.style.display = 'block';
-  
-  const res = allProducts.filter(p => p.name.toLowerCase().includes(q.toLowerCase()));
   if (sg) {
-    sg.innerHTML = res.length 
-      ? res.map(p => cardHTML(p)).join('') 
+    sg.innerHTML = res.length
+      ? res.map(p => cardHTML(p)).join('')
       : '<p style="color:#666;padding:1rem;grid-column:1/-1">No se encontraron productos.</p>';
   }
 }
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && e.target.id === 'search-input') {
+    searchProducts(e.target.value, true);
+  }
+});

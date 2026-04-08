@@ -11,15 +11,27 @@
 
 <header>
   <div class="header-inner">
-    <a href="index.html" class="brand"><span class="brand-icon">🛒</span>Abarrotes El Rosal</a>
+    <a href="index.html" class="brand">
+      <span class="brand-icon">🛒</span> Abarrotes El Rosal
+    </a>
     <div class="search-bar">
       <input type="text" id="search-input" placeholder="Busca tus productos aquí" oninput="searchProducts(this.value)">
-      <button>🔍</button>
+      <button onclick="searchProducts(document.getElementById('search-input').value, true)">🔍</button>
     </div>
     <div class="header-actions">
-      <div class="header-action"><span class="icon">📋</span>Mis Pedidos</div>
-      <div class="header-action"><span class="icon">👤</span>Mi Cuenta</div>
-      <div class="cart-action" onclick="toggleCart()">🛒 <span class="cart-badge" id="hdr-count">0</span> $<span id="hdr-total">0.00</span></div>
+      <div class="header-action">
+        <span class="icon">📋</span>
+        <span>Mis Pedidos</span>
+      </div>
+      <div class="header-action">
+        <span class="icon">👤</span>
+        <span>Mi Cuenta</span>
+      </div>
+      <div class="cart-action" onclick="toggleCart()">
+        <span class="cart-badge" id="hdr-count">0</span>
+        <span class="cart-icon">🛒</span>
+        <span id="hdr-total">$0.00</span>
+      </div>
     </div>
   </div>
 </header>
@@ -29,28 +41,29 @@
     <div class="dropdown">
       <div class="nav-link dept" id="dept-trigger">Departamentos</div>
       <div class="dropdown-menu" id="dept-menu">
-        <a href="productos.html" class="dropdown-item">Todos los Productos</a>
-        <a href="productos.html?cat=carnes" class="dropdown-item">Carnes y Pescados</a>
-        <a href="productos.html?cat=frutas" class="dropdown-item">Frutas y Verduras</a>
-        <div class="dropdown-divider"></div>
-        <a href="productos.html?cat=lacteos" class="dropdown-item">Lácteos y Huevos</a>
-        <a href="productos.html?cat=despensa" class="dropdown-item">Despensa</a>
-        <a href="productos.html?cat=bebidas" class="dropdown-item">Bebidas y Jugos</a>
-        <a href="productos.html?cat=limpieza" class="dropdown-item">Limpieza y Hogar</a>
-        <a href="productos.html?cat=botanas" class="dropdown-item">Botanas</a>
-        <a href="productos.html?cat=panaderia" class="dropdown-item">Panadería</a>
+        <a href="javascript:void(0)" onclick="selectCategory('all')" class="dropdown-item">Todos los Productos</a>
+        <a href="javascript:void(0)" onclick="selectCategory('cerveza')" class="dropdown-item">Cerveza</a>
+        <a href="javascript:void(0)" onclick="selectCategory('frutas')" class="dropdown-item">Frutas y Verduras</a>
+        <a href="javascript:void(0)" onclick="selectCategory('lacteos')" class="dropdown-item">Lácteos y Huevos</a>
+        <a href="javascript:void(0)" onclick="selectCategory('despensa')" class="dropdown-item">Despensa</a>
+        <a href="javascript:void(0)" onclick="selectCategory('bebidas')" class="dropdown-item">Bebidas y Jugos</a>
+        <a href="javascript:void(0)" onclick="selectCategory('limpieza')" class="dropdown-item">Limpieza y Hogar</a>
+        <a href="javascript:void(0)" onclick="selectCategory('botanas')" class="dropdown-item">Botanas</a>
+        <a href="javascript:void(0)" onclick="selectCategory('panaderia')" class="dropdown-item">Panadería</a>
       </div>
     </div>
     
     <a href="promociones.html" class="nav-link promo-link">Promociones</a>
     
-    <div class="nav-sucursal">📍 Selecciona tu sucursal</div>
+    <div class="nav-sucursal">
+      <span class="icon">📍</span>
+      <span>Sucursal: <strong>Anexa 20 de noviembre</strong></span>
+    </div>
   </div>
 </nav>
 
-<div class="container detalle-container" id="detalle-content">
-  <!-- Dynamic Content Here -->
-  <div class="loading">Cargando producto...</div>
+<div id="detalle-content">
+  <div class="loading" style="padding:4rem;text-align:center">Cargando producto...</div>
 </div>
 
 <div class="section-wrap related-section">
@@ -60,6 +73,17 @@
     <div class="section-title-line"></div>
   </div>
   <div class="products-grid" id="related-grid" style="grid-template-columns: repeat(6, 1fr); gap: 10px;"></div>
+</div>
+
+<div id="search-results" style="display:none">
+  <div class="section-wrap">
+    <div class="section-title-bar">
+      <div class="section-title-line"></div>
+      <div class="section-title-badge" style="background:var(--blue)">Resultados de búsqueda</div>
+      <div class="section-title-line"></div>
+    </div>
+    <div class="products-grid" id="search-grid"></div>
+  </div>
 </div>
 
 <button class="float-cart" onclick="toggleCart()">🛒 Mi carrito <div class="float-badge" id="float-count">0</div></button>

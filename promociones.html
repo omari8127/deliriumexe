@@ -1,112 +1,236 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Promociones - Abarrotes El Rosal</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promociones - Abarrotes El Rosal</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .promo-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 2rem;
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
+    @media(max-width: 800px) {
+      .promo-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .promo-sidebar {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid #eee;
+      height: fit-content;
+    }
+
+    .promo-sidebar h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: var(--blue);
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 5px;
+    }
+
+    .filter-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .filter-item:hover {
+      background: #f9f9f9;
+      color: var(--red);
+    }
+
+    .filter-item.active {
+      background: var(--red);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .price-filter {
+      margin-top: 2rem;
+    }
+
+    .price-filter input {
+      width: 100%;
+      accent-color: var(--red);
+    }
+
+    .price-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #777;
+      margin-top: 5px;
+    }
+  </style>
 </head>
+
 <body class="page-promociones">
 
-<header>
-  <div class="header-inner">
-    <a href="index.html" class="brand"><span class="brand-icon">🛒</span>Abarrotes El Rosal</a>
-    <div class="search-bar">
-      <input type="text" id="search-input" placeholder="Busca tus productos aquí" oninput="searchProducts(this.value)">
-      <button>🔍</button>
-    </div>
-    <div class="header-actions">
-      <div class="header-action"><span class="icon">📋</span>Mis Pedidos</div>
-      <div class="header-action"><span class="icon">👤</span>Mi Cuenta</div>
-      <div class="cart-action" onclick="toggleCart()">🛒 <span class="cart-badge" id="hdr-count">0</span> $<span id="hdr-total">0.00</span></div>
-    </div>
-  </div>
-</header>
-
-<nav>
-  <div class="nav-inner">
-    <div class="dropdown">
-      <div class="nav-link dept" id="dept-trigger">Departamentos</div>
-      <div class="dropdown-menu" id="dept-menu">
-        <a href="productos.html" class="dropdown-item">Todos los Productos</a>
-        <a href="productos.html?cat=carnes" class="dropdown-item">Carnes y Pescados</a>
-        <a href="productos.html?cat=frutas" class="dropdown-item">Frutas y Verduras</a>
-        <div class="dropdown-divider"></div>
-        <a href="productos.html?cat=lacteos" class="dropdown-item">Lácteos y Huevos</a>
-        <a href="productos.html?cat=despensa" class="dropdown-item">Despensa</a>
-        <a href="productos.html?cat=bebidas" class="dropdown-item">Bebidas y Jugos</a>
-        <a href="productos.html?cat=limpieza" class="dropdown-item">Limpieza y Hogar</a>
-        <a href="productos.html?cat=botanas" class="dropdown-item">Botanas</a>
-        <a href="productos.html?cat=panaderia" class="dropdown-item">Panadería</a>
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        <span class="brand-icon">🛒</span> Abarrotes El Rosal
+      </a>
+      <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Busca tus productos aquí"
+          oninput="searchProducts(this.value)">
+        <button onclick="searchProducts(document.getElementById('search-input').value, true)">🔍</button>
       </div>
-    </div>
-    
-    <a href="promociones.html" class="nav-link promo-link active">Promociones</a>
-    
-    <div class="nav-sucursal">📍 Selecciona tu sucursal</div>
-  </div>
-</nav>
-
-<div class="promo-header">
-  <div class="promo-header-inner">
-    <h1>🔥 Ofertas y Promociones</h1>
-    <p>Aprovecha los mejores precios esta semana</p>
-  </div>
-</div>
-
-<div class="promo-container section-wrap">
-  <aside class="promo-sidebar">
-    <div class="filter-group">
-      <h3>Categorías</h3>
-      <div id="filter-categories" class="filter-list">
-        <!-- JS dynamic -->
-      </div>
-    </div>
-    
-    <div class="filter-group">
-      <h3>Rango de Precio</h3>
-      <div class="price-range">
-        <input type="range" id="price-slider" min="0" max="500" value="500" oninput="updatePriceFilter(this.value)">
-        <div class="price-labels">
-          <span>$0</span>
-          <span id="price-max-label">$500+</span>
+      <div class="header-actions">
+        <div class="header-action">
+          <span class="icon">📋</span>
+          <span>Mis Pedidos</span>
+        </div>
+        <div class="header-action">
+          <span class="icon">👤</span>
+          <span>Mi Cuenta</span>
+        </div>
+        <div class="cart-action" onclick="toggleCart()">
+          <span class="cart-badge" id="hdr-count">0</span>
+          <span class="cart-icon">🛒</span>
+          <span id="hdr-total">$0.00</span>
         </div>
       </div>
     </div>
-  </aside>
+  </header>
 
-  <main class="promo-main">
-    <div id="promo-grid" class="products-grid">
-      <!-- JS dynamic -->
+  <nav>
+    <div class="nav-inner">
+      <div class="dropdown">
+        <div class="nav-link dept" id="dept-trigger">Departamentos</div>
+        <div class="dropdown-menu" id="dept-menu">
+          <a href="javascript:void(0)" onclick="selectCategory('all')" class="dropdown-item">Todos los Productos</a>
+          <a href="javascript:void(0)" onclick="selectCategory('cerveza')" class="dropdown-item">Cerveza</a>
+          <a href="javascript:void(0)" onclick="selectCategory('frutas')" class="dropdown-item">Frutas y Verduras</a>
+          <a href="javascript:void(0)" onclick="selectCategory('lacteos')" class="dropdown-item">Lácteos y Huevos</a>
+          <a href="javascript:void(0)" onclick="selectCategory('despensa')" class="dropdown-item">Despensa</a>
+          <a href="javascript:void(0)" onclick="selectCategory('bebidas')" class="dropdown-item">Bebidas y Jugos</a>
+          <a href="javascript:void(0)" onclick="selectCategory('limpieza')" class="dropdown-item">Limpieza y Hogar</a>
+          <a href="javascript:void(0)" onclick="selectCategory('botanas')" class="dropdown-item">Botanas</a>
+          <a href="javascript:void(0)" onclick="selectCategory('panaderia')" class="dropdown-item">Panadería</a>
+        </div>
+      </div>
+      <a href="promociones.html" class="nav-link promo-link">Promociones</a>
+      <div class="nav-sucursal">
+        <span class="icon">📍</span>
+        <span>Sucursal: <strong>Anexa 20 de noviembre</strong></span>
+      </div>
     </div>
-    <div id="no-results" style="display:none; text-align:center; padding: 2rem;">
-      <p>No hay productos con descuento que coincidan con tu búsqueda.</p>
-    </div>
-  </main>
-</div>
+  </nav>
 
-<button class="float-cart" onclick="toggleCart()">🛒 Mi carrito <div class="float-badge" id="float-count">0</div></button>
-
-<div class="cart-overlay" id="cart-overlay" onclick="outsideClose(event)">
-  <div class="cart-drawer">
-    <div class="cart-header"><h2>🛒 Mi Carrito</h2><button class="cart-close" onclick="toggleCart()">✕</button></div>
-    <div class="cart-body" id="cart-body"><div class="cart-empty">Tu carrito está vacío</div></div>
-    <div class="cart-footer" id="cart-footer" style="display:none">
-      <div class="cart-total-row"><span>Total</span><span id="drawer-total">$0.00</span></div>
-      <button class="wa-order-btn" onclick="sendWA()">Pedir por WhatsApp</button>
+  <div class="section-wrap" style="padding-top:1rem">
+    <div class="breadcrumb-nav" style="margin: 0 0 1rem 0">
+      <a href="index.html">Inicio</a> <span>›</span> <span class="curr">Promociones</span>
     </div>
+    <h1 style="font-family:'Barlow Condensed',sans-serif; font-size: 2.5rem; font-weight: 900; margin-bottom: 1.5rem;">
+      Ofertas y Promociones</h1>
   </div>
-</div>
 
-<footer><strong>Abarrotes El Rosal</strong> · Tijuana, Baja California · WhatsApp: <strong>664-394-4760</strong></footer>
+  <div class="ecommerce-layout">
+    <aside class="filter-sidebar">
+      <!-- Categoría -->
+      <div class="sidebar-section">
+        <div class="sidebar-header" onclick="this.parentElement.classList.toggle('collapsed')">
+          <h3>Categoría</h3>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="sidebar-content">
+          <div class="filter-list" id="filter-cats"></div>
+        </div>
+      </div>
 
-<script src="data/productos.js"></script>
-<script src="js/app.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    initPromociones();
-  });
-</script>
+
+      <!-- Precio Slider -->
+      <div class="sidebar-section">
+        <div class="sidebar-header" onclick="this.parentElement.classList.toggle('collapsed')">
+          <h3>Precio</h3>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="sidebar-content">
+          <div class="price-slider-wrap">
+            <input type="range" id="side-price-slider" min="0" max="1000" value="1000" oninput="updateFilters()">
+            <div class="price-vals">
+              <span>$0</span>
+              <span id="side-price-max">$500+</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="product-listing">
+      <div class="listing-header">
+        <div class="results-count" id="results-count">Cargando ofertas...</div>
+        <div class="sort-box">
+          ORDENAR POR
+          <select id="sort-select" onchange="updateFilters()">
+            <option value="relevance">RELEVANCIA</option>
+            <option value="price-asc">PRECIO: MENOR A MAYOR</option>
+            <option value="price-desc">PRECIO: MAYOR A MENOR</option>
+            <option value="discount">MAYOR DESCUENTO</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="promo-grid" class="products-grid"></div>
+
+      <div id="no-results" style="display:none; text-align:center; padding: 5rem 0; color: #999;">
+        <div style="font-size: 4rem; margin-bottom: 1rem">🔎</div>
+        <p>No encontramos ofertas que coincidan con tus filtros.</p>
+        <button onclick="resetFilters()"
+          style="margin-top:1rem; background:none; border:none; color:var(--blue); font-weight:700; cursor:pointer; text-decoration:underline">Limpiar
+          todos los filtros</button>
+      </div>
+    </main>
+  </div>
+
+  <div id="search-results" style="display:none">
+
+    <button class="float-cart" onclick="toggleCart()">🛒 Mi carrito <div class="float-badge" id="float-count">0</div>
+    </button>
+
+    <div class="cart-overlay" id="cart-overlay" onclick="outsideClose(event)">
+      <div class="cart-drawer">
+        <div class="cart-header">
+          <h2>🛒 Mi Carrito</h2><button class="cart-close" onclick="toggleCart()">✕</button>
+        </div>
+        <div class="cart-body" id="cart-body">
+          <div class="cart-empty">Tu carrito está vacío</div>
+        </div>
+        <div class="cart-footer" id="cart-footer" style="display:none">
+          <div class="cart-total-row"><span>Total</span><span id="drawer-total">$0.00</span></div>
+          <button class="wa-order-btn" onclick="sendWA()">Pedir por WhatsApp</button>
+        </div>
+      </div>
+    </div>
+
+    <footer><strong>Abarrotes El Rosal</strong> · Tijuana, Baja California · WhatsApp: <strong>664-394-4760</strong>
+    </footer>
+
+    <script src="data/productos.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        initPromociones();
+      });
+    </script>
 </body>
+
 </html>

@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finalizar Pedido – Abarrotes El Rosal</title>
+  <meta name="description" content="Confirma tu pedido en Abarrotes El Rosal. Entrega a domicilio o recoge en tienda.">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ─── CHECKOUT LAYOUT ──────────────────────────────────── */
+    .ck-page {
+      background: #f5f5f5;
+      min-height: 100vh;
+    }
+    .ck-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 2rem;
+      align-items: start;
+    }
+    @media (max-width: 860px) {
+      .ck-wrap {
+        grid-template-columns: 1fr;
+      }
+      .ck-summary { order: -1; }
+    }
+
+    .ck-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 2rem;
+      font-weight: 900;
+      color: #222;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.5px;
+    }
+
+    /* ─── CARDS ────────────────────────────────────────────── */
+    .ck-card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e8e8e8;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .ck-card-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ck-card-title .ck-step {
+      background: var(--blue);
+      color: #fff;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      flex: 0 0 auto;
+    }
+
+    /* ─── FORM FIELDS ──────────────────────────────────────── */
+    .ck-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .ck-form-grid .full { grid-column: 1 / -1; }
+    @media (max-width: 560px) {
+      .ck-form-grid { grid-template-columns: 1fr; }
+    }
+
+    .ck-field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .ck-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .ck-label .req { color: var(--red); margin-left: 2px; }
+    .ck-input {
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-size: 0.95rem;
+      font-family: 'Barlow', sans-serif;
+      color: #333;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      background: #fff;
+    }
+    .ck-input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(0,103,177,0.12);
+    }
+    .ck-input.error {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(236,29,37,0.12);
+    }
+    .ck-err-msg {
+      font-size: 0.75rem;
+      color: var(--red);
+      display: none;
+    }
+    .ck-field.has-error .ck-err-msg { display: block; }
+    .ck-field.has-error .ck-input { border-color: var(--red); }
+
+    /* ─── SEGMENTED TOGGLE (delivery/payment) ─────────────── */
+    .ck-toggle {
+      display: flex;
+      background: #f0f4f8;
+      border-radius: 10px;
+      padding: 4px;
+      gap: 4px;
+    }
+    .ck-toggle-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      border-radius: 7px;
+      padding: 10px 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      font-family: 'Barlow', sans-serif;
+      color: #777;
+      cursor: pointer;
+      transition: all 0.22s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .ck-toggle-btn .tog-icon { font-size: 1.1rem; }
+    .ck-toggle-btn:hover:not(.ck-active) { background: rgba(0,103,177,0.08); color: var(--blue); }
+    .ck-toggle-btn.ck-active {
+      background: var(--blue);
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(0,103,177,0.28);
+    }
+
+    /* ─── ADDRESS BLOCK ────────────────────────────────────── */
+    #address-block {
+      margin-top: 1.25rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      overflow: hidden;
+      transition: max-height 0.35s ease, opacity 0.3s ease;
+    }
+    #address-block.hidden {
+      max-height: 0;
+      opacity: 0;
+      pointer-events: none;
+      margin-top: 0;
+    }
+    #address-block .full { grid-column: 1 / -1; }
+
+    /* ─── PAYMENT OPTIONS ──────────────────────────────────── */
+    .pay-options { display: flex; flex-direction: column; gap: 10px; }
+    .pay-opt {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1.5px solid #ddd;
+      border-radius: 10px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .pay-opt:hover { border-color: var(--blue); background: rgba(0,103,177,0.04); }
+    .pay-opt.selected { border-color: var(--blue); background: rgba(0,103,177,0.07); }
+    .pay-opt input[type="radio"] { accent-color: var(--blue); width: 18px; height: 18px; }
+    .pay-opt-content { flex: 1; }
+    .pay-opt-name { font-weight: 700; font-size: 0.95rem; color: #333; }
+    .pay-opt-desc { font-size: 0.8rem; color: #888; margin-top: 2px; }
+    .pay-opt-icon { font-size: 1.5rem; }
+
+    #transfer-note {
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 0.85rem;
+      color: #795548;
+      margin-top: 12px;
+      display: none;
+    }
+    #transfer-note.show { display: block; }
+
+    /* ─── ORDER SUMMARY CARD ───────────────────────────────── */
+    .ck-summary {
+      position: sticky;
+      top: 118px;
+    }
+    .ck-sum-card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e8e8e8;
+      overflow: hidden;
+    }
+    .ck-sum-header {
+      background: var(--blue);
+      color: #fff;
+      padding: 1rem 1.25rem;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    .ck-sum-items {
+      padding: 0.75rem 1.25rem;
+      max-height: 340px;
+      overflow-y: auto;
+    }
+    .ck-sum-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .ck-sum-item:last-child { border-bottom: none; }
+    .ck-sum-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 6px;
+      background: #f8f9fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex: 0 0 48px;
+    }
+    .ck-sum-img img { width: 100%; height: 100%; object-fit: contain; padding: 3px; }
+    .ck-sum-info { flex: 1; min-width: 0; }
+    .ck-sum-name { font-size: 0.82rem; font-weight: 600; color: #333; line-height: 1.3; }
+    .ck-sum-qty { font-size: 0.75rem; color: #888; margin-top: 2px; }
+    .ck-sum-price { font-size: 0.9rem; font-weight: 800; color: #222; white-space: nowrap; }
+
+    .ck-sum-totals {
+      padding: 1rem 1.25rem;
+      border-top: 1px solid #eee;
+      background: #fafafa;
+    }
+    .ck-sum-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      color: #666;
+      padding: 3px 0;
+    }
+    .ck-sum-row.savings { color: var(--green); font-weight: 700; }
+    .ck-sum-divider { border-top: 1.5px solid #ddd; margin: 8px 0; }
+    .ck-sum-total {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #222;
+      padding: 4px 0;
+    }
+    .ck-empty-cart {
+      padding: 2rem;
+      text-align: center;
+      color: #999;
+      font-size: 0.9rem;
+    }
+
+    /* ─── CONFIRM BUTTON ───────────────────────────────────── */
+    .ck-confirm-btn {
+      width: 100%;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 15px;
+      font-size: 1rem;
+      font-weight: 800;
+      font-family: 'Barlow', sans-serif;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 14px rgba(0,103,177,0.3);
+      margin-top: 1rem;
+    }
+    .ck-confirm-btn:hover { background: #004a80; transform: translateY(-1px); box-shadow: 0 7px 20px rgba(0,103,177,0.35); }
+    .ck-confirm-btn:active { transform: scale(0.98); }
+
+    .ck-wa-btn {
+      width: 100%;
+      background: #25D366;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      font-family: 'Barlow', sans-serif;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s;
+      margin-top: 10px;
+    }
+    .ck-wa-btn:hover { background: #1eba56; }
+    .wa-svg { width: 20px; height: 20px; fill: #fff; }
+
+    /* ─── MODAL CONFIRMATION ───────────────────────────────── */
+    .ck-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 99999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .ck-modal-overlay.open { display: flex; }
+    .ck-modal {
+      background: #fff;
+      border-radius: 16px;
+      max-width: 480px;
+      width: 100%;
+      overflow: hidden;
+      animation: modalPop 0.35s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes modalPop {
+      from { transform: scale(0.8); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    .ck-modal-header {
+      background: var(--green);
+      color: #fff;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .ck-modal-header .modal-icon { font-size: 3rem; display: block; margin-bottom: 6px; }
+    .ck-modal-header h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 900;
+    }
+    .ck-modal-header p { font-size: 0.9rem; opacity: 0.9; margin-top: 4px; }
+    .ck-modal-body { padding: 1.5rem; }
+    .ck-modal-section { margin-bottom: 1rem; }
+    .ck-modal-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 4px;
+    }
+    .ck-modal-value { font-size: 0.95rem; font-weight: 600; color: #333; }
+    .ck-modal-items { font-size: 0.85rem; color: #555; line-height: 1.9; }
+    .ck-modal-total {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #222;
+      padding: 10px 0;
+      border-top: 2px solid #f0f0f0;
+      margin-top: 6px;
+    }
+    .ck-modal-footer { padding: 0 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 10px; }
+    .ck-modal-wa {
+      width: 100%;
+      background: #25D366;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 800;
+      font-family: 'Barlow', sans-serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+    .ck-modal-wa:hover { background: #1eba56; }
+    .ck-modal-close {
+      width: 100%;
+      background: #f5f5f5;
+      color: #555;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      font-family: 'Barlow', sans-serif;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .ck-modal-close:hover { background: #eee; }
+
+    /* ─── MISC ─────────────────────────────────────────────── */
+    .ck-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--blue);
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .ck-back-link:hover { opacity: 0.7; }
+    .ck-empty-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      text-align: center;
+      color: #999;
+    }
+    .ck-empty-page .big-icon { font-size: 5rem; margin-bottom: 1rem; }
+    .ck-empty-page h2 { font-size: 1.5rem; color: #555; margin-bottom: 0.5rem; }
+    .ck-empty-page a {
+      display: inline-block;
+      margin-top: 1.5rem;
+      background: var(--blue);
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+  </style>
+</head>
+
+<body class="ck-page">
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        <span class="brand-icon">🛒</span> Abarrotes El Rosal
+      </a>
+      <div class="header-actions" style="margin-left:auto">
+        <a href="productos.html" class="header-action" style="color:#fff;text-decoration:none">
+          <span class="icon">🛍️</span>
+          <span>Seguir comprando</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAV breadcrumb -->
+  <nav>
+    <div class="nav-inner" style="padding:0 1.5rem">
+      <span class="breadcrumb-nav" style="margin:0">
+        <a href="index.html" style="color:#777">Inicio</a>
+        <span style="color:#ccc">›</span>
+        <a href="productos.html" style="color:#777">Productos</a>
+        <span style="color:#ccc">›</span>
+        <span class="curr">Finalizar pedido</span>
+      </span>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="ck-wrap" id="ck-wrap">
+
+    <!-- LEFT: FORM -->
+    <div class="ck-form-side">
+      <h1 class="ck-title">Finalizar Pedido</h1>
+
+      <!-- 1. DATOS DEL CLIENTE -->
+      <div class="ck-card">
+        <div class="ck-card-title">
+          <span class="ck-step">1</span> Datos de contacto
+        </div>
+        <div class="ck-form-grid">
+          <div class="ck-field full" id="field-nombre">
+            <label class="ck-label">Nombre completo <span class="req">*</span></label>
+            <input class="ck-input" id="inp-nombre" type="text" placeholder="Ej. Juan Pérez García" autocomplete="name">
+            <span class="ck-err-msg">Por favor ingresa tu nombre completo.</span>
+          </div>
+          <div class="ck-field" id="field-tel">
+            <label class="ck-label">Teléfono <span class="req">*</span></label>
+            <input class="ck-input" id="inp-tel" type="tel" placeholder="Ej. 664-123-4567" autocomplete="tel">
+            <span class="ck-err-msg">Ingresa un teléfono válido.</span>
+          </div>
+          <div class="ck-field full">
+            <label class="ck-label">Notas del pedido</label>
+            <input class="ck-input" id="inp-notas" type="text" placeholder="Ej. Sin cebolla, timbrar dos veces…">
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. TIPO DE ENTREGA -->
+      <div class="ck-card">
+        <div class="ck-card-title">
+          <span class="ck-step">2</span> Tipo de entrega
+        </div>
+        <div class="ck-toggle">
+          <button class="ck-toggle-btn ck-active" id="btn-domicilio" onclick="setDelivery('domicilio')">
+            <span class="tog-icon">🚚</span> Entrega a domicilio
+          </button>
+          <button class="ck-toggle-btn" id="btn-tienda" onclick="setDelivery('tienda')">
+            <span class="tog-icon">🏪</span> Recoger en tienda
+          </button>
+        </div>
+
+        <div id="address-block">
+          <div class="ck-field full" id="field-calle">
+            <label class="ck-label">Calle <span class="req">*</span></label>
+            <input class="ck-input" id="inp-calle" type="text" placeholder="Nombre de la calle" autocomplete="address-line1">
+            <span class="ck-err-msg">Ingresa el nombre de la calle.</span>
+          </div>
+          <div class="ck-field" id="field-num">
+            <label class="ck-label">Número <span class="req">*</span></label>
+            <input class="ck-input" id="inp-num" type="text" placeholder="Ej. 123-A">
+            <span class="ck-err-msg">Ingresa el número.</span>
+          </div>
+          <div class="ck-field" id="field-colonia">
+            <label class="ck-label">Colonia <span class="req">*</span></label>
+            <input class="ck-input" id="inp-colonia" type="text" placeholder="Ej. Anexa 20 de Noviembre">
+            <span class="ck-err-msg">Ingresa la colonia.</span>
+          </div>
+          <div class="ck-field full">
+            <label class="ck-label">Referencias (opcional)</label>
+            <input class="ck-input" id="inp-refs" type="text" placeholder="Ej. Casa color azul, cruce con Av. Reforma">
+          </div>
+        </div>
+
+        <div id="pickup-info" style="display:none;margin-top:1rem;background:#e8f4fd;border-radius:8px;padding:12px 14px;font-size:0.88rem;color:#0067b1;">
+          📍 <strong>Sucursal Anexa 20 de noviembre</strong><br>
+          Tijuana, Baja California — Lun a Dom: 9:00 am – 9:00 pm
+        </div>
+      </div>
+
+      <!-- 3. MÉTODO DE PAGO -->
+      <div class="ck-card">
+        <div class="ck-card-title">
+          <span class="ck-step">3</span> Método de pago
+        </div>
+        <div class="pay-options">
+          <label class="pay-opt selected" id="pay-efectivo">
+            <input type="radio" name="pay" value="efectivo" checked onchange="setPayment('efectivo')">
+            <span class="pay-opt-icon">💵</span>
+            <div class="pay-opt-content">
+              <div class="pay-opt-name">Efectivo</div>
+              <div class="pay-opt-desc">Paga al momento de recibir tu pedido</div>
+            </div>
+          </label>
+          <label class="pay-opt" id="pay-transferencia">
+            <input type="radio" name="pay" value="transferencia" onchange="setPayment('transferencia')">
+            <span class="pay-opt-icon">📲</span>
+            <div class="pay-opt-content">
+              <div class="pay-opt-name">Transferencia</div>
+              <div class="pay-opt-desc">Pago electrónico antes de la entrega</div>
+            </div>
+          </label>
+        </div>
+        <div id="transfer-note">
+          ℹ️ <strong>Datos de pago:</strong> Te enviaremos el número de cuenta por WhatsApp después de confirmar tu pedido.
+        </div>
+      </div>
+
+      <!-- CONFIRM BUTTON -->
+      <button class="ck-confirm-btn" onclick="confirmOrder()">
+        ✅ Confirmar pedido
+      </button>
+    </div>
+
+    <!-- RIGHT: ORDER SUMMARY -->
+    <div class="ck-summary">
+      <div class="ck-sum-card">
+        <div class="ck-sum-header">🧾 Resumen del pedido</div>
+        <div class="ck-sum-items" id="ck-sum-items">
+          <div class="ck-empty-cart">Tu carrito está vacío</div>
+        </div>
+        <div class="ck-sum-totals" id="ck-sum-totals" style="display:none">
+          <div class="ck-sum-row">
+            <span>Subtotal</span>
+            <span id="ck-subtotal">$0.00</span>
+          </div>
+          <div class="ck-sum-row savings" id="ck-savings-row" style="display:none">
+            <span>Ahorros 🎉</span>
+            <span id="ck-savings">-$0.00</span>
+          </div>
+          <div class="ck-sum-divider"></div>
+          <div class="ck-sum-total">
+            <span>Total</span>
+            <span id="ck-total">$0.00</span>
+          </div>
+        </div>
+      </div>
+      <a href="productos.html" class="ck-back-link" style="margin-top:12px">
+        ← Seguir comprando
+      </a>
+    </div>
+
+  </div>
+
+  <!-- ─── CONFIRMATION MODAL ────────────────────────────────── -->
+  <div class="ck-modal-overlay" id="ck-modal" onclick="closeModalOutside(event)">
+    <div class="ck-modal">
+      <div class="ck-modal-header">
+        <span class="modal-icon">🎉</span>
+        <h2>¡Pedido listo!</h2>
+        <p>Revisa los detalles antes de enviarlo</p>
+      </div>
+      <div class="ck-modal-body">
+        <div class="ck-modal-section">
+          <div class="ck-modal-label">Cliente</div>
+          <div class="ck-modal-value" id="modal-cliente">—</div>
+        </div>
+        <div class="ck-modal-section">
+          <div class="ck-modal-label">Entrega</div>
+          <div class="ck-modal-value" id="modal-entrega">—</div>
+        </div>
+        <div class="ck-modal-section">
+          <div class="ck-modal-label">Pago</div>
+          <div class="ck-modal-value" id="modal-pago">—</div>
+        </div>
+        <div class="ck-modal-section">
+          <div class="ck-modal-label">Productos</div>
+          <div class="ck-modal-items" id="modal-items">—</div>
+          <div class="ck-modal-total">
+            <span>Total</span>
+            <span id="modal-total">$0.00</span>
+          </div>
+        </div>
+      </div>
+      <div class="ck-modal-footer">
+        <button class="ck-modal-wa" id="modal-wa-btn" onclick="sendWAFinal()">
+          <svg class="wa-svg" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+          Enviar pedido por WhatsApp
+        </button>
+        <button class="ck-modal-close" onclick="closeModal()">Revisar pedido</button>
+      </div>
+    </div>
+  </div>
+
+  <footer style="margin-top:0">
+    <strong>Abarrotes El Rosal</strong> · Tijuana, Baja California · WhatsApp: <strong>664-394-4760</strong>
+  </footer>
+
+  <script src="data/productos.js"></script>
+  <script src="js/checkout.js"></script>
+</body>
+
+</html>
