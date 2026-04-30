@@ -51,8 +51,12 @@
       --sb-bg: #13151e;
       --sb-border: #2a2d3e;
       --card-bg: #1a1d27;
+      --card-head-bg: #1a1d27;
       --card-hover: #1f2333;
       --input-bg: #1f2333;
+      --table-head-bg: #1a1d27;
+      --accent: var(--gold);
+      --accent-p: var(--gold-p);
     }
 
     :root.light-mode {
@@ -60,28 +64,32 @@
       --warm: #fff;
       --ink: #2e1065;
       --ink2: #6b21a8;
-      --muted: #94a3b8;
+      --muted: #64748b;
       --gold: #d946ef;
       --gold-l: #f472b6;
       --gold-p: rgba(217, 70, 239, 0.1);
-      --rose: #ef4444;
-      --rose-p: rgba(239, 68, 68, 0.1);
+      --rose: #e11d48;
+      --rose-p: rgba(225, 29, 72, 0.1);
       --sage: #059669;
       --sage-p: rgba(5, 150, 105, 0.1);
       --cobalt: #7c3aed;
       --cobalt-p: rgba(124, 58, 237, 0.1);
       --warn: #ea580c;
       --b: #f0e7f6;
-      --bs: #e5e7eb;
-      --sh: 0 2px 8px rgba(0,0,0,0.05);
-      --shm: 0 8px 32px rgba(0,0,0,0.1);
+      --bs: #e2e8f0;
+      --sh: 0 2px 8px rgba(0,0,0,0.06);
+      --shm: 0 8px 32px rgba(124, 58, 237, 0.15);
       
       --body-bg: #fdf2f8;
       --sb-bg: #6d28d9;
       --sb-border: #7c3aed;
       --card-bg: #ffffff;
+      --card-head-bg: #faf5ff;
       --card-hover: #fdf4ff;
       --input-bg: #ffffff;
+      --table-head-bg: #f8faff;
+      --accent: var(--gold);
+      --accent-p: var(--gold-p);
     }
 
     body {
@@ -135,7 +143,7 @@
 
     .sb-logo {
       padding: 24px 20px 18px;
-      border-bottom: 1px solid #2a2d3e;
+      border-bottom: 1px solid var(--b);
       display: flex;
       align-items: center;
       gap: 12px;
@@ -152,14 +160,14 @@
       font-family: 'Inter', sans-serif;
       font-weight: 600;
       font-size: 17px;
-      color: #c9a84c;
+      color: var(--accent);
       line-height: 1.2;
       letter-spacing: -0.01em
     }
 
     .sb-logo span {
       font-size: 10px;
-      color: #4b5563;
+      color: var(--muted);
       letter-spacing: .1em;
       text-transform: uppercase;
       display: block;
@@ -176,7 +184,7 @@
       font-weight: 500;
       letter-spacing: .1em;
       text-transform: uppercase;
-      color: #4b5563;
+      color: var(--muted);
       padding: 0 10px;
       margin: 14px 0 5px;
       display: block
@@ -190,7 +198,7 @@
       border-radius: var(--rs);
       cursor: pointer;
       font-size: 13.5px;
-      color: #6b7280;
+      color: var(--muted);
       transition: all .15s;
       margin-bottom: 1px;
       border: none;
@@ -200,13 +208,13 @@
     }
 
     .ni:hover {
-      background: rgba(201, 168, 76, 0.08);
-      color: #e8e8f0
+      background: var(--accent-p);
+      color: var(--ink)
     }
 
     .ni.on {
-      background: rgba(201, 168, 76, 0.12);
-      color: #c9a84c;
+      background: var(--accent-p);
+      color: var(--accent);
       font-weight: 500
     }
 
@@ -229,7 +237,7 @@
 
     .sb-foot {
       padding: 14px 10px;
-      border-top: 1px solid #2a2d3e
+      border-top: 1px solid var(--b)
     }
 
     .sb-user {
@@ -243,24 +251,24 @@
       width: 30px;
       height: 30px;
       border-radius: 50%;
-      background: #c9a84c;
+      background: var(--accent);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 12px;
       font-weight: 600;
-      color: #0f1117;
+      color: #fff;
       flex-shrink: 0
     }
 
     .sb-un {
       font-size: 12px;
-      color: #e8e8f0
+      color: var(--ink)
     }
 
     .sb-ur {
       font-size: 10px;
-      color: #6b7280
+      color: var(--muted)
     }
 
     /* Main */
@@ -291,13 +299,13 @@
       font-size: 19px;
       font-weight: 600;
       letter-spacing: -0.01em;
-      color: #e8e8f0;
+      color: var(--ink);
       flex: 1
     }
 
     .tb-sub {
       font-size: 12px;
-      color: #6b7280;
+      color: var(--muted);
       margin-top: 1px
     }
 
@@ -339,32 +347,32 @@
     }
 
     .btn-gold {
-      background: #c9a84c;
-      color: #0f1117
+      background: var(--accent);
+      color: #fff
     }
 
     .btn-gold:hover {
-      background: #b8962e
+      filter: brightness(1.1)
     }
 
     .btn-dark {
-      background: #1f2333;
-      color: #e8e8f0;
-      border: 1px solid #2a2d3e
+      background: var(--input-bg);
+      color: var(--ink);
+      border: 1px solid var(--b)
     }
 
     .btn-dark:hover {
-      background: #2a2d3e
+      background: var(--card-hover)
     }
 
     .btn-out {
       background: transparent;
-      border: 1px solid #2a2d3e;
-      color: #e8e8f0
+      border: 1px solid var(--b);
+      color: var(--ink)
     }
 
     .btn-out:hover {
-      background: #1f2333
+      background: var(--card-hover)
     }
 
     .btn-sage {
@@ -409,11 +417,13 @@
 
     .ch {
       padding: 16px 20px;
-      border-bottom: 1px solid #2a2d3e;
+      border-bottom: 1px solid var(--b);
+      background: var(--card-head-bg);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px
+      gap: 12px;
+      border-radius: var(--r) var(--r) 0 0;
     }
 
     .ct {
@@ -421,7 +431,7 @@
       font-size: 15px;
       font-weight: 600;
       letter-spacing: -0.01em;
-      color: #e8e8f0
+      color: var(--ink)
     }
 
     .cb {
@@ -437,22 +447,22 @@
     }
 
     .mc {
-      background: #1a1d27;
-      border: 1px solid #2a2d3e;
+      background: var(--card-bg);
+      border: 1px solid var(--b);
       border-radius: var(--r);
       padding: 16px 18px;
       box-shadow: var(--sh);
-      border-top: 2px solid #c9a84c;
+      border-top: 3px solid var(--accent);
       transition: background .15s
     }
 
     .mc:hover {
-      background: #1f2333
+      background: var(--card-hover)
     }
 
     .ml {
       font-size: 11.5px;
-      color: #6b7280;
+      color: var(--muted);
       margin-bottom: 5px
     }
 
@@ -461,49 +471,45 @@
       font-size: 28px;
       font-weight: 700;
       line-height: 1;
-      color: #e8e8f0
+      color: var(--ink)
     }
 
     .ms {
       font-size: 11px;
-      color: #6b7280;
+      color: var(--muted);
       margin-top: 4px
     }
 
     .mc.gold {
-      border-top-color: #c9a84c;
-      background: #1a1d27
+      border-top-color: var(--gold);
     }
 
     .mc.gold .mv {
-      color: #c9a84c
+      color: var(--gold)
     }
 
     .mc.rose {
-      border-top-color: #ef4444;
-      background: #1a1d27
+      border-top-color: var(--rose);
     }
 
     .mc.rose .mv {
-      color: #ef4444
+      color: var(--rose)
     }
 
     .mc.sage {
-      border-top-color: #10b981;
-      background: #1a1d27
+      border-top-color: var(--sage);
     }
 
     .mc.sage .mv {
-      color: #10b981
+      color: var(--sage)
     }
 
     .mc.warn {
-      border-top-color: #f59e0b;
-      background: #1a1d27
+      border-top-color: var(--warn);
     }
 
     .mc.warn .mv {
-      color: #f59e0b
+      color: var(--warn)
     }
 
     /* Status */
@@ -546,8 +552,8 @@
     }
 
     .st-a {
-      background: rgba(255,255,255,.06);
-      color: #6b7280
+      background: var(--b);
+      color: var(--muted)
     }
 
     .st-dvc {
@@ -594,15 +600,15 @@
       font-weight: 600;
       letter-spacing: .07em;
       text-transform: uppercase;
-      color: #6b7280;
-      border-bottom: 1px solid #2a2d3e;
-      background: #1a1d27;
+      color: var(--muted);
+      border-bottom: 1px solid var(--b);
+      background: var(--table-head-bg);
       white-space: nowrap
     }
 
     tbody td {
       padding: 12px 14px;
-      border-bottom: 1px solid #2a2d3e;
+      border-bottom: 1px solid var(--b);
       vertical-align: middle
     }
 
@@ -611,13 +617,13 @@
     }
 
     tbody tr:hover {
-      background: rgba(201, 168, 76, 0.04)
+      background: var(--accent-p)
     }
 
     .fo {
       font-family: monospace;
       font-size: 12px;
-      color: #6b7280;
+      color: var(--muted);
       font-weight: 600
     }
 
@@ -649,7 +655,7 @@
     label {
       font-size: 11.5px;
       font-weight: 500;
-      color: #6b7280;
+      color: var(--muted);
       letter-spacing: .03em
     }
 
@@ -675,8 +681,8 @@
     input:focus,
     select:focus,
     textarea:focus {
-      border-color: #c9a84c;
-      box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.12)
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-p)
     }
 
     textarea {
@@ -702,10 +708,10 @@
     }
 
     .md {
-      background: #1a1d27;
-      border: 1px solid #2a2d3e;
+      background: var(--card-bg);
+      border: 1px solid var(--b);
       border-radius: var(--r);
-      box-shadow: 0 12px 40px rgba(0,0,0,.6);
+      box-shadow: var(--shm);
       width: 100%;
       max-width: 540px;
       max-height: 90vh;
@@ -735,7 +741,8 @@
 
     .mh {
       padding: 20px 24px 16px;
-      border-bottom: 1px solid #2a2d3e;
+      border-bottom: 1px solid var(--b);
+      background: var(--card-head-bg);
       display: flex;
       align-items: center;
       justify-content: space-between
@@ -746,7 +753,7 @@
       font-size: 17px;
       font-weight: 600;
       letter-spacing: -0.01em;
-      color: #e8e8f0
+      color: var(--ink)
     }
 
     .mx {
@@ -760,8 +767,8 @@
     }
 
     .mx:hover {
-      color: #e8e8f0;
-      background: #2a2d3e
+      color: var(--ink);
+      background: var(--card-hover)
     }
 
     .mb {
@@ -770,7 +777,7 @@
 
     .mf {
       padding: 14px 24px;
-      border-top: 1px solid #2a2d3e;
+      border-top: 1px solid var(--b);
       display: flex;
       justify-content: flex-end;
       gap: 9px
