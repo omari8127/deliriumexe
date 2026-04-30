@@ -4,7 +4,8 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder --win"
+    "build": "electron-builder --win",
+    "vercel-build": "echo 'Static deployment'"
   },
   "build": {
     "appId": "com.deliriumdecor.tickets",
