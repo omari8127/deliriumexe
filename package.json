@@ -2,7 +2,7 @@
   "name": "deliriumexe",
   "version": "1.0.0",
   "scripts": {
-    "start": "echo 'Run this project by opening delirium-decor.html in a browser' && exit 0",
+    "start": "echo 'Run this project by opening index.html in a browser' && exit 0",
     "dev": "npx serve .",
     "build": "echo 'Build skipped for web'",
     "vercel-build": "echo 'Static deployment'"
