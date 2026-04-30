@@ -20,7 +20,7 @@
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      background: #0a0c12;
+      background: #fdf2f8;
     }
 
     #bg-canvas {
@@ -52,12 +52,12 @@
       width: 100%;
       max-width: 380px;
       padding: 44px 38px 36px;
-      background: rgba(255, 255, 255, 0.07);
+      background: rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
       border-radius: 22px;
-      border: 1px solid rgba(255, 255, 255, 0.13);
-      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 24px 64px rgba(217, 70, 239, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4);
       animation: cardIn .4s cubic-bezier(.22, 1, .36, 1) both;
     }
 
@@ -82,14 +82,15 @@
       width: 92px;
       height: 92px;
       border-radius: 20px;
-      background: rgba(59, 130, 246, 0.08);
-      border: 1px solid rgba(59, 130, 246, 0.2);
+      background: #fff;
+      border: 2px solid #d946ef;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 20px;
       overflow: hidden;
       padding: 6px;
+      box-shadow: 0 4px 15px rgba(217, 70, 239, 0.2);
     }
 
     .brand-icon img {
@@ -101,16 +102,18 @@
     .login-brand h1 {
       font-size: 24px;
       font-weight: 700;
-      color: #3b82f6;
+      color: #2e1065;
       letter-spacing: -0.02em;
       margin-bottom: 5px;
     }
 
     .login-brand p {
       font-size: 12px;
-      color: rgba(255, 255, 255, 0.38);
+      color: #6d28d9;
       letter-spacing: 0.1em;
       text-transform: uppercase;
+      font-weight: 600;
+      opacity: 0.8;
     }
 
     /* Floating label field */
@@ -125,7 +128,7 @@
       top: 13px;
       width: 16px;
       height: 16px;
-      color: rgba(255, 255, 255, 0.3);
+      color: #94a3b8;
       pointer-events: none;
       transition: color .2s;
     }
@@ -136,8 +139,8 @@
       padding: 12px 4px 10px 26px;
       background: transparent;
       border: none;
-      border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-      color: #fff;
+      border-bottom: 2px solid #f0e7f6;
+      color: #2e1065;
       font-size: 14.5px;
       font-family: 'Inter', sans-serif;
       outline: none;
@@ -157,11 +160,11 @@
     }
 
     .field-group input:focus {
-      border-bottom-color: #3b82f6;
+      border-bottom-color: #d946ef;
     }
 
     .field-group input:focus~.field-icon {
-      color: #3b82f6;
+      color: #d946ef;
     }
 
     .field-group input::placeholder {
@@ -173,7 +176,7 @@
       left: 26px;
       top: 13px;
       font-size: 13.5px;
-      color: rgba(255, 255, 255, 0.42);
+      color: #94a3b8;
       pointer-events: none;
       transition: all .2s cubic-bezier(.4, 0, .2, 1);
       transform-origin: left top;
@@ -182,14 +185,14 @@
     .field-group input:focus~.field-label,
     .field-group input:not(:placeholder-shown)~.field-label {
       transform: translateY(-22px) scale(0.8);
-      color: #3b82f6;
+      color: #d946ef;
     }
 
     .login-btn {
       width: 100%;
       padding: 14px;
       margin-top: 6px;
-      background: #3b82f6;
+      background: linear-gradient(135deg, #d946ef 0%, #7c3aed 100%);
       color: #fff;
       border: none;
       border-radius: 11px;
@@ -201,14 +204,14 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: background .15s, transform .1s, box-shadow .15s;
+      transition: all .15s;
       letter-spacing: 0.01em;
-      box-shadow: 0 4px 18px rgba(59, 130, 246, 0.3);
+      box-shadow: 0 4px 18px rgba(217, 70, 239, 0.3);
     }
 
     .login-btn:hover {
-      background: #60a5fa;
-      box-shadow: 0 6px 24px rgba(59, 130, 246, 0.45);
+      filter: brightness(1.1);
+      box-shadow: 0 6px 24px rgba(217, 70, 239, 0.45);
     }
 
     .login-btn:active {
@@ -256,7 +259,7 @@
       text-align: center;
       margin-top: 22px;
       font-size: 11px;
-      color: rgba(255, 255, 255, 0.18);
+      color: #94a3b8;
       letter-spacing: 0.05em;
     }
   </style>
@@ -459,8 +462,8 @@
       const timeLoc = gl.getUniformLocation(prog, 'iTime');
       const colorLoc = gl.getUniformLocation(prog, 'u_color');
 
-      // Blue cobalt: #3b82f6 — 59, 130, 246
-      gl.uniform3f(colorLoc, 59 / 255, 130 / 255, 246 / 255);
+      // Pink/Purple theme: #d946ef — 217, 70, 239
+      gl.uniform3f(colorLoc, 217 / 255, 70 / 255, 239 / 255);
 
       const t0 = Date.now();
       function loop() {
