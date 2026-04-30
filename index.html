@@ -1673,7 +1673,7 @@
     <!-- Sidebar -->
     <aside class="sb">
       <div class="sb-logo">
-        <img src="icon.png" alt="Logo" class="sb-logo-img">
+        <img src="favicon.png" alt="Logo" class="sb-logo-img">
         <div>
           <h1>Delirium<br>Decor</h1><span>Control de Tickets</span>
         </div>
@@ -2144,8 +2144,31 @@
           <div class="card">
             <div class="ch">
               <span class="ct">Historial de Ventas</span>
-              <input type="text" id="vg-search" placeholder="Buscar cliente o producto…" oninput="renderVentas()"
-                style="padding:7px 12px;font-size:13px;border:1px solid var(--bs);border-radius:var(--rs);outline:none;width:220px">
+              <div style="display:flex;gap:8px;align-items:center">
+                <select id="vg-mes" onchange="renderVentas()" class="fsel" style="width:110px;padding:6px;font-size:12px">
+                  <option value="">Cualquier Mes</option>
+                  <option value="1">Enero</option>
+                  <option value="2">Febrero</option>
+                  <option value="3">Marzo</option>
+                  <option value="4">Abril</option>
+                  <option value="5">Mayo</option>
+                  <option value="6">Junio</option>
+                  <option value="7">Julio</option>
+                  <option value="8">Agosto</option>
+                  <option value="9">Septiembre</option>
+                  <option value="10">Octubre</option>
+                  <option value="11">Noviembre</option>
+                  <option value="12">Diciembre</option>
+                </select>
+                <select id="vg-anio" onchange="renderVentas()" class="fsel" style="width:85px;padding:6px;font-size:12px">
+                  <option value="">Año</option>
+                  <option value="2024">2024</option>
+                  <option value="2025">2025</option>
+                  <option value="2026" selected>2026</option>
+                </select>
+                <input type="text" id="vg-search" placeholder="Buscar cliente o producto…" oninput="renderVentas()"
+                  style="padding:7px 12px;font-size:13px;border:1px solid var(--bs);border-radius:var(--rs);outline:none;width:200px">
+              </div>
             </div>
             <div class="tw">
               <table>
@@ -2498,6 +2521,16 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
     function sEmoji(s) {
       const m = { Halloween: '🎃', Navidad: '🎄', 'Día de Muertos': '💀', 'San Valentín': '❤️', Pascua: '🐰', Primavera: '🌸', 'Día de las Madres': '👩', General: '📦' };
       return m[s] || '📦';
+    }
+
+    function getClientColor(name) {
+      if (!name) return 'var(--ink)';
+      const colors = [
+        '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316', '#14b8a6', '#6366f1'
+      ];
+      let hash = 0;
+      for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+      return colors[Math.abs(hash) % colors.length];
     }
     function fDate(d) {
       if (!d) return '—';
@@ -3810,15 +3843,21 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
 
     function renderVentas() {
       const tb = document.getElementById('vg-list-body'); if (!tb) return;
-      const q = (document.getElementById('vg-search')?.value || '').toLowerCase();
+      const q = (document.getElementById('vg-search')?.value || '').toLowerCase().trim();
+      const selMes = document.getElementById('vg-mes')?.value || '';
+      const selAnio = document.getElementById('vg-anio')?.value || '';
       
       const groups = {};
       ventasGrandes.forEach(v => {
         const match = v.notas && v.notas.match(/\[V:([a-f0-9]+)\]/);
-        const key = v.venta_id || (match ? match[1] : `${v.cliente}|${v.fecha}|${v.metodo_pago}`);
+        // Robust grouping key: trim name and clean date to avoid duplicates like "VERO"
+        const cName = (v.cliente || '').trim();
+        const cDate = (v.fecha || '').split('T')[0];
+        const key = v.venta_id || (match ? match[1] : `${cName.toLowerCase()}|${cDate}|${v.metodo_pago}`);
+        
         if (!groups[key]) groups[key] = {
-          cliente: v.cliente,
-          fecha: v.fecha,
+          cliente: cName,
+          fecha: cDate,
           created_at: v.created_at,
           metodo_pago: v.metodo_pago,
           notas: v.notas ? v.notas.replace(/\[V:[a-f0-9]+\]/, '').trim() : '',
@@ -3828,30 +3867,47 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         groups[key].items.push(v);
       });
 
-      const filtered = Object.values(groups).filter(g =>
-        !q || g.cliente.toLowerCase().includes(q) || g.items.some(i => i.producto.toLowerCase().includes(q))
-      );
+      const filtered = Object.values(groups).filter(g => {
+        // 1. Search Filter
+        const matchesSearch = !q || g.cliente.toLowerCase().includes(q) || g.items.some(i => i.producto.toLowerCase().includes(q));
+        if (!matchesSearch) return false;
+
+        // 2. Date Filters
+        const d = new Date(g.fecha ? g.fecha + 'T12:00:00' : g.created_at);
+        if (selAnio && d.getFullYear() != selAnio) return false;
+        if (selMes && (d.getMonth() + 1) != selMes) return false;
+
+        return true;
+      });
+
+      // Sort by date descending
+      filtered.sort((a, b) => {
+        const da = new Date(a.fecha ? a.fecha + 'T12:00:00' : a.created_at);
+        const db = new Date(b.fecha ? b.fecha + 'T12:00:00' : b.created_at);
+        return db - da;
+      });
 
       const metricsEl = document.getElementById('vg-metrics');
       if (metricsEl) {
-        const totalVenta = ventasGrandes.reduce((s, v) => s + (+v.precio_venta * +v.cantidad), 0);
-        const totalCostIVA = ventasGrandes.reduce((s, v) => s + (+v.precio_compra * +v.cantidad * 1.0875), 0);
+        // Metrics should reflect the filtered list for better context
+        const totalVenta = filtered.reduce((sum, g) => sum + g.items.reduce((s, v) => s + (+v.precio_venta * +v.cantidad), 0), 0);
+        const totalCostIVA = filtered.reduce((sum, g) => sum + g.items.reduce((s, v) => s + (+v.precio_compra * +v.cantidad * 1.0875), 0), 0);
         const totalGan = totalVenta - totalCostIVA;
-        const clientes = new Set(ventasGrandes.map(v => v.cliente)).size;
+        const clientes = new Set(filtered.map(v => v.cliente.toLowerCase().trim())).size;
         metricsEl.innerHTML = `
-          <div class="mc gold"><div class="ml">Total ventas mayoristas</div>
+          <div class="mc gold"><div class="ml">Ingresos Filtrados</div>
             <div class="mv" style="font-size:20px">$${totalVenta.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</div>
-            <div class="ms">ingresos</div></div>
-          <div class="mc sage"><div class="ml">Ganancia acumulada Neta</div>
+            <div class="ms">del período seleccionado</div></div>
+          <div class="mc sage"><div class="ml">Ganancia Neta (Filtro)</div>
             <div class="mv" 
               style="font-size:20px;color:var(--sage)">$${totalGan.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</div>
             <div class="ms">utilidad (IVA incl)</div></div>
-          <div class="mc"><div class="ml">Clientes atendidos</div><div class="mv">${clientes}</div><div class="ms">distintos</div></div>
-          <div class="mc"><div class="ml">Pedidos registrados</div><div class="mv">${Object.keys(groups).length}</div><div class="ms">ventas completas</div></div>`;
+          <div class="mc"><div class="ml">Clientes</div><div class="mv">${clientes}</div><div class="ms">en este filtro</div></div>
+          <div class="mc"><div class="ml">Pedidos</div><div class="mv">${filtered.length}</div><div class="ms">encontrados</div></div>`;
       }
 
       if (!filtered.length) {
-        tb.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="ei">💼</div><h3>Sin ventas</h3><p>No se encontraron resultados.</p></div></td></tr>`;
+        tb.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="ei">💼</div><h3>Sin ventas</h3><p>No se encontraron resultados para los filtros seleccionados.</p></div></td></tr>`;
         return;
       }
 
@@ -3869,10 +3925,11 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         
         const fechaStr = g.fecha ? fDate(g.fecha + 'T12:00:00') : fDate(g.created_at);
         const [pagoCls, pagoLabel] = pagoMap[g.metodo_pago] || ['st st-a', '—'];
+        const cColor = getClientColor(g.cliente);
         
         return `<tr>
           <td style="font-size:12.5px;color:var(--muted)">${fechaStr}</td>
-          <td><span class="an">${g.cliente}</span></td>
+          <td><span class="an" style="color:${cColor};font-weight:700;border-bottom:1px solid ${cColor}44">${g.cliente}</span></td>
           <td style="text-align:center">${g.items.length} prod. (${g.items.reduce((s,i)=>s+(+i.cantidad),0)} und.)</td>
           <td style="font-weight:700">$${tV.toFixed(2)}</td>
           <td style="font-weight:700;color:${gN >= 0 ? 'var(--sage)' : 'var(--rose)'}">${gN >= 0 ? '+' : '-'}$${Math.abs(gN).toFixed(2)}</td>
