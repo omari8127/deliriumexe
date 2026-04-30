@@ -1,8 +1,5 @@
 {
   "cleanUrls": true,
   "buildCommand": null,
-  "outputDirectory": ".",
-  "rewrites": [
-    { "source": "/", "destination": "/delirium-decor.html" }
-  ]
+  "outputDirectory": "."
 }

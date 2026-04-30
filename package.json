@@ -1,7 +1,6 @@
 {
   "name": "deliriumexe",
   "version": "1.0.0",
-  "main": "main.js",
   "scripts": {
     "start": "echo 'Run this project by opening delirium-decor.html in a browser' && exit 0",
     "dev": "npx serve .",
