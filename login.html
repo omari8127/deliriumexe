@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delirium Decor — Acceso</title>
+  <link rel="icon" type="image/png" href="icon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #0a0c12;
+    }
+
+    #bg-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .blur-overlay {
+      position: absolute;
+      inset: 0;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .login-wrapper {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100vw;
+      height: 100vh;
+      padding: 20px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+      padding: 44px 38px 36px;
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      animation: cardIn .4s cubic-bezier(.22, 1, .36, 1) both;
+    }
+
+    @keyframes cardIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px) scale(.97);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .login-brand {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .login-brand .brand-icon {
+      width: 92px;
+      height: 92px;
+      border-radius: 20px;
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      overflow: hidden;
+      padding: 6px;
+    }
+
+    .brand-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .login-brand h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #3b82f6;
+      letter-spacing: -0.02em;
+      margin-bottom: 5px;
+    }
+
+    .login-brand p {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.38);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* Floating label field */
+    .field-group {
+      position: relative;
+      margin-bottom: 30px;
+    }
+
+    .field-icon {
+      position: absolute;
+      left: 2px;
+      top: 13px;
+      width: 16px;
+      height: 16px;
+      color: rgba(255, 255, 255, 0.3);
+      pointer-events: none;
+      transition: color .2s;
+    }
+
+    .field-group input {
+      display: block;
+      width: 100%;
+      padding: 12px 4px 10px 26px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 14.5px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color .2s;
+      border-radius: 0;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .field-group input:-webkit-autofill,
+    .field-group input:-webkit-autofill:hover,
+    .field-group input:-webkit-autofill:focus {
+      -webkit-text-fill-color: #fff;
+      -webkit-box-shadow: 0 0 0 1000px transparent inset;
+      transition: background-color 5000s ease-in-out 0s;
+      caret-color: #fff;
+    }
+
+    .field-group input:focus {
+      border-bottom-color: #3b82f6;
+    }
+
+    .field-group input:focus~.field-icon {
+      color: #3b82f6;
+    }
+
+    .field-group input::placeholder {
+      color: transparent;
+    }
+
+    .field-label {
+      position: absolute;
+      left: 26px;
+      top: 13px;
+      font-size: 13.5px;
+      color: rgba(255, 255, 255, 0.42);
+      pointer-events: none;
+      transition: all .2s cubic-bezier(.4, 0, .2, 1);
+      transform-origin: left top;
+    }
+
+    .field-group input:focus~.field-label,
+    .field-group input:not(:placeholder-shown)~.field-label {
+      transform: translateY(-22px) scale(0.8);
+      color: #3b82f6;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      margin-top: 6px;
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      border-radius: 11px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background .15s, transform .1s, box-shadow .15s;
+      letter-spacing: 0.01em;
+      box-shadow: 0 4px 18px rgba(59, 130, 246, 0.3);
+    }
+
+    .login-btn:hover {
+      background: #60a5fa;
+      box-shadow: 0 6px 24px rgba(59, 130, 246, 0.45);
+    }
+
+    .login-btn:active {
+      transform: scale(0.97);
+    }
+
+    .login-btn svg {
+      transition: transform .15s;
+    }
+
+    .login-btn:hover svg {
+      transform: translateX(3px);
+    }
+
+    .error-msg {
+      display: none;
+      margin-top: 14px;
+      padding: 11px 15px;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 9px;
+      color: #ef4444;
+      font-size: 13px;
+      text-align: center;
+      animation: errIn .2s ease;
+    }
+
+    @keyframes errIn {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .error-msg.show {
+      display: block;
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 22px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.18);
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="blur-overlay"></div>
+
+  <div class="login-wrapper">
+    <div class="login-card">
+
+      <div class="login-brand">
+        <div class="brand-icon"><img src="favicon.png" alt="Logo"></div>
+        <h1>Delirium Decor</h1>
+        <p>Sistema de Control de Tickets</p>
+      </div>
+
+      <form id="login-form" onsubmit="handleLogin(event)" autocomplete="off">
+
+        <div class="field-group">
+          <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          <input type="text" id="username" placeholder=" " autocomplete="username" spellcheck="false" required>
+          <span class="field-label">Usuario</span>
+        </div>
+
+        <div class="field-group">
+          <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+          <input type="password" id="password" placeholder=" " autocomplete="current-password" required>
+          <span class="field-label">Contraseña</span>
+        </div>
+
+        <button type="submit" class="login-btn" id="login-btn">
+          Entrar
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </button>
+
+        <div class="error-msg" id="error-msg">
+          ❌ Usuario o contraseña incorrectos
+        </div>
+      </form>
+
+      <div class="login-footer">Acceso restringido · Solo personal autorizado</div>
+    </div>
+  </div>
+
+  <script>
+    // ══ SUPABASE AUTH ══
+    const SB_URL = 'https://pzbklcnmraqyijdpnleg.supabase.co';
+    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6YmtsY25tcmFxeWlqZHBubGVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5NTI1NzUsImV4cCI6MjA5MDUyODU3NX0.sFKmxz2chZGzRZXRXi-7nez6EhY6aR2TIxWvQ5-6EU0';
+    const supabaseDB = supabase.createClient(SB_URL, SB_KEY);
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const rawUser = document.getElementById('username').value.trim().toLowerCase();
+      const pass = document.getElementById('password').value;
+      const errEl = document.getElementById('error-msg');
+      const btn = document.getElementById('login-btn');
+
+      // Si ingresa formato simple como "admin", convertirlo a formato email para Supabase
+      let email = rawUser;
+      if (!email.includes('@')) {
+        email = email + '@deliriumdecor.com';
+      }
+
+      btn.innerHTML = `
+        <svg class="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;">
+          <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+        </svg>
+        Verificando...
+      `;
+      btn.style.opacity = '0.8';
+      btn.disabled = true;
+
+      const { data, error } = await supabaseDB.auth.signInWithPassword({
+        email: email,
+        password: pass
+      });
+
+      if (!error && data.session) {
+        btn.textContent = '✓ Acceso concedido…';
+        btn.style.opacity = '1';
+        btn.style.background = '#10b981';
+        btn.style.boxShadow = '0 4px 18px rgba(16,185,129,0.35)';
+        sessionStorage.setItem('dd_auth', 'ok');
+        sessionStorage.setItem('dd_user', rawUser);
+
+        setTimeout(() => { window.location.href = 'delirium-decor.html'; }, 600);
+      } else {
+        btn.innerHTML = `
+          Entrar
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        `;
+        btn.style.opacity = '1';
+        btn.disabled = false;
+
+        errEl.classList.remove('show');
+        void errEl.offsetWidth; // force reflow
+
+        errEl.innerHTML = '❌ ' + (error.message.toLowerCase().includes('invalid') ? 'Usuario o contraseña incorrectos' : 'Error: ' + error.message);
+        errEl.classList.add('show');
+
+        document.getElementById('password').value = '';
+        document.getElementById('password').focus();
+
+        const card = document.querySelector('.login-card');
+        card.style.animation = 'none';
+        void card.offsetWidth;
+        card.style.animation = 'shake .35s ease';
+      }
+    }
+
+    // ══ WebGL SMOKEY BACKGROUND (mismo shader del componente React) ══
+    const VERT = `
+      attribute vec4 a_position;
+      void main() { gl_Position = a_position; }
+    `;
+
+    const FRAG = `
+      precision mediump float;
+      uniform vec2  iResolution;
+      uniform float iTime;
+      uniform vec3  u_color;
+
+      void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+        vec2 centeredUV = (2.0 * fragCoord - iResolution.xy) / min(iResolution.x, iResolution.y);
+        float time = iTime * 0.45;
+        vec2 d = centeredUV;
+        for (float i = 1.0; i < 8.0; i++) {
+          d.x += 0.5 / i * cos(i * 2.0 * d.y + time);
+          d.y += 0.5 / i * cos(i * 2.0 * d.x + time);
+        }
+        float wave = abs(sin(d.x + d.y + time));
+        float glow = smoothstep(0.9, 0.2, wave);
+        fragColor = vec4(u_color * glow, 1.0);
+      }
+
+      void main() { mainImage(gl_FragColor, gl_FragCoord.xy); }
+    `;
+
+    // Shake keyframe for wrong password
+    const styleEl = document.createElement('style');
+    styleEl.textContent = `
+      @keyframes shake {
+        0%,100% { transform: translateX(0); }
+        20%      { transform: translateX(-8px); }
+        40%      { transform: translateX(8px); }
+        60%      { transform: translateX(-5px); }
+        80%      { transform: translateX(5px); }
+      }
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(styleEl);
+
+    (function initGL() {
+      const canvas = document.getElementById('bg-canvas');
+      const gl = canvas.getContext('webgl');
+      if (!gl) return; // graceful degradation — canvas just stays black
+
+      function mkShader(type, src) {
+        const s = gl.createShader(type);
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        return s;
+      }
+
+      const prog = gl.createProgram();
+      gl.attachShader(prog, mkShader(gl.VERTEX_SHADER, VERT));
+      gl.attachShader(prog, mkShader(gl.FRAGMENT_SHADER, FRAG));
+      gl.linkProgram(prog);
+      gl.useProgram(prog);
+
+      const buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER,
+        new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
+        gl.STATIC_DRAW);
+
+      const posLoc = gl.getAttribLocation(prog, 'a_position');
+      gl.enableVertexAttribArray(posLoc);
+      gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+      const resLoc = gl.getUniformLocation(prog, 'iResolution');
+      const timeLoc = gl.getUniformLocation(prog, 'iTime');
+      const colorLoc = gl.getUniformLocation(prog, 'u_color');
+
+      // Blue cobalt: #3b82f6 — 59, 130, 246
+      gl.uniform3f(colorLoc, 59 / 255, 130 / 255, 246 / 255);
+
+      const t0 = Date.now();
+      function loop() {
+        const w = window.innerWidth, h = window.innerHeight;
+        if (canvas.width !== w || canvas.height !== h) {
+          canvas.width = w; canvas.height = h;
+          gl.viewport(0, 0, w, h);
+        }
+        gl.uniform2f(resLoc, w, h);
+        gl.uniform1f(timeLoc, (Date.now() - t0) / 1000);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        requestAnimationFrame(loop);
+      }
+      loop();
+    })();
+  </script>
+</body>
+
+</html>

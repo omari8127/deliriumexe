@@ -1,0 +1,4301 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <!-- ══ AUTH GUARD — redirect to login if not authenticated ══ -->
+  <script>
+    if (!sessionStorage.getItem('dd_auth')) {
+      window.location.replace('login.html');
+    }
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delirium Decor — Tickets</title>
+  <link rel="icon" type="image/png" href="icon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --cream: #1a1d27;
+      --warm: #1a1d27;
+      --ink: #e8e8f0;
+      --ink2: #c0c0d0;
+      --muted: #6b7280;
+      --gold: #c9a84c;
+      --gold-l: #e0c070;
+      --gold-p: rgba(201, 168, 76, 0.12);
+      --rose: #ef4444;
+      --rose-p: rgba(239, 68, 68, 0.12);
+      --sage: #10b981;
+      --sage-p: rgba(16, 185, 129, 0.12);
+      --cobalt: #3b82f6;
+      --cobalt-p: rgba(59, 130, 246, 0.12);
+      --warn: #f59e0b;
+      --b: #2a2d3e;
+      --bs: #3a3d52;
+      --sh: 0 1px 4px rgba(0,0,0,.3), 0 0 0 1px #2a2d3e;
+      --shm: 0 4px 20px rgba(0,0,0,.4), 0 0 0 1px #2a2d3e;
+      --r: 12px;
+      --rs: 8px;
+      --rx: 5px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f1117;
+      color: #e8e8f0;
+      min-height: 100vh
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+      font-family: 'Inter', sans-serif
+    }
+
+    .app {
+      display: flex;
+      min-height: 100vh
+    }
+
+    /* Sidebar */
+    .sb {
+      width: 220px;
+      background: #13151e;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      z-index: 50;
+      overflow-y: auto;
+      border-right: 1px solid #2a2d3e
+    }
+
+    .sb-logo {
+      padding: 24px 20px 18px;
+      border-bottom: 1px solid #2a2d3e;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sb-logo-img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .sb-logo h1 {
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 17px;
+      color: #c9a84c;
+      line-height: 1.2;
+      letter-spacing: -0.01em
+    }
+
+    .sb-logo span {
+      font-size: 10px;
+      color: #4b5563;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      display: block;
+      margin-top: 3px
+    }
+
+    .sb-nav {
+      padding: 14px 10px;
+      flex: 1
+    }
+
+    .sb-sec {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: #4b5563;
+      padding: 0 10px;
+      margin: 14px 0 5px;
+      display: block
+    }
+
+    .ni {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 10px;
+      border-radius: var(--rs);
+      cursor: pointer;
+      font-size: 13.5px;
+      color: #6b7280;
+      transition: all .15s;
+      margin-bottom: 1px;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left
+    }
+
+    .ni:hover {
+      background: rgba(201, 168, 76, 0.08);
+      color: #e8e8f0
+    }
+
+    .ni.on {
+      background: rgba(201, 168, 76, 0.12);
+      color: #c9a84c;
+      font-weight: 500
+    }
+
+    .ni .ico {
+      font-size: 15px;
+      width: 18px;
+      text-align: center;
+      flex-shrink: 0
+    }
+
+    .nbadge {
+      margin-left: auto;
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 999px
+    }
+
+    .sb-foot {
+      padding: 14px 10px;
+      border-top: 1px solid #2a2d3e
+    }
+
+    .sb-user {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 10px
+    }
+
+    .sb-av {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #c9a84c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #0f1117;
+      flex-shrink: 0
+    }
+
+    .sb-un {
+      font-size: 12px;
+      color: #e8e8f0
+    }
+
+    .sb-ur {
+      font-size: 10px;
+      color: #6b7280
+    }
+
+    /* Main */
+    .main {
+      margin-left: 220px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh
+    }
+
+    .topbar {
+      background: #13151e;
+      border-bottom: 1px solid #2a2d3e;
+      padding: 13px 26px;
+      display: flex;
+      align-items: center;
+      gap: 14px
+    }
+
+    .tb-title {
+      font-family: 'Inter', sans-serif;
+      font-size: 19px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #e8e8f0;
+      flex: 1
+    }
+
+    .tb-sub {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 1px
+    }
+
+    .page {
+      padding: 26px;
+      display: none
+    }
+
+    .page.on {
+      display: block;
+      animation: fi .18s ease
+    }
+
+    @keyframes fi {
+      from {
+        opacity: 0;
+        transform: translateY(4px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: var(--rs);
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all .15s;
+      white-space: nowrap
+    }
+
+    .btn-gold {
+      background: #c9a84c;
+      color: #0f1117
+    }
+
+    .btn-gold:hover {
+      background: #b8962e
+    }
+
+    .btn-dark {
+      background: #1f2333;
+      color: #e8e8f0;
+      border: 1px solid #2a2d3e
+    }
+
+    .btn-dark:hover {
+      background: #2a2d3e
+    }
+
+    .btn-out {
+      background: transparent;
+      border: 1px solid #2a2d3e;
+      color: #e8e8f0
+    }
+
+    .btn-out:hover {
+      background: #1f2333
+    }
+
+    .btn-sage {
+      background: rgba(16, 185, 129, 0.12);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.2)
+    }
+
+    .btn-rose {
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.2)
+    }
+
+    .btn-rose:hover {
+      background: #ef4444;
+      color: #fff
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12.5px
+    }
+
+    .btn-xs {
+      padding: 4px 9px;
+      font-size: 12px
+    }
+
+    /* Cards */
+    .card {
+      background: #1a1d27;
+      border: 1px solid #2a2d3e;
+      border-radius: var(--r);
+      box-shadow: var(--sh)
+    }
+
+    .card:hover {
+      background: #1f2333
+    }
+
+    .ch {
+      padding: 16px 20px;
+      border-bottom: 1px solid #2a2d3e;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px
+    }
+
+    .ct {
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #e8e8f0
+    }
+
+    .cb {
+      padding: 20px
+    }
+
+    /* Metrics */
+    .mg {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 13px;
+      margin-bottom: 22px
+    }
+
+    .mc {
+      background: #1a1d27;
+      border: 1px solid #2a2d3e;
+      border-radius: var(--r);
+      padding: 16px 18px;
+      box-shadow: var(--sh);
+      border-top: 2px solid #c9a84c;
+      transition: background .15s
+    }
+
+    .mc:hover {
+      background: #1f2333
+    }
+
+    .ml {
+      font-size: 11.5px;
+      color: #6b7280;
+      margin-bottom: 5px
+    }
+
+    .mv {
+      font-family: 'Inter', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1;
+      color: #e8e8f0
+    }
+
+    .ms {
+      font-size: 11px;
+      color: #6b7280;
+      margin-top: 4px
+    }
+
+    .mc.gold {
+      border-top-color: #c9a84c;
+      background: #1a1d27
+    }
+
+    .mc.gold .mv {
+      color: #c9a84c
+    }
+
+    .mc.rose {
+      border-top-color: #ef4444;
+      background: #1a1d27
+    }
+
+    .mc.rose .mv {
+      color: #ef4444
+    }
+
+    .mc.sage {
+      border-top-color: #10b981;
+      background: #1a1d27
+    }
+
+    .mc.sage .mv {
+      color: #10b981
+    }
+
+    .mc.warn {
+      border-top-color: #f59e0b;
+      background: #1a1d27
+    }
+
+    .mc.warn .mv {
+      color: #f59e0b
+    }
+
+    /* Status */
+    .st {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11.5px;
+      font-weight: 500;
+      padding: 3px 9px;
+      border-radius: 999px
+    }
+
+    .st::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor
+    }
+
+    .st-p {
+      background: rgba(201, 168, 76, 0.12);
+      color: #c9a84c
+    }
+
+    .st-v {
+      background: rgba(16, 185, 129, 0.12);
+      color: #10b981
+    }
+
+    .st-d {
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444
+    }
+
+    .st-dc {
+      background: rgba(59, 130, 246, 0.12);
+      color: #3b82f6
+    }
+
+    .st-a {
+      background: rgba(255,255,255,.06);
+      color: #6b7280
+    }
+
+    .st-dvc {
+      background: rgba(16, 185, 129, 0.12);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.25)
+    }
+
+    .st-dvv {
+      background: rgba(59, 130, 246, 0.12);
+      color: #3b82f6;
+      border: 1px solid rgba(59, 130, 246, 0.2)
+    }
+
+    /* Season badge */
+    .sbadge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11.5px;
+      padding: 2px 8px;
+      border-radius: var(--rx);
+      background: rgba(201, 168, 76, 0.12);
+      color: #c9a84c;
+      font-weight: 500;
+      border: 1px solid rgba(201, 168, 76, 0.2)
+    }
+
+    /* Table */
+    .tw {
+      overflow-x: auto
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px
+    }
+
+    thead th {
+      text-align: left;
+      padding: 9px 14px;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: #6b7280;
+      border-bottom: 1px solid #2a2d3e;
+      background: #1a1d27;
+      white-space: nowrap
+    }
+
+    tbody td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #2a2d3e;
+      vertical-align: middle
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none
+    }
+
+    tbody tr:hover {
+      background: rgba(201, 168, 76, 0.04)
+    }
+
+    .fo {
+      font-family: monospace;
+      font-size: 12px;
+      color: #6b7280;
+      font-weight: 600
+    }
+
+    .an {
+      font-weight: 500
+    }
+
+    .pr {
+      font-weight: 600
+    }
+
+    /* Forms */
+    .fg {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px
+    }
+
+    .fi {
+      display: flex;
+      flex-direction: column;
+      gap: 5px
+    }
+
+    .fi.full {
+      grid-column: 1/-1
+    }
+
+    label {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: #6b7280;
+      letter-spacing: .03em
+    }
+
+    input[type=text],
+    input[type=number],
+    select,
+    textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid #2a2d3e;
+      border-radius: var(--rs);
+      font-size: 13.5px;
+      color: #e8e8f0;
+      background: #1f2333;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #c9a84c;
+      box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.12)
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 68px
+    }
+
+    /* Modal */
+    .mo {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px
+    }
+
+    .mo.on {
+      display: flex
+    }
+
+    .md {
+      background: #1a1d27;
+      border: 1px solid #2a2d3e;
+      border-radius: var(--r);
+      box-shadow: 0 12px 40px rgba(0,0,0,.6);
+      width: 100%;
+      max-width: 540px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: mIn .2s ease
+    }
+
+    .md-lg {
+      max-width: 680px
+    }
+
+    .md-xl {
+      max-width: 880px
+    }
+
+    @keyframes mIn {
+      from {
+        opacity: 0;
+        transform: scale(.96) translateY(8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .mh {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid #2a2d3e;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .mh h2 {
+      font-family: 'Inter', sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #e8e8f0
+    }
+
+    .mx {
+      background: none;
+      border: none;
+      font-size: 19px;
+      cursor: pointer;
+      color: #6b7280;
+      padding: 3px 6px;
+      border-radius: 4px
+    }
+
+    .mx:hover {
+      color: #e8e8f0;
+      background: #2a2d3e
+    }
+
+    .mb {
+      padding: 22px 24px
+    }
+
+    .mf {
+      padding: 14px 24px;
+      border-top: 1px solid #2a2d3e;
+      display: flex;
+      justify-content: flex-end;
+      gap: 9px
+    }
+
+    /* Search row */
+    .srow {
+      display: flex;
+      gap: 9px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      align-items: center
+    }
+
+    .siw {
+      position: relative;
+      flex: 1;
+      min-width: 200px
+    }
+
+    .siw input {
+      padding-left: 34px
+    }
+
+    .sico {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6b7280;
+      font-size: 14px;
+      pointer-events: none
+    }
+
+    .fsel {
+      width: auto;
+      min-width: 130px
+    }
+
+    /* QR */
+    .qrb {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 11px;
+      padding: 18px;
+      background: #1f2333;
+      border: 1px solid #2a2d3e;
+      border-radius: var(--r)
+    }
+
+    /* Detail */
+    .dg {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 13px
+    }
+
+    .df {
+      padding: 11px 14px;
+      background: #0f1117;
+      border: 1px solid #2a2d3e;
+      border-radius: var(--rs)
+    }
+
+    .dl {
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: #6b7280;
+      margin-bottom: 3px
+    }
+
+    .dv {
+      font-size: 14.5px;
+      font-weight: 500;
+      color: #e8e8f0
+    }
+
+    /* Setup banner */
+    .setup {
+      background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(201,168,76,0.03));
+      border: 1px solid rgba(201,168,76,0.25);
+      border-radius: var(--r);
+      padding: 18px 22px;
+      margin-bottom: 22px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start
+    }
+
+    .setup h3 {
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #e8e8f0;
+      margin-bottom: 5px
+    }
+
+    .setup p {
+      font-size: 12.5px;
+      color: #6b7280;
+      line-height: 1.5;
+      margin-bottom: 10px
+    }
+
+    .setup-row {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap
+    }
+
+    .setup-row input {
+      flex: 1;
+      min-width: 180px;
+      font-family: monospace;
+      font-size: 12px;
+      padding: 8px 11px;
+      border: 1px solid #2a2d3e;
+      border-radius: var(--rs);
+      background: #1f2333;
+      color: #e8e8f0;
+      outline: none
+    }
+
+    .setup-row input:focus {
+      border-color: #c9a84c;
+      box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.12)
+    }
+
+    /* Toast */
+    .tw2 {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 7px
+    }
+
+    .toast {
+      background: #1f2333;
+      color: #e8e8f0;
+      border: 1px solid #2a2d3e;
+      padding: 11px 16px;
+      border-radius: var(--rs);
+      font-size: 13.5px;
+      box-shadow: var(--shm);
+      animation: tIn .22s ease;
+      max-width: 300px
+    }
+
+    .toast.ok {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #10b981
+    }
+
+    .toast.err {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #ef4444
+    }
+
+    @keyframes tIn {
+      from {
+        opacity: 0;
+        transform: translateX(10px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    /* Scanner */
+    .scan-box {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: #000;
+      border-radius: var(--r);
+      overflow: hidden
+    }
+
+    .scan-box video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .scan-ov {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none
+    }
+
+    .scan-fr {
+      width: 190px;
+      height: 190px;
+      border: 2px solid var(--gold);
+      border-radius: 7px;
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, .42)
+    }
+
+    /* Label */
+    .lp {
+      border: 1.5px dashed #2a2d3e;
+      border-radius: var(--rs);
+      padding: 14px;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      background: #1f2333;
+      min-width: 150px
+    }
+
+    .lname {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      max-width: 130px;
+      color: #e8e8f0
+    }
+
+    .lprice {
+      font-size: 17px;
+      font-weight: 700;
+      color: #c9a84c
+    }
+
+    .lseas {
+      font-size: 9px;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: .08em
+    }
+
+    /* Unsold row */
+    .ur {
+      background: rgba(196, 97, 74, .04)
+    }
+
+    .ur:hover {
+      background: rgba(196, 97, 74, .08) !important
+    }
+
+    /* Empty */
+    .empty {
+      text-align: center;
+      padding: 50px 20px;
+      color: #6b7280
+    }
+
+    .ei {
+      font-size: 44px;
+      margin-bottom: 14px;
+      opacity: .4
+    }
+
+    .empty h3 {
+      font-family: 'Inter', sans-serif;
+      font-size: 19px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #e8e8f0;
+      margin-bottom: 7px
+    }
+
+    .empty p {
+      font-size: 13px;
+      line-height: 1.6;
+      max-width: 300px;
+      margin: 0 auto
+    }
+
+    /* Dev status banner */
+    .devbanner {
+      border-radius: var(--r);
+      padding: 18px 22px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      animation: fi .2s ease
+    }
+
+    .devbanner .dbi {
+      font-size: 38px;
+      flex-shrink: 0
+    }
+
+    .devbanner .dbt {
+      flex: 1
+    }
+
+    .devbanner .dbt strong {
+      font-family: 'Inter', sans-serif;
+      font-size: 19px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      display: block;
+      margin-bottom: 3px
+    }
+
+    .devbanner .dbt span {
+      font-size: 12.5px;
+      opacity: .75
+    }
+
+    .devbanner .dbd {
+      font-family: 'Inter', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      flex-shrink: 0;
+      text-align: right;
+      line-height: 1.1
+    }
+
+    .devbanner .dbd small {
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      opacity: .7
+    }
+
+    .dev-ok {
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
+      border: 1.5px solid rgba(16, 185, 129, 0.25)
+    }
+
+    .dev-warn {
+      background: rgba(245, 158, 11, 0.1);
+      color: #f59e0b;
+      border: 1.5px solid rgba(245, 158, 11, 0.3)
+    }
+
+    .dev-expired {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1.5px solid rgba(239, 68, 68, 0.3)
+    }
+
+    /* Scan popup overlay */
+    .scan-popup {
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 14, 20, 0.85);
+      backdrop-filter: blur(12px) saturate(180%);
+      -webkit-backdrop-filter: blur(12px) saturate(180%);
+      z-index: 500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px
+    }
+
+    .scan-popup.on {
+      display: flex
+    }
+
+    .scan-card {
+      background: linear-gradient(145deg, #1f2233 0%, #171926 100%);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 24px;
+      padding: 36px 32px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.08);
+      animation: mIn .3s cubic-bezier(0.16, 1, 0.3, 1);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scan-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    }
+
+    .scan-card .sc-folio {
+      font-family: monospace;
+      font-size: 12px;
+      color: #9ca3af;
+      background: rgba(255,255,255,0.05);
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 99px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .scan-card .sc-name {
+      font-family: 'Inter', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 24px;
+      line-height: 1.2
+    }
+
+    .scan-card .sc-banner {
+      border-radius: 16px;
+      padding: 24px 20px;
+      margin-bottom: 24px;
+      background: rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: inset 0 2px 20px rgba(0,0,0,0.2);
+    }
+
+    .scan-card .sc-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));
+      transform: scale(1);
+      transition: transform 0.3s ease;
+    }
+    .scan-card:hover .sc-icon {
+      transform: scale(1.1);
+    }
+
+    .scan-card .sc-status {
+      font-family: 'Inter', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .scan-card .sc-sub {
+      font-size: 13.5px;
+      opacity: .8;
+      font-weight: 500;
+    }
+
+    .scan-card .sc-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 6px
+    }
+
+    /* Dash two-col */
+    .dg2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px
+    }
+
+    /* Progress bar */
+    .pb {
+      height: 5px;
+      background: #2a2d3e;
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 5px 0 3px
+    }
+
+    .pbf {
+      height: 100%;
+      background: #c9a84c;
+      border-radius: 3px;
+      transition: width .5s
+    }
+
+    @media(max-width:900px) {
+      .mg {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .dg2 {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media(max-width:680px) {
+      .sb {
+        width: 54px
+      }
+
+      .sb-logo h1,
+      .sb-logo span,
+      .ni span,
+      .nbadge,
+      .sb-un,
+      .sb-ur,
+      .sb-sec {
+        display: none
+      }
+
+      .ni {
+        justify-content: center;
+        padding: 11px
+      }
+
+      .sb-user {
+        justify-content: center
+      }
+
+      .main {
+        margin-left: 54px
+      }
+
+      .fg {
+        grid-template-columns: 1fr
+      }
+
+      .dg {
+        grid-template-columns: 1fr
+      }
+
+      .mg {
+        grid-template-columns: 1fr 1fr
+      }
+    }
+
+    @media(max-width:420px) {
+      .mg {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media print {
+      body * {
+        visibility: hidden
+      }
+
+      #lbl-print,
+      #lbl-print * {
+        visibility: visible
+      }
+
+      #lbl-print {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: #fff;
+        display: block !important;
+      }
+
+      .lp {
+        break-inside: avoid;
+        border: 1px solid #eee;
+        margin: 5px;
+        display: inline-flex !important;
+      }
+    }
+
+    /* ══ Ventas Grandes ══ */
+    .inv-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.12);
+      color: #3b82f6
+    }
+
+    .inv-badge.low {
+      background: rgba(245, 158, 11, 0.12);
+      color: #f59e0b
+    }
+
+    .inv-badge.out {
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444
+    }
+
+    .vg-prod-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 2px
+    }
+
+    .btn-cobalt {
+      background: rgba(59, 130, 246, 0.12);
+      color: #3b82f6;
+      border: 1px solid rgba(59, 130, 246, 0.2)
+    }
+
+    .btn-cobalt:hover {
+      background: #3b82f6;
+      color: #fff
+    }
+
+    #fab-scan:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(201,168,76,0.5); }
+    #fab-scan:active { transform: scale(0.95); }
+    .mo.on ~ #fab-scan,
+    .scan-popup.on ~ #fab-scan { 
+      display: none !important; 
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="tw2" id="toasts"></div>
+
+  <!-- MODAL: New Ticket -->
+  <div class="mo" id="m-new">
+    <div class="md md-xl">
+      <div class="mh">
+        <h2>Nuevo Ticket</h2><button class="mx" onclick="cm('m-new')">✕</button>
+      </div>
+      <div class="mb">
+        <div class="fg" style="margin-bottom:16px">
+          <div class="fi"><label>Temporada *</label><select id="nt2">
+              <option value="">Seleccionar…</option>
+              <option>Halloween</option>
+              <option>Navidad</option>
+              <option>Día de Muertos</option>
+              <option>San Valentín</option>
+              <option>Pascua</option>
+              <option>Primavera</option>
+              <option>Día de las Madres</option>
+              <option>Spring</option>
+              <option>Cocina</option>
+              <option>Otoño</option>
+              <option>Ocasión Especial</option>
+              <option>General</option>
+            </select></div>
+          <div class="fi"><label>Estado inicial</label><select id="ne">
+              <option value="pendiente">Bodega</option>
+              <option value="apartado">Apartado</option>
+              <option value="vendido">Vendido</option>
+              <option value="descuento">En descuento</option>
+            </select></div>
+          <div class="fi">
+            <label>Método de pago</label>
+            <select id="nt-pago">
+              <option value="efectivo">💵 Efectivo</option>
+              <option value="transferencia">🏦 Transferencia</option>
+              <option value="adelanto">⏳ Adelanto / Parcial</option>
+              <option value="pendiente">🕐 Por cobrar</option>
+            </select>
+          </div>
+          <div class="fi"><label>Proveedor</label><input type="text" id="np2" placeholder="Nombre del proveedor&hellip;"></div>
+          <div class="fi">
+            <label>Código del ticket (Folio) * <small style="font-weight:400;text-transform:none;opacity:0.75">(Escribe BD, HL o HB para generar)</small></label>
+            <input type="text" id="n-folio"
+              style="font-family:monospace;font-weight:700;color:var(--cobalt);letter-spacing:.05em;font-size:14px"
+              placeholder="Ej: 123456789"
+              oninput="onFolioInput(this)">
+          </div>
+          <div class="fi full"><label>Notas generales</label><textarea id="no2" placeholder="Observaciones del ticket&hellip;"
+              style="min-height:50px"></textarea></div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <span
+            style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">📦
+            Artículos del ticket</span>
+          <button class="btn btn-gold btn-sm" style="font-size:14px;padding:9px 16px"
+            onclick="addItemRow('mi-body','mi-tot')">&#10010; Agregar artículo</button>
+        </div>
+        <div style="overflow-x:auto;border:1px solid var(--b);border-radius:var(--rs);margin-bottom:10px">
+          <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px">
+            <thead>
+              <tr style="background:var(--cream)">
+                <th
+                  style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">
+                  Código Barras</th>
+                <th
+                  style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">
+                  Nombre *</th>
+                <th
+                  style="padding:7px 10px;text-align:center;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">
+                  Cant.</th>
+                <th
+                  style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">
+                  Costo Unit. $</th>
+                <th
+                  style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">
+                  Venta Unit. $</th>
+                <th
+                  style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--sage);border-bottom:1px solid var(--b)">
+                  Ganancia</th>
+                <th style="border-bottom:1px solid var(--b);width:28px"></th>
+              </tr>
+            </thead>
+            <tbody id="mi-body"></tbody>
+          </table>
+        </div>
+        <div id="mi-tot"></div>
+      </div>
+      <div class="mf"><button class="btn btn-out" onclick="cm('m-new')">Cancelar</button><button class="btn btn-gold"
+          onclick="saveModalTicket()">✓ Guardar ticket</button></div>
+    </div>
+  </div>
+
+  <!-- MODAL: QR -->
+  <div class="mo" id="m-qr">
+    <div class="md">
+      <div class="mh">
+        <h2>Código QR</h2><button class="mx" onclick="cm('m-qr')">✕</button>
+      </div>
+      <div class="mb">
+        <div id="qr-info"
+          style="margin-bottom:16px;padding:12px 16px;background:var(--cream);border-radius:var(--rs);display:flex;justify-content:space-between;align-items:center">
+        </div>
+        <div class="qrb"><canvas id="qr-c"></canvas></div>
+        <div id="lbl-wrap" style="margin-top:16px;display:flex;justify-content:center"></div>
+        <div id="lbl-print" style="display:none"></div>
+      </div>
+      <div class="mf"><button class="btn btn-out btn-sm" onclick="cm('m-qr')">Cerrar</button><button
+          class="btn btn-gold btn-sm" onclick="printLbl()">🖨️ Imprimir etiqueta</button></div>
+    </div>
+  </div>
+
+  <!-- MODAL: Detail -->
+  <div class="mo" id="m-det">
+    <div class="md md-lg">
+      <div class="mh">
+        <h2 id="det-title">Ticket</h2><button class="mx" onclick="cm('m-det')">✕</button>
+      </div>
+      <div class="mb">
+        <div id="det-dev-banner"></div>
+        <div id="det-body"></div>
+      </div>
+      <div class="mf" id="det-foot"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: Detalle Venta Grande -->
+  <div class="mo" id="m-vg-det">
+    <div class="md md-lg">
+      <div class="mh">
+        <h2 id="vg-det-title">Detalle de Venta Grande</h2><button class="mx" onclick="cm('m-vg-det')">✕</button>
+      </div>
+      <div class="mb">
+        <div id="vg-det-body"></div>
+      </div>
+      <div class="mf">
+        <button class="btn btn-out" onclick="cm('m-vg-det')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCAN POPUP (scanner USB) -->
+  <div class="scan-popup" id="scan-popup" onclick="if(event.target===this)this.classList.remove('on')">
+    <div class="scan-card">
+      <div class="sc-folio" id="sp-folio"></div>
+      <div class="sc-name" id="sp-name"></div>
+      <div class="sc-banner" id="sp-banner">
+        <div class="sc-icon" id="sp-icon"></div>
+        <div class="sc-status" id="sp-status"></div>
+        <div class="sc-sub" id="sp-sub"></div>
+      </div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:14px" id="sp-dates"></div>
+      <div class="sc-actions">
+        <button class="btn btn-out" onclick="document.getElementById('scan-popup').classList.remove('on')">Cerrar
+          (Esc)</button>
+        <button class="btn btn-gold" id="sp-det-btn">Ver detalle completo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Scanner (Barcode) -->
+  <div class="mo" id="m-scan">
+    <div class="md">
+      <div class="mh">
+        <h2>🔍 Buscar ticket</h2><button class="mx" onclick="cm('m-scan')">✕</button>
+      </div>
+      <div class="mb">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:13px">Escanea el código de barras con el lector o
+          ingresa el folio manualmente.</p>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input type="text" id="mf-in" placeholder="TKT-0001 — escanea o escribe" autofocus autocomplete="off"
+            oninput="autoSearch(this,'modal')">
+          <button class="btn btn-dark btn-sm"
+            onclick="findByFolio(document.getElementById('mf-in').value)">Buscar</button>
+        </div>
+        <p style="font-size:11px;color:var(--muted);margin-top:8px">💡 El lector de barras envía el código
+          automáticamente — no necesitas presionar Buscar.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Confirmar -->
+  <div class="mo" id="m-conf">
+    <div class="md" style="max-width:400px">
+      <div class="mh">
+        <h2>Confirmación</h2><button class="mx" onclick="cm('m-conf')">✕</button>
+      </div>
+      <div class="mb">
+        <p id="conf-msg" style="font-size:14px;line-height:1.5;color:var(--ink2)"></p>
+      </div>
+      <div class="mf">
+        <button class="btn btn-out" onclick="cm('m-conf')">Cancelar</button>
+        <button class="btn btn-rose" id="conf-btn">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Cierre Mensual -->
+  <div class="mo" id="m-cierre">
+    <div class="md md-xl">
+      <div class="mh">
+        <h2>📅 Cierre Mensual</h2><button class="mx" onclick="cm('m-cierre')">✕</button>
+      </div>
+      <div class="mb">
+        <div class="fg" style="margin-bottom:16px">
+          <div class="fi">
+            <label>Mes</label>
+            <select id="cierre-mes">
+              <option value="1">Enero</option>
+              <option value="2">Febrero</option>
+              <option value="3">Marzo</option>
+              <option value="4">Abril</option>
+              <option value="5">Mayo</option>
+              <option value="6">Junio</option>
+              <option value="7">Julio</option>
+              <option value="8">Agosto</option>
+              <option value="9">Septiembre</option>
+              <option value="10">Octubre</option>
+              <option value="11">Noviembre</option>
+              <option value="12">Diciembre</option>
+            </select>
+          </div>
+          <div class="fi">
+            <label>Año</label>
+            <select id="cierre-anio">
+              <option value="2024">2024</option>
+              <option value="2025">2025</option>
+              <option value="2026" selected>2026</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:16px;display:flex;gap:9px">
+          <button class="btn btn-gold" onclick="generarCierre()">📊 Generar Cierre</button>
+          <button class="btn btn-dark" onclick="exportarCierre()">📊 Exportar Excel</button>
+        </div>
+        <div id="cierre-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Venta Grande -->
+  <div class="mo" id="m-ventas">
+    <div class="md md-xl">
+      <div class="mh">
+        <h2>💼 Nueva Venta</h2><button class="mx" onclick="cm('m-ventas')">✕</button>
+      </div>
+      <div class="mb">
+        <div class="fg" style="margin-bottom:16px">
+          <div class="fi">
+            <label>Cliente *</label>
+            <input type="text" id="vg-cliente" placeholder="Nombre del cliente o empresa…" list="vg-clientes-list"
+              autocomplete="off">
+            <datalist id="vg-clientes-list"></datalist>
+          </div>
+          <div class="fi">
+            <label>Fecha de venta</label>
+            <input type="date" id="vg-fecha">
+          </div>
+          <div class="fi">
+            <label>Método de pago</label>
+            <select id="vg-pago">
+              <option value="efectivo">💵 Efectivo</option>
+              <option value="transferencia">🏦 Transferencia</option>
+              <option value="adelanto">⏳ Adelanto / Parcial</option>
+              <option value="pendiente">🕐 Por cobrar</option>
+            </select>
+          </div>
+          <div class="fi full">
+            <label>Notas (opcional)</label>
+            <textarea id="vg-notas" placeholder="Observaciones de la venta…" style="min-height:46px"></textarea>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <span
+            style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">📦
+            Productos de la venta</span>
+          <button class="btn btn-gold btn-sm" style="font-size:14px" onclick="addVGRow()">&#10010; Agregar
+            producto</button>
+        </div>
+        <div style="overflow-x:auto;border:1px solid var(--b);border-radius:var(--rs);margin-bottom:10px">
+          <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:680px">
+            <thead>
+              <tr style="background:var(--cream)">
+                <th
+                  style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">
+                  Producto</th>
+                <th
+                  style="padding:7px 10px;text-align:center;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">
+                  Cant.</th>
+                <th
+                  style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">
+                  Costo $</th>
+                <th
+                  style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">
+                  Venta $</th>
+                <th
+                  style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--cobalt);border-bottom:1px solid var(--b)">
+                  Stock</th>
+                <th style="border-bottom:1px solid var(--b);width:28px"></th>
+              </tr>
+            </thead>
+            <tbody id="vg-body"></tbody>
+          </table>
+        </div>
+        <div id="vg-tot"></div>
+      </div>
+      <div class="mf">
+        <button class="btn btn-out" onclick="cm('m-ventas')">Cancelar</button>
+        <button class="btn btn-gold" onclick="saveVentaGrande()">💼 Confirmar Venta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Promo Form -->
+  <div class="mo" id="m-promo">
+    <div class="md">
+      <div class="mh">
+        <h2>Asignar Promoción</h2><button class="mx" onclick="cm('m-promo')">✕</button>
+      </div>
+      <div class="mb">
+        <div id="promo-art-info" style="margin-bottom:16px; padding:12px; background:var(--gold-p); border-radius:var(--rs)"></div>
+        <input type="hidden" id="promo-art-id">
+        <div class="fg">
+          <div class="fi"><label>Precio Original</label><input type="number" id="promo-p-orig" readonly style="background:var(--cream)"></div>
+          <div class="fi"><label>Precio Promocional *</label><input type="number" id="promo-p-new" placeholder="0.00"></div>
+          <div class="fi"><label>Fecha Inicio (Opcional)</label><input type="date" id="promo-start"></div>
+          <div class="fi"><label>Fecha Fin (Opcional)</label><input type="date" id="promo-end"></div>
+        </div>
+      </div>
+      <div class="mf">
+        <button class="btn btn-out" onclick="cm('m-promo')">Cancelar</button>
+        <button class="btn btn-gold" onclick="savePromo()">Aplicar Promoción</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sb">
+      <div class="sb-logo">
+        <img src="icon.png" alt="Logo" class="sb-logo-img">
+        <div>
+          <h1>Delirium<br>Decor</h1><span>Control de Tickets</span>
+        </div>
+      </div>
+      <nav class="sb-nav">
+        <button class="ni on" id="ni-dash" onclick="go('dash')"><span
+            class="ico">📊</span><span>Dashboard</span></button>
+        <span class="sb-sec">Tickets</span>
+        <button class="ni" id="ni-list" onclick="go('list')"><span class="ico">🎫</span><span>Todos los
+            tickets</span></button>
+        <button class="ni" id="ni-new" onclick="go('new')"><span class="ico">➕</span><span>Nuevo ticket</span></button>
+        <button class="ni" id="ni-scan" onclick="go('scan')"><span class="ico">📱</span><span>Escanear
+            código</span></button>
+        <span class="sb-sec">Análisis</span>
+        <button class="ni" id="ni-dev" onclick="go('dev')"><span class="ico">🔄</span><span>Devoluciones</span><span
+            class="nbadge" id="devbadge" style="background:var(--warn)">0</span></button>
+        <button class="ni" id="ni-unsold" onclick="go('unsold')"><span class="ico">📦</span><span>Bodega</span><span class="nbadge" id="ubadge">0</span></button>
+        <button class="ni" id="ni-export" onclick="go('export')"><span
+            class="ico">📤</span><span>Exportar</span></button>
+        <span class="sb-sec">Mayoreo</span>
+        <button class="ni" id="ni-ventas" onclick="go('ventas')" style="border:1px solid rgba(201,150,58,.25)"><span
+            class="ico">💼</span><span>Ventas</span></button>
+        <button class="ni" id="ni-promos" onclick="go('promos')"
+          style="margin-top:8px; border:1px solid rgba(201,150,58,.25); font-weight: 600;"><span
+            class="ico">🏷️</span><span>Promociones</span></button>
+      </nav>
+      <div class="sb-foot">
+        <div class="sb-user">
+          <div class="sb-av" id="user-av">DD</div>
+          <div>
+            <div class="sb-un" id="user-un">Delirium Decor</div>
+            <div class="sb-ur">Personal autorizado</div>
+          </div>
+        </div>
+        <button onclick="logOut()" style="
+          display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;
+          background:none;border:none;cursor:pointer;color:#6b7280;font-size:12.5px;
+          font-family:'Inter',sans-serif;border-radius:var(--rs);margin-top:4px;
+          transition:background .15s,color .15s;
+        " onmouseover="this.style.background='rgba(239,68,68,0.08)';this.style.color='#ef4444'" onmouseout="this.style.background='none';this.style.color='#6b7280'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Cerrar sesión
+        </button>
+      </div>
+    </aside>
+
+    <main class="main">
+
+      <!-- DASHBOARD -->
+      <div class="page on" id="p-dash">
+        <div class="topbar">
+          <div>
+            <div class="tb-title">Dashboard</div>
+            <div class="tb-sub" id="today-date"></div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-dark btn-sm" onclick="om('m-cierre')">📅 Cierre Mensual</button>
+            <button class="btn btn-dark btn-sm" onclick="openVentaGrande()">💼 Venta</button>
+            <button class="btn btn-gold btn-sm" onclick="openNewTicket()">➕ Nuevo ticket</button>
+          </div>
+        </div>
+        <div style="padding:26px">
+          <div id="setup-wrap"></div>
+          <div class="mg">
+            <div class="mc">
+              <div class="ml">Total tickets</div>
+              <div class="mv" id="m-tot">0</div>
+              <div class="ms">registrados</div>
+            </div>
+            <div class="mc gold">
+              <div class="ml">Vendidos</div>
+              <div class="mv" id="m-sold">0</div>
+              <div class="ms">en total</div>
+            </div>
+            <div class="mc rose">
+              <div class="ml">Bodega</div>
+              <div class="mv" id="m-pend">0</div>
+              <div class="ms">en bodega</div>
+            </div>
+            <div class="mc sage">
+              <div class="ml">Venta total</div>
+              <div class="mv" id="m-rev">$0</div>
+              <div class="ms">ingresos</div>
+            </div>
+            <div class="mc sage">
+              <div class="ml">Ganancia</div>
+              <div class="mv" id="m-gan" style="font-size:22px">$0</div>
+              <div class="ms">utilidad neta</div>
+            </div>
+            <div class="mc warn">
+              <div class="ml">⏰ Vencen esta semana</div>
+              <div class="mv" id="m-exp">0</div>
+              <div class="ms">devoluciones urgentes</div>
+            </div>
+          </div>
+          <div class="dg2">
+            <div class="card">
+              <div class="ch"><span class="ct">Tickets recientes</span></div>
+              <div class="cb" id="recent-list"></div>
+            </div>
+            <div class="card">
+              <div class="ch"><span class="ct">Por temporada</span></div>
+              <div class="cb" id="season-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIST -->
+      <div class="page" id="p-list">
+        <div class="topbar">
+          <div>
+            <div class="tb-title">Todos los tickets</div>
+            <div class="tb-sub" id="list-sub">0 tickets</div>
+          </div><button class="btn btn-gold btn-sm" onclick="openNewTicket()">➕ Nuevo</button>
+        </div>
+        <div style="padding:26px">
+          <div class="srow">
+            <div class="siw"><span class="sico">🔍</span><input type="text" id="q-search"
+                placeholder="Buscar nombre, folio…" oninput="filterList()"></div>
+            <select class="fsel" id="q-estado" onchange="filterList()">
+              <option value="">Todos los estados</option>
+              <option value="pendiente">Bodega</option>
+              <option value="vendido">Vendido</option>
+              <option value="devuelto">Devuelto</option>
+              <option value="descuento">En descuento</option>
+              <option value="apartado">Apartado</option>
+            </select>
+            <select class="fsel" id="q-temp" onchange="filterList()">
+              <option value="">Todas las temporadas</option>
+              <option>Halloween</option>
+              <option>Navidad</option>
+              <option>Día de Muertos</option>
+              <option>San Valentín</option>
+              <option>Pascua</option>
+              <option>Primavera</option>
+              <option>Día de las Madres</option>
+              <option>Spring</option>
+              <option>Cocina</option>
+              <option>Otoño</option>
+              <option>Ocasión Especial</option>
+              <option>General</option>
+            </select>
+            <button class="btn btn-out btn-sm"
+              onclick="om('m-scan');setTimeout(()=>document.getElementById('mf-in').focus(),100)">🔍 Buscar por
+              código</button>
+          </div>
+          <div class="card">
+            <div class="tw">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Folio</th>
+                    <th>Artículo</th>
+                    <th>Categoría</th>
+                    <th>Temporada</th>
+                    <th>Precio</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="list-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEW -->
+      <div class="page" id="p-new">
+        <div class="topbar">
+          <div class="tb-title">Nuevo Ticket</div>
+        </div>
+        <div style="padding:26px">
+          <div class="card" style="max-width:850px">
+            <div class="ch"><span class="ct">Registrar ticket con múltiples artículos</span></div>
+            <div class="cb">
+              <div class="fg" style="margin-bottom:18px">
+                <div class="fi"><label>Temporada *</label><select id="pt">
+                    <option value="">Seleccionar&hellip;</option>
+                    <option>Halloween</option>
+                    <option>Navidad</option>
+                    <option>D&iacute;a de Muertos</option>
+                    <option>San Valent&iacute;n</option>
+                    <option>Pascua</option>
+                    <option>Primavera</option>
+                    <option>D&iacute;a de las Madres</option>
+                    <option>Spring</option>
+                    <option>Cocina</option>
+                    <option>Otoño</option>
+                    <option>Ocasión Especial</option>
+                    <option>General</option>
+                  </select></div>
+                <div class="fi"><label>Estado inicial</label><select id="pe">
+                    <option value="pendiente">Bodega</option>
+                    <option value="apartado">Apartado</option>
+                    <option value="vendido">Vendido</option>
+                    <option value="descuento">En descuento</option>
+                  </select></div>
+                <div class="fi">
+                  <label>Método de pago</label>
+                  <select id="p-pago">
+                    <option value="efectivo">💵 Efectivo</option>
+                    <option value="transferencia">🏦 Transferencia</option>
+                    <option value="adelanto">⏳ Adelanto / Parcial</option>
+                    <option value="pendiente">🕐 Por cobrar</option>
+                  </select>
+                </div>
+                <div class="fi"><label>Proveedor</label><input type="text" id="pp"
+                    placeholder="Nombre del proveedor&hellip;"></div>
+                <div class="fi">
+                  <label>Código del ticket (Folio) * <small style="font-weight:400;text-transform:none;opacity:0.75">(Escribe BD, HL o HB para generar)</small></label>
+                  <input type="text" id="p-folio"
+                    style="font-family:monospace;font-weight:700;color:var(--cobalt);letter-spacing:.05em;font-size:14px"
+                    placeholder="Ej: 123456789 (Código del ticket Ross)"
+                    oninput="onFolioInput(this)">
+                </div>
+                <div class="fi">
+                  <label>Fecha de registro</label>
+                  <input type="date" id="p-fecha">
+                </div>
+                <div class="fi full"><label>Notas generales</label><textarea id="po"
+                    placeholder="Observaciones del ticket&hellip;" style="min-height:50px"></textarea></div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <span
+                  style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">&#128230;
+                  Artículos individuales</span>
+                <button class="btn btn-gold btn-sm" style="font-size:14px;padding:9px 16px"
+                  onclick="addItemRow('pi-body','pi-tot')">&#10010; Agregar artículo</button>
+              </div>
+              <div style="overflow-x:auto;border:1px solid var(--b);border-radius:var(--rs);margin-bottom:10px">
+                <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px">
+                  <thead>
+                    <tr style="background:var(--cream)">
+                      <th
+                        style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">
+                        C&oacute;digo Barras</th>
+                      <th
+                        style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">
+                        Nombre *</th>
+                      <th
+                        style="padding:7px 10px;text-align:center;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">
+                        Cant.</th>
+                      <th
+                        style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">
+                        Costo Unit. $</th>
+                      <th
+                        style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">
+                        Venta Unit. $</th>
+                      <th
+                        style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--sage);border-bottom:1px solid var(--b)">
+                        Ganancia</th>
+                      <th style="border-bottom:1px solid var(--b);width:28px"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="pi-body"></tbody>
+                </table>
+              </div>
+              <div id="pi-tot"></div>
+              <div style="margin-top:18px;display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap">
+                <button class="btn btn-out" onclick="clearPForm()">Limpiar</button>
+                <button class="btn btn-dark" onclick="savePageTicketOnly()">&#10003; Solo guardar</button>
+                <button class="btn btn-gold" onclick="savePageTicket()">&#10003; Guardar y ver QR</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCAN -->
+      <div class="page" id="p-scan">
+        <div class="topbar">
+          <div class="tb-title">Escanear código de barras</div>
+        </div>
+        <div style="padding:26px">
+          <div class="card" style="max-width:520px;margin:0 auto">
+            <div class="ch"><span class="ct">🔍 Buscar ticket por código de barras</span></div>
+            <div class="cb">
+              <div
+                style="background:var(--gold-p);border:1.5px solid var(--gold-l);border-radius:var(--rs);padding:14px 16px;margin-bottom:18px;font-size:13px;color:var(--ink2);line-height:1.6">
+                <strong>¿Cómo usar?</strong><br>
+                1. Conecta el lector de códigos de barras USB.<br>
+                2. Haz clic en el campo de abajo para enfocarlo.<br>
+                3. Escanea el código — se busca automáticamente.
+              </div>
+              <label style="font-size:11.5px;font-weight:500;color:var(--muted);margin-bottom:6px;display:block">Código
+                / Folio del ticket</label>
+              <div style="display:flex;gap:8px">
+                <input type="text" id="pf-in" placeholder="Escanea o escribe TKT-0001…" autofocus autocomplete="off"
+                  oninput="autoSearch(this,'page')"
+                  style="font-size:15px;padding:11px 14px;font-family:monospace;letter-spacing:.03em">
+                <button class="btn btn-dark"
+                  onclick="findByFolio(document.getElementById('pf-in').value)">Buscar</button>
+              </div>
+              <p style="font-size:11.5px;color:var(--muted);margin-top:10px">💡 El lector envía automáticamente un Enter
+                al terminar — la búsqueda ocurre sin hacer clic.</p>
+              <div id="scan-result" style="margin-top:16px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UNSOLD -->
+      <div class="page" id="p-unsold">
+        <div class="topbar">
+          <div>
+            <div class="tb-title">Bodega</div>
+            <div class="tb-sub">Pendientes · Apartados · En descuento</div>
+          </div><button class="btn btn-out btn-sm" onclick="exportUnsold()">📤 Exportar</button>
+        </div>
+        <div style="padding:26px">
+          <div style="display:flex;gap:9px;margin-bottom:16px;flex-wrap:wrap">
+            <select class="fsel" id="us-temp" onchange="renderUnsold()">
+              <option value="">Todas las temporadas</option>
+              <option>Halloween</option>
+              <option>Navidad</option>
+              <option>Día de Muertos</option>
+              <option>San Valentín</option>
+              <option>Pascua</option>
+              <option>Primavera</option>
+              <option>Día de las Madres</option>
+              <option>Spring</option>
+              <option>Cocina</option>
+              <option>Otoño</option>
+              <option>Ocasión Especial</option>
+              <option>General</option>
+            </select>
+            <div style="flex:1"></div>
+            <button class="btn btn-out btn-sm" onclick="bulkDiscount()">💸 Marcar selección en descuento</button>
+          </div>
+          <div class="card">
+            <div class="tw">
+              <table>
+                <thead>
+                  <tr>
+                    <th><input type="checkbox" id="chk-all" onchange="selAll(this)"></th>
+                    <th>Folio</th>
+                    <th>Artículo</th>
+                    <th>Categoría</th>
+                    <th>Temporada</th>
+                    <th>Precio</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="unsold-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DEVOLUCIONES -->
+      <div class="page" id="p-dev">
+        <div class="topbar">
+          <div>
+            <div class="tb-title">Devoluciones</div>
+            <div class="tb-sub">Artículos pendientes ordenados por urgencia de devolución</div>
+          </div><button class="btn btn-out btn-sm" onclick="exportDev()">📤 Exportar</button>
+        </div>
+        <div style="padding:26px">
+          <div style="display:flex;gap:9px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+            <select class="fsel" id="dev-temp" onchange="renderDev()">
+              <option value="">Todas las temporadas</option>
+              <option>Halloween</option>
+              <option>Navidad</option>
+              <option>Día de Muertos</option>
+              <option>San Valentín</option>
+              <option>Pascua</option>
+              <option>Primavera</option>
+              <option>Día de las Madres</option>
+              <option>Spring</option>
+              <option>Cocina</option>
+              <option>Otoño</option>
+              <option>Ocasión Especial</option>
+              <option>General</option>
+            </select>
+            <select class="fsel" id="dev-filter" onchange="renderDev()">
+              <option value="pending">Solo bodega/apartados</option>
+              <option value="all">Incluir vencidos</option>
+            </select>
+            <div style="flex:1"></div>
+            <div id="dev-summary" style="font-size:12.5px;color:var(--muted)"></div>
+          </div>
+          <div class="card">
+            <div class="tw">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Folio</th>
+                    <th>Artículo</th>
+                    <th>Temporada</th>
+                    <th>Fecha Registro</th>
+                    <th>Fecha Límite</th>
+                    <th>Días Restantes</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="dev-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXPORT -->
+      <div class="page" id="p-export">
+        <div class="topbar">
+          <div class="tb-title">Exportar reportes</div>
+        </div>
+        <div style="padding:26px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:780px">
+            <div class="card">
+              <div class="ch"><span class="ct">Tickets a Excel</span></div>
+              <div class="cb">
+                <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Exporta filtrado por temporada y estado.
+                </p>
+                <div class="fi" style="margin-bottom:12px"><label>Temporada</label><select id="ex-t">
+                    <option value="">Todas</option>
+                    <option>Spring</option>
+                    <option>Cocina</option>
+                    <option>Otoño</option>
+                    <option>Ocasión Especial</option>
+                    <option>General</option>
+                  </select></div>
+                <div class="fi" style="margin-bottom:14px"><label>Estado</label><select id="ex-e">
+                    <option value="">Todos</option>
+                    <option value="pendiente">Bodega</option>
+                    <option value="vendido">Vendido</option>
+                    <option value="devuelto">Devuelto</option>
+                    <option value="descuento">En descuento</option>
+                  </select></div>
+                <button class="btn btn-gold" onclick="exportExcel()">📊 Exportar Excel</button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="ch"><span class="ct">Resumen por temporada</span></div>
+              <div class="cb">
+                <div id="exp-preview" style="margin-bottom:14px"></div>
+                <button class="btn btn-dark" onclick="exportSeason()">📋 Exportar resumen</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VENTAS GRANDES -->
+      <div class="page" id="p-ventas">
+        <div class="topbar">
+          <div>
+            <div class="tb-title">Ventas</div>
+            <div class="tb-sub">Pedidos mayoristas y clientes especiales</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-out btn-sm" onclick="exportarVentasGrandesExcel()">📊 Exportar Excel</button>
+            <button class="btn btn-gold btn-sm" onclick="openVentaGrande()">💼 Nueva Venta</button>
+          </div>
+        </div>
+        <div style="padding:26px">
+          <div class="mg" id="vg-metrics" style="margin-bottom:22px"></div>
+          <div class="card">
+            <div class="ch">
+              <span class="ct">Historial de Ventas</span>
+              <input type="text" id="vg-search" placeholder="Buscar cliente o producto…" oninput="renderVentas()"
+                style="padding:7px 12px;font-size:13px;border:1px solid var(--bs);border-radius:var(--rs);outline:none;width:220px">
+            </div>
+            <div class="tw">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Cliente</th>
+                    <th>Artículos</th>
+                    <th>Total Venta</th>
+                    <th>Ganancia Neta</th>
+                    <th>Pago</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="vg-list-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMOS -->
+      <div class="page" id="p-promos">
+        <div class="topbar">
+          <div>
+            <div class="tb-title">Promociones</div>
+            <div class="tb-sub">Gestiona precios temporales para artículos no vendidos</div>
+          </div>
+        </div>
+        <div style="padding:26px">
+          <div class="dg2">
+            <div class="card">
+              <div class="ch"><span class="ct">Artículos disponibles para Promo</span></div>
+              <div class="cb">
+                <div class="siw" style="margin-bottom:12px">
+                  <span class="sico">🔍</span>
+                  <input type="text" id="promo-search" placeholder="Filtrar artículos no vendidos..." oninput="renderPromosList()">
+                </div>
+                <div class="tw" style="max-height: 400px; overflow-y: auto;">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Artículo</th>
+                        <th>Precio Actual</th>
+                        <th>Acción</th>
+                      </tr>
+                    </thead>
+                    <tbody id="promo-avail-body"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="ch"><span class="ct">Promociones Activas</span></div>
+              <div class="cb">
+                <div class="tw">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Artículo</th>
+                        <th>Promo</th>
+                        <th>Vence</th>
+                        <th>Acción</th>
+                      </tr>
+                    </thead>
+                    <tbody id="promo-active-body"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // ══ CONFIG SUPABASE ══
+    const SB_URL = 'https://pzbklcnmraqyijdpnleg.supabase.co';
+    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6YmtsY25tcmFxeWlqZHBubGVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5NTI1NzUsImV4cCI6MjA5MDUyODU3NX0.sFKmxz2chZGzRZXRXi-7nez6EhY6aR2TIxWvQ5-6EU0';
+
+    // ══ STATE ══
+    let tickets = [], ventasGrandes = [], notasVenta = [], DB = null, curQR = null, curDetId = null;
+
+    // ══ AUTH ══
+    function logOut() {
+      sessionStorage.removeItem('dd_auth');
+      sessionStorage.removeItem('dd_user');
+      window.location.replace('login.html');
+    }
+
+    // ══ INIT ══
+    window.addEventListener('load', () => {
+      document.querySelectorAll('.mo').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) modal.classList.remove('on');
+        });
+      });
+      document.getElementById('today-date').textContent =
+        new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      
+      // Update sidebar user info
+      const u = sessionStorage.getItem('dd_user');
+      if (u) {
+        const name = u.charAt(0).toUpperCase() + u.slice(1);
+        document.getElementById('user-un').textContent = name;
+        document.getElementById('user-av').textContent = u.charAt(0).toUpperCase();
+      }
+
+      connect(SB_URL, SB_KEY, true);
+      initBarcodeListeners();
+    });
+
+    // ══ SUPABASE ══
+    async function connect(url, key, silent) {
+      try {
+        DB = supabase.createClient(url, key);
+        const { error } = await DB.from('tickets').select('id').limit(1);
+        if (error) {
+          if (error.code === '42P01') {
+            toast('Tabla "tickets" no existe — créala en Supabase SQL Editor', 'err');
+            showSQLInfo();
+          } else toast('Error Supabase: ' + error.message, 'err');
+          DB = null; loadDemo(); render(); return;
+        }
+        if (!silent) toast('✓ Conectado a Supabase', 'ok');
+        const w = document.getElementById('setup-wrap'); if (w) w.innerHTML = '';
+        await pull();
+      } catch (e) { toast('Error al conectar: ' + e.message, 'err'); DB = null; loadDemo(); render(); }
+    }
+
+    function showSQLInfo() {
+      const w = document.getElementById('setup-wrap'); if (!w) return;
+      w.innerHTML = `<div class="setup"><span style="font-size:24px;flex-shrink:0">⚠️</span><div style="flex:1"><h3>Crea las tablas en Supabase</h3><p>Ejecuta este SQL en <strong>Supabase → SQL Editor</strong>:</p><pre style="background:#1A1510;color:#E8C47A;padding:12px;border-radius:8px;font-size:11px;overflow-x:auto;margin-top:8px">
+-- 1. Agregar proveedor al encabezado
+ALTER TABLE tickets ADD COLUMN proveedor text;
+
+-- 2. Nueva tabla de artículos
+CREATE TABLE articulos (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  ticket_id uuid REFERENCES tickets(id) ON DELETE CASCADE,
+  nombre text NOT NULL,
+  cantidad integer DEFAULT 1,
+  precio_unitario numeric DEFAULT 0,
+  precio_compra numeric DEFAULT 0,
+  codigo_barras text,
+  estado text DEFAULT 'pendiente',
+  created_at timestamptz DEFAULT now()
+);
+
+-- 3. Desactivar RLS para evitar errores de política de seguridad
+ALTER TABLE articulos DISABLE ROW LEVEL SECURITY;
+ALTER TABLE tickets DISABLE ROW LEVEL SECURITY;
+
+-- Índices
+CREATE INDEX idx_articulos_barcode ON articulos(codigo_barras) WHERE codigo_barras IS NOT NULL;
+CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
+</pre></div></div>`;
+    }
+
+    async function pull() {
+      if (!DB) return;
+      // Fetch tickets and their articulos
+      const { data, error } = await DB.from('tickets').select('*, articulos(*), ticket_items(*)').order('created_at', { ascending: false });
+      if (error) { toast('Error cargando: ' + error.message, 'err'); return; }
+
+      tickets = (data || []).map(t => {
+        // Migration logic: use articulos if they exist, otherwise ticket_items (old format)
+        let items = t.articulos || [];
+        if (!items.length && t.ticket_items && t.ticket_items.length) {
+          items = t.ticket_items.map(i => ({ ...i, precio_unitario: i.precio_venta, precio_compra: i.precio_compra, estado: t.estado }));
+        }
+
+        // Dynamic status calculation for tickets with articulos
+        if (t.articulos && t.articulos.length) {
+          t.estado = calcTicketStatus(t.articulos);
+        }
+
+        return { ...t, items };
+      });
+      render();
+      await pullVentasGrandes();
+      await fetchPromos();
+    }
+
+    function calcTicketStatus(items) {
+      if (!items || !items.length) return 'pendiente';
+      const allSold = items.every(i => i.estado === 'vendido');
+      if (allSold) return 'completado';
+
+      const anySold = items.some(i => i.estado === 'vendido');
+      const anyApartado = items.some(i => i.estado === 'apartado');
+      const allReturned = items.every(i => i.estado.startsWith('devuelto'));
+
+      if (allReturned) return 'devuelto';
+      if (anySold || anyApartado) return 'parcial';
+      return 'pendiente';
+    }
+
+    async function push(row, items = []) {
+      const curUser = sessionStorage.getItem('dd_user') || 'desconocido';
+      const rowWithUser = { ...row, vendedor: curUser };
+
+      if (!DB) {
+        const t = { ...rowWithUser, id: crypto.randomUUID(), created_at: new Date().toISOString(), items: items.map(i => ({ ...i, id: crypto.randomUUID(), estado: 'pendiente' })) };
+        tickets.unshift(t); render(); return t;
+      }
+
+      // Insert ticket header
+      const { data, error } = await DB.from('tickets').insert([rowWithUser]).select().single();
+      if (error) { toast('Error: ' + error.message, 'err'); return null; }
+
+      if (items.length) {
+        const iRows = items.map(i => ({ ...i, ticket_id: data.id, estado: 'pendiente' }));
+        const { error: ie } = await DB.from('articulos').insert(iRows);
+        if (ie) toast('Error guardando artículos: ' + ie.message, 'err');
+        data.items = items.map(i => ({ ...i, estado: 'pendiente' }));
+      } else { data.items = []; }
+
+      tickets.unshift(data);
+      render();
+      return data;
+    }
+
+    // Update a single article
+    async function patchArticulo(artId, fields) {
+      const t = tickets.find(t => t.items.some(i => i.id === artId));
+      if (!t) return;
+      const art = t.items.find(i => i.id === artId);
+      Object.assign(art, fields);
+
+      if (DB) {
+        const { error } = await DB.from('articulos').update(fields).eq('id', artId);
+        if (error) { toast('Error actualizando artículo: ' + error.message, 'err'); return; }
+
+        // Recalculate ticket status and update in DB
+        const newStatus = calcTicketStatus(t.items);
+        if (newStatus !== t.estado) {
+          t.estado = newStatus;
+          await DB.from('tickets').update({ estado: newStatus, updated_at: new Date().toISOString() }).eq('id', t.id);
+        }
+      } else {
+        t.estado = calcTicketStatus(t.items);
+      }
+
+      render();
+      if (curDetId === t.id) openDet(t.id);
+      toast('✓ Artículo actualizado', 'ok');
+
+      if (fields.estado === 'vendido') {
+        const curUser = sessionStorage.getItem('dd_user') || 'desconocido';
+        const art = t.items.find(i => i.id === artId);
+        
+        // Track seller in DB column (if exists)
+        if (DB) {
+          await DB.from('articulos').update({ vendedor: curUser }).eq('id', artId).catch(()=>{});
+        }
+
+        const nota = {
+          id: crypto.randomUUID(),
+          fecha: new Date().toISOString(),
+          articulo_id: artId,
+          ticket_id: t.id,
+          folio: t.folio,
+          nombre: art.nombre,
+          precio_compra: art.precio_compra || 0,
+          precio_venta: art.precio_unitario || art.precio_venta || 0,
+          ganancia: (art.precio_unitario || 0) - (art.precio_compra || 0),
+          tipo: 'venta',
+          vendedor: curUser
+        };
+        notasVenta.unshift(nota);
+        if (DB) {
+          await DB.from('notas_venta').insert([nota]).catch(e => console.warn('notas_venta:', e.message));
+        }
+      }
+    }
+
+    async function patch(id, fields) {
+      const t = tickets.find(t => t.id === id); if (!t) return;
+      Object.assign(t, fields);
+      if (DB) {
+        const { error } = await DB.from('tickets').update({ ...fields, updated_at: new Date().toISOString() }).eq('id', id);
+        if (error) { toast('Error: ' + error.message, 'err'); return; }
+      }
+      render(); toast('✓ Ticket: ' + (fields.estado ? elbl(fields.estado) : 'Actualizado'), 'ok');
+    }
+
+    async function updateProvider(id) {
+      const t = tickets.find(t => t.id === id);
+      if (!t) return;
+      const newProv = prompt('Editar Proveedor:', t.proveedor || '');
+      if (newProv === null) return;
+      await patch(id, { proveedor: newProv.trim() });
+      if (curDetId === id) openDet(id);
+    }
+
+    async function updateFolio(id) {
+      const t = tickets.find(t => t.id === id);
+      if (!t) return;
+      const newFolio = prompt('Editar Folio / Ticket:', t.folio || '');
+      if (newFolio === null) return;
+      const finalFolio = newFolio.trim().toUpperCase();
+      if (!finalFolio) return;
+      
+      const exists = tickets.find(x => x.folio === finalFolio && x.id !== id);
+      if (exists) { toast('\u26a0\ufe0f Ese folio ya existe en otro ticket', 'err'); return; }
+
+      await patch(id, { folio: finalFolio });
+      if (curDetId === id) openDet(id);
+    }
+
+    function askConf(m, cb) {
+      document.getElementById('conf-msg').textContent = m;
+      const bt = document.getElementById('conf-btn');
+      bt.onclick = () => { cm('m-conf'); cb(); };
+      om('m-conf');
+    }
+
+    async function deleteTicket(id) {
+      askConf('¿Estás seguro de eliminar este ticket? Se borrarán también todos sus artículos de forma permanente.', async () => {
+        if (DB) {
+          const { error } = await DB.from('tickets').delete().eq('id', id);
+          if (error) { toast('Error al eliminar: ' + error.message, 'err'); return; }
+        }
+        tickets = tickets.filter(t => t.id !== id);
+        render();
+        toast('✓ Ticket eliminado', 'ok');
+      });
+    }
+
+    // ══ UTILS ══
+    function om(id) { document.getElementById(id)?.classList.add('on'); }
+    function cm(id) { document.getElementById(id)?.classList.remove('on'); }
+    function toast(m, t = 'ok') {
+      const c = document.getElementById('toasts'); if (!c) return;
+      const e = document.createElement('div'); e.className = `toast ${t}`; e.textContent = m;
+      c.appendChild(e); setTimeout(() => e.remove(), 4000);
+    }
+    function stBadge(s) {
+      const m = { pendiente: 'p', vendido: 'v', devuelto: 'd', devuelto_completo: 'v', devuelto_vale: 'dvv', descuento: 'dc', apartado: 'a', archivado: 'a', parcial: 'warn', completado: 'v' };
+      const cls = m[s] || 'a';
+      return `<span class="st st-${cls}">${elbl(s)}</span>`;
+    }
+    function elbl(s) {
+      const m = { pendiente: 'Bodega', vendido: 'Vendido', devuelto: 'Devuelto', devuelto_completo: 'Devuelta (Comp.)', devuelto_vale: 'Devuelta (Vale)', descuento: 'En Descuento', apartado: 'Apartado', parcial: 'Parcial', completado: 'Completado', archivado: 'Archivado' };
+      return m[s] || s;
+    }
+    function sEmoji(s) {
+      const m = { Halloween: '🎃', Navidad: '🎄', 'Día de Muertos': '💀', 'San Valentín': '❤️', Pascua: '🐰', Primavera: '🌸', 'Día de las Madres': '👩', General: '📦' };
+      return m[s] || '📦';
+    }
+    function fDate(d) {
+      if (!d) return '—';
+      const date = new Date(d);
+      if (isNaN(date.getTime())) return d;
+      return date.toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    // ══ NAVIGATION ══
+    function go(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+      document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
+      document.getElementById('p-' + page).classList.add('on');
+      const ni = document.getElementById('ni-' + page);
+      if (ni) ni.classList.add('on');
+      if (page === 'scan') setTimeout(() => { const el = document.getElementById('pf-in'); if (el) { el.focus(); el.select(); } }, 100);
+      if (page === 'new') {
+        const b = document.getElementById('pi-body');
+        if (b && !b.children.length) addItemRow('pi-body', 'pi-tot');
+        // Fecha de hoy por defecto
+        const fechaEl = document.getElementById('p-fecha');
+        if (fechaEl && !fechaEl.value) fechaEl.value = new Date().toISOString().slice(0, 10);
+      }
+      if (page === 'dash') renderDash();
+      if (page === 'list') renderList();
+      if (page === 'unsold') renderUnsold();
+      if (page === 'export') renderExpPreview();
+      if (page === 'dev') renderDev();
+      if (page === 'ventas') renderVentas();
+      if (page === 'promos') fetchPromos();
+    }
+
+    // ══ RENDER ══
+    function render() { renderDash(); renderList(); renderUnsold(); renderDev(); renderVentas(); updateBadge(); }
+
+    function renderDash() {
+      let totTickets = tickets.length;
+      let soldArts = 0, pendArts = 0, revTotal = 0, costTotal = 0;
+      let expWeekArts = 0;
+
+      tickets.forEach(t => {
+        const ds = calcDevStatus(t);
+        const isUrgent = ds.days <= 7;
+
+        (t.items || []).forEach(i => {
+          if (i.estado === 'vendido') {
+            soldArts += (+i.cantidad || 1);
+            revTotal += (+i.precio_unitario || +i.precio_venta || 0) * (+i.cantidad || 1);
+            costTotal += (+i.precio_compra || 0) * (+i.cantidad || 1);
+          } else if (['pendiente', 'apartado', 'descuento'].includes(i.estado)) {
+            pendArts += (+i.cantidad || 1);
+            if (isUrgent) expWeekArts += (+i.cantidad || 1);
+          }
+        });
+      });
+
+      const gan = revTotal - costTotal;
+
+      document.getElementById('m-tot').textContent = totTickets;
+      document.getElementById('m-sold').textContent = soldArts;
+      document.getElementById('m-pend').textContent = pendArts;
+      document.getElementById('m-rev').textContent = '$' + revTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 });
+
+      const gEl = document.getElementById('m-gan');
+      if (gEl) {
+        gEl.textContent = (gan >= 0 ? '+ ' : '- ') + '$' + Math.abs(gan).toLocaleString('es-MX', { minimumFractionDigits: 2 });
+        gEl.style.color = gan >= 0 ? 'var(--sage)' : 'var(--rose)';
+      }
+
+      const mExp = document.getElementById('m-exp');
+      if (mExp) mExp.textContent = expWeekArts;
+
+      // Recent Tickets List
+      const rl = document.getElementById('recent-list');
+      const rec = tickets.slice(0, 6);
+      if (!rec.length) {
+        rl.innerHTML = `<div class="empty"><div class="ei">🎫</div><p>Aún no hay tickets</p></div>`;
+      } else {
+        rl.innerHTML = rec.map(t => {
+          const tV = (t.items || []).reduce((acc, i) => acc + ((+i.precio_unitario || 0) * (+i.cantidad || 1)), 0);
+          return `
+        <div onclick="openDet('${t.id}')" style="display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--b);cursor:pointer">
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:500;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.proveedor || 'Sin proveedor'}</div>
+            <div style="font-size:11.5px;color:var(--muted)">${t.folio} · ${t.items.length} art.</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-weight:600;font-size:13.5px">$${tV.toFixed(2)}</div>
+            ${stBadge(t.estado)}
+            <div style="margin-top:4px"><button class="btn btn-xs btn-rose" onclick="event.stopPropagation(); askConf('¿Eliminar este ticket y todos sus artículos?', ()=>deleteTicket('${t.id}'))">✕</button></div>
+          </div>
+        </div>`;
+        }).join('') + `<div style="padding-top:11px"><button class="btn btn-out btn-sm" style="width:100%" onclick="go('list')">Ver todos los tickets &rarr;</button></div>`;
+
+      const nl = document.getElementById('notas-list');
+      if (nl) {
+        nl.innerHTML = notasVenta.slice(0, 5).map(n => `
+    <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--b);font-size:12.5px">
+      <div>
+        <div style="font-weight:500">${n.nombre}</div>
+        <div style="color:var(--muted);font-size:11px">${n.folio} · ${fDate(n.fecha)}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-weight:600;color:var(--sage)">+$${(+n.ganancia).toFixed(2)}</div>
+        <div style="color:var(--muted);font-size:11px">$${(+n.precio_venta).toFixed(2)} venta</div>
+      </div>
+    </div>`).join('') || '<p style="font-size:12.5px;color:var(--muted)">Sin ventas registradas aún</p>';
+      }
+      }
+
+      // Season Progress
+      const byS = {};
+      tickets.forEach(t => {
+        const s = t.temporada || 'Sin temporada';
+        if (!byS[s]) byS[s] = { tot: 0, sold: 0, rev: 0 };
+        (t.items || []).forEach(i => {
+          byS[s].tot += (+i.cantidad || 1);
+          if (i.estado === 'vendido') {
+            byS[s].sold += (+i.cantidad || 1);
+            byS[s].rev += (+i.precio_unitario || 0) * (+i.cantidad || 1);
+          }
+        });
+      });
+
+      const sl = document.getElementById('season-list');
+      const ents = Object.entries(byS);
+      if (!ents.length) {
+        sl.innerHTML = `<div class="empty"><div class="ei">🌸</div><p>Sin temporadas aún</p></div>`;
+      } else {
+        sl.innerHTML = ents.map(([s, d]) => `
+      <div style="margin-bottom:13px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <span style="font-size:13px;font-weight:500">${sEmoji(s)} ${s}</span>
+          <span style="font-size:11.5px;color:var(--muted)">${d.sold}/${d.tot} art.</span>
+        </div>
+        <div class="pb"><div class="pbf" style="width:${d.tot ? Math.round(d.sold / d.tot * 100) : 0}%"></div></div>
+        <div style="font-size:11px;color:var(--muted)">$${d.rev.toLocaleString('es-MX', { minimumFractionDigits: 2 })} recaudado</div>
+      </div>`).join('');
+      }
+    }
+
+    function renderList(data) {
+      const rows = data !== undefined ? data : tickets;
+      document.getElementById('list-sub').textContent = rows.length + ' ticket' + (rows.length !== 1 ? 's' : '');
+      const tb = document.getElementById('list-body');
+      if (!rows.length) { tb.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="ei">🎫</div><h3>Sin resultados</h3><p>Intenta otros filtros o registra tu primer ticket.</p></div></td></tr>`; return; }
+      
+      tb.innerHTML = rows.map(t => {
+        const tV = (t.items || []).reduce((acc, i) => acc + ((+i.precio_unitario || +i.precio_venta || 0) * (+i.cantidad || 1)), 0);
+        const itemName = t.proveedor || t.nombre || 'Ticket Múltiple';
+        const catOrCount = t.categoria || ((t.items ? t.items.length : 0) + ' arts');
+        return `<tr><td><span class="fo">${t.folio}</span></td><td><span class="an">${itemName}</span></td><td style="font-size:12.5px;color:var(--muted)">${catOrCount}</td><td><span class="sbadge">${sEmoji(t.temporada)} ${t.temporada || '—'}</span></td><td><span class="pr">$${tV.toFixed(2)}</span></td><td>${stBadge(t.estado)}</td><td style="font-size:12px;color:var(--muted)">${fDate(t.created_at)}</td><td><div style="display:flex;gap:5px"><button class="btn btn-xs btn-out" onclick="openDet('${t.id}')">Ver</button><button class="btn btn-xs btn-out" onclick="showQR('${t.id}')">QR</button><button class="btn btn-xs btn-rose" onclick="deleteTicket('${t.id}')">Eliminar</button></div></td></tr>`;
+      }).join('');
+    }
+
+    function filterList() {
+      const q = document.getElementById('q-search').value.toLowerCase();
+      const es = document.getElementById('q-estado').value;
+      const te = document.getElementById('q-temp').value;
+      renderList(tickets.filter(t => (!q || t.nombre.toLowerCase().includes(q) || t.folio.toLowerCase().includes(q) || (t.categoria || '').toLowerCase().includes(q)) && (!es || t.estado === es) && (!te || t.temporada === te)));
+    }
+
+    function renderUnsold() {
+      const te = document.getElementById('us-temp')?.value || '';
+      const tb = document.getElementById('unsold-body'); if (!tb) return;
+
+      // Flatten all articles from matching tickets
+      let allArts = [];
+      tickets.filter(t => !te || t.temporada === te).forEach(t => {
+        (t.items || []).forEach(i => {
+          // Ocultar artículos con stock en 0 (ya vendidos/agotados)
+          if (['pendiente', 'apartado', 'descuento'].includes(i.estado) && (i.cantidad == null || +i.cantidad > 0)) {
+            allArts.push({ ...i, ticketId: t.id, folio: t.folio, temporada: t.temporada });
+          }
+        });
+      });
+
+      if (!allArts.length) {
+        tb.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="ei">📦</div><h3>¡Todo vendido!</h3><p>No hay artículos pendientes.</p></div></td></tr>`;
+        return;
+      }
+
+      tb.innerHTML = allArts.map(a => {
+        const promo = typeof getActivePromo === 'function' ? getActivePromo(a.id) : null;
+        const displayPrice = promo ? promo.precio_promocional : (a.precio_unitario || 0);
+        const promoBadge = promo ? '<span class="st st-v" style="font-size:10px; padding:1px 5px; margin-left:5px">PROMO</span>' : '';
+
+        return `
+    <tr class="ur">
+      <td><input type="checkbox" class="uch" data-id="${a.id}"></td>
+      <td><span class="fo">${a.folio}</span></td>
+      <td><span class="an">${a.nombre}</span> ${promoBadge} <br> <small style="color:var(--muted);font-family:monospace">${a.codigo_barras || '—'}</small></td>
+      <td><span class="sbadge">${sEmoji(a.temporada)} ${a.temporada || '—'}</span></td>
+      <td>
+        ${promo ? `<small style="text-decoration:line-through; color:var(--muted); display:block">$${(+a.precio_unitario).toFixed(2)}</small>` : ''}
+        <span class="pr" style="${promo ? 'color:var(--rose)' : ''}">$${(+displayPrice).toFixed(2)}</span>
+      </td>
+      <td>${stBadge(a.estado)}</td>
+      <td>
+        <div style="display:flex;gap:5px">
+          <button class="btn btn-xs btn-sage" onclick="patchArticulo('${a.id}',{estado:'vendido'})">✓ Vendido</button>
+          <button class="btn btn-xs btn-out" onclick="patchArticulo('${a.id}',{estado:'descuento'})">💸</button>
+          <button class="btn btn-xs btn-out" onclick="openDet('${a.ticketId}')">Ver</button>
+        </div>
+      </td>
+    </tr>`;
+      }).join('');
+    }
+
+    function updateBadge() {
+      let unsold = 0, urgent = 0;
+      tickets.forEach(t => {
+        const ds = calcDevStatus(t);
+        (t.items || []).forEach(i => {
+          if (['pendiente', 'apartado'].includes(i.estado)) {
+            unsold++;
+            if (ds.days <= 7) urgent++;
+          }
+        });
+      });
+      document.getElementById('ubadge').textContent = unsold;
+      const db = document.getElementById('devbadge');
+      if (db) {
+        db.textContent = urgent;
+        db.style.display = urgent > 0 ? '' : 'none';
+      }
+    }
+
+    function renderExpPreview() {
+      const byS = {};
+      tickets.forEach(t => { const s = t.temporada || 'Sin temporada'; if (!byS[s]) byS[s] = { tot: 0, sold: 0, rev: 0 }; byS[s].tot++; if (t.estado === 'vendido') { byS[s].sold++; byS[s].rev += (+t.precio || 0); } });
+      const el = document.getElementById('exp-preview'); if (!el) return;
+      const ents = Object.entries(byS);
+      el.innerHTML = ents.length ? ents.map(([s, d]) => `<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--b)"><span>${sEmoji(s)} ${s}</span><span style="color:var(--muted)">${d.sold}/${d.tot} · $${d.rev.toFixed(2)}</span></div>`).join('') : '<p style="font-size:13px;color:var(--muted)">Sin datos</p>';
+    }
+
+    function selAll(cb) { document.querySelectorAll('.uch').forEach(c => c.checked = cb.checked); }
+    function bulkDiscount() { const ids = [...document.querySelectorAll('.uch:checked')].map(c => c.dataset.id); if (!ids.length) { toast('Selecciona artículos primero', 'err'); return; } ids.forEach(id => patch(id, { estado: 'descuento' })); }
+
+    // ══ TICKET ══
+    function folio() {
+      if (!tickets.length) return 'TKT-0001';
+      const nums = tickets.map(t => {
+        const m = (t.folio || '').match(/\d+/);
+        return m ? parseInt(m[0], 10) : 0;
+      });
+      const max = Math.max(...nums);
+      return 'TKT-' + String(max + 1).padStart(4, '0');
+    }
+
+    function openNewTicket() {
+      document.getElementById('mi-body').innerHTML = '';
+      document.getElementById('mi-tot').innerHTML = '';
+      document.getElementById('nt2').value = 'General';
+      document.getElementById('ne').selectedIndex = 0;
+      document.getElementById('nt-pago').value = 'efectivo';
+      document.getElementById('no2').value = '';
+      document.getElementById('np2').value = '';
+      const folioEl = document.getElementById('n-folio');
+      if (folioEl) folioEl.value = '';
+      document.getElementById('m-new').classList.add('on');
+      setTimeout(() => addItemRow('mi-body', 'mi-tot'), 50);
+    }
+
+    async function saveModalTicket() {
+      const te = document.getElementById('nt2').value;
+      if (!te) { toast('Selecciona la temporada', 'err'); return; }
+      const folioVal = document.getElementById('n-folio')?.value.trim();
+      if (!folioVal) { toast('Ingresa el código del ticket (Folio)', 'err'); return; }
+      const items = getItems('mi-body');
+      if (!items.length) { toast('Agrega al menos un producto', 'err'); return; }
+      const tv = items.reduce((s, i) => s + (+i.precio_venta || 0) * (+i.cantidad || 1), 0);
+      const row = {
+        folio: folioVal,
+        nombre: items.map(i => i.nombre).join(', ').substring(0, 100),
+        temporada: te,
+        estado: document.getElementById('ne').value,
+        precio: tv,
+        notas: document.getElementById('no2').value,
+        proveedor: document.getElementById('np2').value || null,
+        metodo_pago: document.getElementById('nt-pago').value
+      };
+      const t = await push(row, items);
+      if (t) { cm('m-new'); toast('\u2713 Ticket ' + t.folio + ' creado (' + items.length + ' prod.)', 'ok'); }
+    }
+
+    async function savePageTicket() {
+      const te = document.getElementById('pt').value;
+      if (!te) { toast('Selecciona la temporada', 'err'); return; }
+      const folioVal = document.getElementById('p-folio')?.value.trim();
+      if (!folioVal) { toast('Ingresa el código del ticket (Folio)', 'err'); return; }
+      const items = getItems('pi-body');
+      if (!items.length) { toast('Agrega al menos un producto', 'err'); return; }
+      const tv = items.reduce((s, i) => s + (+i.precio_venta || 0) * (+i.cantidad || 1), 0);
+      const fechaVal = document.getElementById('p-fecha')?.value || null;
+      const row = {
+        folio: folioVal,
+        nombre: items.map(i => i.nombre).join(', ').substring(0, 100),
+        temporada: te,
+        estado: document.getElementById('pe').value,
+        precio: tv,
+        notas: document.getElementById('po').value,
+        fecha_registro: fechaVal,
+        proveedor: document.getElementById('pp').value || null,
+        metodo_pago: document.getElementById('p-pago').value
+      };
+      const t = await push(row, items);
+      if (t) { toast('\u2713 Ticket ' + t.folio + ' guardado', 'ok'); clearPForm(); setTimeout(() => showQR(t.id), 250); }
+    }
+
+    async function savePageTicketOnly() {
+      const te = document.getElementById('pt').value;
+      if (!te) { toast('Selecciona la temporada', 'err'); return; }
+      const folioVal = document.getElementById('p-folio')?.value.trim();
+      if (!folioVal) { toast('Ingresa el código del ticket (Folio)', 'err'); return; }
+      const items = getItems('pi-body');
+      if (!items.length) { toast('Agrega al menos un producto', 'err'); return; }
+      const tv = items.reduce((s, i) => s + (+i.precio_venta || 0) * (+i.cantidad || 1), 0);
+      const fechaVal = document.getElementById('p-fecha')?.value || null;
+      const row = {
+        folio: folioVal,
+        nombre: items.map(i => i.nombre).join(', ').substring(0, 100),
+        temporada: te,
+        estado: document.getElementById('pe').value,
+        precio: tv,
+        notas: document.getElementById('po').value,
+        fecha_registro: fechaVal,
+        proveedor: document.getElementById('pp').value || null,
+        metodo_pago: document.getElementById('p-pago').value
+      };
+      const t = await push(row, items);
+      if (t) {
+        toast('\u2713 Ticket ' + t.folio + ' guardado', 'ok');
+        clearPForm();
+      }
+    }
+
+    function clearPForm() {
+      document.getElementById('pt').value = 'General';
+      document.getElementById('po').value = '';
+      document.getElementById('pp').value = '';
+      document.getElementById('p-pago').value = 'efectivo';
+      document.getElementById('pi-body').innerHTML = '';
+      document.getElementById('pi-tot').innerHTML = '';
+      // Limpiar folio y resetear fecha a hoy
+      const folioEl = document.getElementById('p-folio');
+      if (folioEl) folioEl.value = '';
+      const fechaEl = document.getElementById('p-fecha');
+      if (fechaEl) fechaEl.value = new Date().toISOString().slice(0, 10);
+    }
+
+    // ══ DEVOLUCIÓN STATUS ══
+    function calcDevStatus(t) {
+      const regDate = t.fecha_registro ? new Date(t.fecha_registro + 'T00:00:00') : new Date(t.created_at);
+      const limDate = new Date(regDate); limDate.setDate(limDate.getDate() + 30);
+      const now = new Date(); now.setHours(0, 0, 0, 0);
+      const days = Math.ceil((limDate - now) / 86400000);
+      if (days > 7) return { days, limDate, regDate, cls: 'dev-ok', icon: '✅', label: days + ' días para devolver', sub: 'Devolución a tiempo · límite ' + fDate(limDate.toISOString()) };
+      if (days > 0) return { days, limDate, regDate, cls: 'dev-warn', icon: '⚠️', label: 'Urgente: ' + days + ' día' + (days === 1 ? '' : 's'), sub: '¡Menos de una semana! · límite ' + fDate(limDate.toISOString()) };
+      return { days, limDate, regDate, cls: 'dev-expired', icon: '🔴', label: 'VENCIÓ — Solo vale', sub: 'Venció hace ' + Math.abs(days) + ' día' + (Math.abs(days) === 1 ? '' : 's') + ' (' + fDate(limDate.toISOString()) + ')' };
+    }
+
+    function devBannerHTML(t) {
+      if (!['pendiente', 'apartado'].includes(t.estado)) return '';
+      const ds = calcDevStatus(t);
+      return `<div class="devbanner ${ds.cls}">
+    <div class="dbi">${ds.icon}</div>
+    <div class="dbt"><strong>${ds.label}</strong><span>Registrado: ${fDate((t.fecha_registro ? t.fecha_registro + 'T00:00:00' : t.created_at))} · Límite: ${fDate(ds.limDate.toISOString())}</span></div>
+    <div class="dbd">${ds.days > 0 ? ds.days : 0}<small>${ds.days > 0 ? 'días' : 'venció'}</small></div>
+  </div>`;
+    }
+
+    // ══ DETAIL ══
+    function openDet(id) {
+      curDetId = id;
+      const t = tickets.find(t => t.id === id); if (!t) return;
+      const items = t.items || [];
+
+      const pMap = { efectivo: '💵 Efectivo', transferencia: '🏦 Transferencia', adelanto: '⏳ Adelanto', pendiente: '🕐 Por cobrar' };
+      const pagoLabel = t.metodo_pago ? (pMap[t.metodo_pago] || t.metodo_pago) : '—';
+
+      let tC = 0, tV = 0;
+      items.forEach(i => {
+        tC += (+i.precio_compra || 0) * (+i.cantidad || 1);
+        tV += (+i.precio_unitario || +i.precio_venta || 0) * (+i.cantidad || 1);
+      });
+      const gan = tV - tC;
+
+      const TH = 'padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b);background:var(--cream)';
+
+      const iRows = items.map(i => {
+        const promo = typeof getActivePromo === 'function' ? getActivePromo(i.id) : null;
+        const unitPrice = (promo ? +promo.precio_promocional : (+i.precio_unitario || +i.precio_venta || 0));
+        const cost = (+i.precio_compra || 0);
+        const profit = (unitPrice - cost) * (i.cantidad || 1);
+
+        return `<tr>
+      <td style="padding:9px 10px;border-bottom:1px solid var(--b);font-family:monospace;font-size:11.5px">${i.codigo_barras || i.barcode || '—'}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid var(--b);font-weight:500">${i.nombre} ${promo ? '<span class="st st-v" style="font-size:9px">PROMO</span>' : ''}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid var(--b);text-align:center">${i.cantidad || 1}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid var(--b)">
+        ${promo ? `<small style="text-decoration:line-through;color:var(--muted);display:block">$${(+i.precio_unitario).toFixed(2)}</small>` : ''}
+        <span style="${promo ? 'color:var(--rose);font-weight:700' : ''}">$${unitPrice.toFixed(2)}</span>
+      </td>
+      <td style="padding:9px 10px;border-bottom:1px solid var(--b)">
+        <div style="display:flex;gap:4px;flex-wrap:nowrap">
+          ${['pendiente', 'vendido', 'devuelto_completo', 'devuelto_vale'].map(st => `
+            <button style="white-space:nowrap" class="btn btn-xs ${i.estado === st ? (st === 'vendido' ? 'btn-rose' : 'btn-gold') : 'btn-out'}" 
+              onclick="patchArticulo('${i.id}', {estado:'${st}'}); event.stopPropagation();">
+              ${st === 'devuelto_completo' ? 'Devolución' : st === 'devuelto_vale' ? 'Vale' : elbl(st)}
+            </button>
+          `).join('')}
+        </div>
+      </td>
+      <td style="padding:9px 10px;border-bottom:1px solid var(--b);font-weight:700;color:${profit >= 0 ? 'var(--sage)' : 'var(--rose)'}">
+        ${profit >= 0 ? '+' : ''}$${Math.abs(profit).toFixed(2)}
+      </td>
+    </tr>`;
+      }).join('');
+
+      const iHTML = items.length ? `
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">📦 Artículos del Ticket (${items.length})</div>
+      <div style="overflow-x:auto;border:1px solid var(--b);border-radius:var(--rs)">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:600px">
+          <thead>
+            <tr>
+              <th style="${TH}">Código</th>
+              <th style="${TH}">Nombre</th>
+              <th style="${TH};text-align:center">Cant.</th>
+              <th style="${TH}">P. Unit</th>
+              <th style="${TH}">Estado Artículo</th>
+              <th style="${TH};color:var(--sage)">Ganancia</th>
+            </tr>
+          </thead>
+          <tbody>${iRows}</tbody>
+        </table>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap">
+        <div style="text-align:right"><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Total Costo</div><div style="font-size:15px;font-weight:700">$${tC.toFixed(2)}</div></div>
+        <div style="text-align:right"><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Total Venta</div><div style="font-size:15px;font-weight:700">$${tV.toFixed(2)}</div></div>
+        <div style="text-align:right;background:var(--sage-p);border-radius:var(--rs);padding:6px 12px;border:1px solid rgba(74,122,90,.2)">
+          <div style="font-size:10px;color:var(--sage);font-weight:600;text-transform:uppercase">Utilidad Estimada</div>
+          <div style="font-size:17px;font-weight:700;color:${gan >= 0 ? 'var(--sage)' : 'var(--rose)'}">${gan >= 0 ? '+ ' : '- '}$${Math.abs(gan).toFixed(2)}</div>
+        </div>
+      </div>
+    </div>` : "";
+
+      // Dev banner base on ticket register date
+      const devB = document.getElementById('det-dev-banner'); if (devB) devB.innerHTML = devBannerHTML(t);
+
+      document.getElementById('det-title').textContent = t.folio + ' — ' + (t.proveedor || 'Sin proveedor');
+      document.getElementById('det-body').innerHTML = `
+    <div class="dg" style="margin-bottom:16px">
+      <div class="df">
+        <div class="dl">Folio / Ticket</div>
+        <div class="dv" style="font-family:monospace;display:flex;align-items:center;gap:8px">
+          <span>${t.folio}</span>
+          <button class="btn btn-out" style="padding:2px 6px;font-size:10px;height:auto;border-color:rgba(0,0,0,0.1)" onclick="updateFolio('${t.id}')">✏️ Editar</button>
+        </div>
+      </div>
+      <div class="df">
+        <div class="dl">Proveedor</div>
+        <div class="dv" style="display:flex;align-items:center;gap:8px">
+          <span>${t.proveedor || '—'}</span>
+          <button class="btn btn-out" style="padding:2px 6px;font-size:10px;height:auto;border-color:rgba(0,0,0,0.1)" onclick="updateProvider('${t.id}')">✏️ Editar</button>
+        </div>
+      </div>
+      <div class="df"><div class="dl">Temporada</div><div class="dv">${sEmoji(t.temporada)} ${t.temporada || '—'}</div></div>
+      <div class="df"><div class="dl">Registrado por</div><div class="dv" style="font-weight:600;color:var(--gold)">${t.vendedor ? (t.vendedor.charAt(0).toUpperCase() + t.vendedor.slice(1)) : 'Sistema'}</div></div>
+      <div class="df"><div class="dl">Estado General</div><div class="dv">${stBadge(t.estado)}</div></div>
+      <div class="df"><div class="dl">Método de pago</div><div class="dv">${pagoLabel}</div></div>
+      <div class="df"><div class="dl">Fecha Registro</div><div class="dv">${fDate(t.fecha_registro ? t.fecha_registro + 'T00:00:00' : t.created_at)}</div></div>
+      ${t.notas ? `<div class="df" style="grid-column:1/-1"><div class="dl">Notas del ticket</div><div class="dv" style="font-size:13.5px">${t.notas}</div></div>` : ''}
+    </div>
+    ${iHTML}
+    <div style="margin-top:8px;padding-top:12px;border-top:1px solid var(--b)">
+      <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:8px">Acciones Rápidas Ticket</label>
+      <div style="display:flex;gap:7px;flex-wrap:wrap">
+        <button class="btn btn-xs btn-out" onclick="showQR('${t.id}')">🖨️ Imprimir Etiquetas</button>
+        <button class="btn btn-xs btn-out" onclick="patch('${t.id}',{estado:'archivado'}); cm('m-det');">📦 Archivar Ticket</button>
+      </div>
+    </div>`;
+
+      document.getElementById('det-foot').innerHTML = `<button class="btn btn-out" onclick="curDetId=null; cm('m-det')">Cerrar</button>`;
+      om('m-det');
+    }
+
+    // ══ DEVOLUCIONES PAGE ══
+    function renderDev() {
+      const te = document.getElementById('dev-temp')?.value || '';
+      const tb = document.getElementById('dev-body'); if (!tb) return;
+
+      let allArts = [];
+      tickets.filter(t => !te || t.temporada === te).forEach(t => {
+        const ds = calcDevStatus(t);
+        (t.items || []).forEach(i => {
+          if (['pendiente', 'apartado'].includes(i.estado)) {
+            allArts.push({ ...i, ticket: t, ds: ds });
+          }
+        });
+      });
+
+      // Sort by days remaining (most urgent first)
+      allArts.sort((a, b) => a.ds.days - b.ds.days);
+
+      const urgent = allArts.filter(a => a.ds.days <= 7).length;
+      const expired = allArts.filter(a => a.ds.days <= 0).length;
+
+      const sumEl = document.getElementById('dev-summary');
+      if (sumEl) sumEl.innerHTML = `<span style="color:var(--rose);font-weight:600">${expired} vencidos</span> · <span style="color:var(--warn);font-weight:600">${urgent} urgentes (≤7 días)</span> · ${allArts.length} art. total`;
+
+      if (!allArts.length) {
+        tb.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="ei">🔄</div><h3>Sin devoluciones pendientes</h3><p>No hay artículos pendientes de devolución.</p></div></td></tr>`;
+        return;
+      }
+
+      tb.innerHTML = allArts.map(a => {
+        const ds = a.ds;
+        const daysBadge = ds.days > 7
+          ? `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;background:#d4edda;color:var(--sage);font-weight:700;font-size:12.5px">✅ ${ds.days} días</span>`
+          : ds.days > 0
+            ? `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;background:#fff3cd;color:#856404;font-weight:700;font-size:12.5px">⚠️ ${ds.days} días</span>`
+            : `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;background:var(--rose-p);color:var(--rose);font-weight:700;font-size:12.5px">🔴 Venció</span>`;
+
+        const regStr = fDate(a.ticket.fecha_registro ? a.ticket.fecha_registro + 'T00:00:00' : a.ticket.created_at);
+        const limStr = fDate(ds.limDate.toISOString());
+
+        return `
+      <tr style="${ds.days <= 0 ? 'background:rgba(196,97,74,.06)' : ds.days <= 7 ? 'background:rgba(212,130,10,.06)' : ''}">
+        <td><span class="fo">${a.ticket.folio}</span></td>
+        <td><span class="an">${a.nombre}</span> <br> <small style="color:var(--muted);font-family:monospace">${a.codigo_barras || '—'}</small></td>
+        <td><span class="sbadge">${sEmoji(a.ticket.temporada)} ${a.ticket.temporada || '—'}</span></td>
+        <td style="font-size:12.5px;color:var(--muted)">${regStr}</td>
+        <td style="font-size:12.5px;${ds.days <= 0 ? 'color:var(--rose);font-weight:600' : ds.days <= 7 ? 'color:var(--warn);font-weight:600' : 'color:var(--muted)'}">${limStr}</td>
+        <td>${daysBadge}</td>
+        <td>${stBadge(a.estado)}</td>
+        <td><div style="display:flex;gap:5px;flex-wrap:wrap">
+          <button class="btn btn-xs btn-sage" onclick="patchArticulo('${a.id}',{estado:'devuelto_completo'})">✓ Devuelto</button>
+          <button class="btn btn-xs btn-out" onclick="patchArticulo('${a.id}',{estado:'devuelto_vale'})">📄 Vale</button>
+          <button class="btn btn-xs btn-out" onclick="openDet('${a.ticket.id}')">Ver</button>
+        </div></td>
+      </tr>`;
+      }).join('');
+    }
+
+    // ══ QR & LABELS ══
+    async function showQR(id) {
+      const t = tickets.find(t => t.id === id); if (!t) return;
+      curQR = t;
+
+      const infoEl = document.getElementById('qr-info');
+      const wrapEl = document.getElementById('lbl-wrap');
+      const printEl = document.getElementById('lbl-print');
+
+      infoEl.innerHTML = `
+    <div>
+      <div style="font-weight:600;font-size:14px">${t.proveedor || 'Sin proveedor'}</div>
+      <div style="font-size:12px;color:var(--muted)">${t.folio} · ${t.items.length} artículos</div>
+    </div>
+    <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700">$${(t.items.reduce((s, i) => s + ((+i.precio_unitario || 0) * (+i.cantidad || 1)), 0)).toFixed(2)}</div>
+  `;
+
+      wrapEl.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:15px;justify-content:center;padding:10px" id="lbl-grid"></div>';
+      printEl.innerHTML = '<div class="print-sheet" style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;padding:20px"></div>';
+
+      const grid = wrapEl.querySelector('#lbl-grid');
+      const sheet = printEl.querySelector('.print-sheet');
+
+      // 1. Ticket Header Code (optional sticker)
+      // 2. Individual Article Labels
+      for (const item of t.items) {
+        const qty = +item.cantidad || 1;
+        for (let k = 0; k < qty; k++) {
+          const lp = document.createElement('div'); lp.className = 'lp';
+          const barcode = (item.codigo_barras || item.barcode || t.folio).toUpperCase();
+
+          lp.innerHTML = `
+        <div class="lseas">${sEmoji(t.temporada)} ${t.temporada || 'Delirium Decor'}</div>
+        <div class="lname text-truncate" style="max-width:140px">${item.nombre}</div>
+        <canvas class="item-qr"></canvas>
+        <div style="font-family:monospace;font-size:9px;margin-top:-4px">${barcode}</div>
+        <div class="lprice">$${(+item.precio_unitario || 0).toFixed(2)}</div>
+      `;
+
+          const canvas = lp.querySelector('.item-qr');
+          await QRCode.toCanvas(canvas, barcode, { width: 85, margin: 1, color: { dark: '#1A1510', light: '#fff' } });
+
+          grid.appendChild(lp.cloneNode(true));
+          sheet.appendChild(lp);
+        }
+      }
+
+      // Generate a main ticket QR for the header display
+      const mainCanvas = document.getElementById('qr-c');
+      await QRCode.toCanvas(mainCanvas, t.folio, { width: 140, margin: 2, color: { dark: '#1A1510', light: '#FFFEF9' } });
+
+      om('m-qr');
+    }
+
+    function printLbl() { if (!curQR) return; window.print(); }
+
+    // ══ ITEM HELPERS ══
+    const _IS = 'padding:6px 8px;font-size:12.5px;border:1px solid var(--bs);border-radius:var(--rx);background:#1f2333;color:#3b82f6;font-weight:600;width:100%;outline:none;';
+    
+    function onFolioInput(inp) {
+      const val = inp.value.trim().toUpperCase();
+      if (val === 'BD' || val === 'HL' || val === 'HB') {
+        const ts = Date.now().toString().slice(-6);
+        inp.value = val + '-' + ts;
+        // Mover foco a Notas
+        const notesId = inp.id === 'n-folio' ? 'no2' : 'po';
+        const notesEl = document.getElementById(notesId);
+        if (notesEl) setTimeout(() => notesEl.focus(), 50);
+      }
+    }
+
+    function onBarcodeInput(inp) {
+      const val = inp.value.trim().toUpperCase();
+      if (val === 'HL') {
+        const ts = Date.now().toString().slice(-6);
+        inp.value = 'HL-' + ts;
+        inp.style.color = 'var(--gold)';
+        const tr = inp.closest('tr');
+        const nombreInput = tr.querySelectorAll('input[type=text]')[1];
+        if (nombreInput) setTimeout(() => nombreInput.focus(), 50);
+      }
+    }
+
+    function addItemRow(bodyId, totId) {
+      const tb = document.getElementById(bodyId); if (!tb) return;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+    <td style="padding:5px 6px;border-bottom:1px solid var(--b)">
+      <input type="text" placeholder="Código o HL-precio" 
+        style="${_IS}min-width:110px;font-family:monospace;"
+        oninput="onBarcodeInput(this)">
+    </td>
+    <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><input type="text" placeholder="Nombre..." style="${_IS}min-width:150px"></td>
+    <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><input type="number" value="1" min="1" oninput="calcItemRow(this,'${totId}')" style="${_IS}width:52px;text-align:center"></td>
+    <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><input type="number" value="0" min="0" step="0.5" oninput="calcItemRow(this,'${totId}')" style="${_IS}width:85px"></td>
+    <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><input type="number" value="0" min="0" step="0.5" oninput="calcItemRow(this,'${totId}')" style="${_IS}width:85px"></td>
+    <td class="gc" style="padding:5px 10px;border-bottom:1px solid var(--b);font-weight:700;color:var(--sage);white-space:nowrap;min-width:70px">$0.00</td>
+    <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><button onclick="removeItemRow(this,'${totId}')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:2px 5px">✕</button></td>`;
+      tb.appendChild(tr);
+      calcTotals(totId, bodyId);
+      // Focus barcode input of the new row
+      tr.querySelector('input[type=text]').focus();
+    }
+
+    function removeItemRow(btn, totId) {
+      const tr = btn.closest('tr'), bId = tr.closest('tbody').id;
+      tr.remove(); calcTotals(totId, bId);
+    }
+
+    function calcItemRow(inp, totId) {
+      const tr = inp.closest('tr');
+      const ns = tr.querySelectorAll('input[type=number]');
+      // ns[0]=qty, ns[1]=cost, ns[2]=sale
+      const g = (+ns[2].value - +ns[1].value) * (+ns[0].value || 1);
+      const gc = tr.querySelector('.gc');
+      gc.textContent = '$' + g.toFixed(2);
+      gc.style.color = g >= 0 ? 'var(--sage)' : 'var(--rose)';
+      calcTotals(totId, tr.closest('tbody').id);
+    }
+
+    function calcTotals(totId, bodyId) {
+      const tb = document.getElementById(bodyId); if (!tb) return;
+      let tC = 0, tV = 0, tQ = 0;
+      tb.querySelectorAll('tr').forEach(tr => {
+        const ns = tr.querySelectorAll('input[type=number]');
+        if (ns.length < 3) return;
+        const c = +ns[0].value || 1, p = +ns[1].value || 0, v = +ns[2].value || 0;
+        tC += p * c; tV += v * c; tQ += c;
+      });
+      const g = tV - tC;
+      const el = document.getElementById(totId); if (!el) return;
+      el.innerHTML = `<div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--b)">
+        <div style="text-align:right"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Artículos Totales</div><div style="font-size:16px;font-weight:700">${tQ} und.</div></div>
+        <div style="text-align:right"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Total costo</div><div style="font-size:16px;font-weight:700">$${tC.toFixed(2)}</div></div>
+        <div style="text-align:right"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Total venta</div><div style="font-size:16px;font-weight:700">$${tV.toFixed(2)}</div></div>
+        <div style="text-align:right;background:var(--sage-p);border-radius:var(--rs);padding:6px 12px;border:1px solid rgba(74,122,90,.2)">
+          <div style="font-size:10px;color:var(--sage);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Ganancia</div>
+          <div style="font-size:18px;font-weight:700;color:${g >= 0 ? 'var(--sage)' : 'var(--rose)'}">${g >= 0 ? '+' : ''}$${Math.abs(g).toFixed(2)}</div>
+        </div>
+      </div>`;
+    }
+
+    function getItems(bodyId) {
+      const tb = document.getElementById(bodyId); if (!tb) return [];
+      return [...tb.querySelectorAll('tr')].map(tr => {
+        const barcode = tr.querySelectorAll('input[type=text]')[0]?.value.trim();
+        const nombre = tr.querySelectorAll('input[type=text]')[1]?.value.trim();
+        if (!nombre) return null;
+        const ns = tr.querySelectorAll('input[type=number]');
+        return {
+          codigo_barras: barcode,
+          nombre: nombre,
+          cantidad: +ns[0].value || 1,
+          precio_compra: +ns[1].value || 0,
+          precio_unitario: +ns[2].value || 0,
+          estado: 'pendiente'
+        };
+      }).filter(Boolean);
+    }
+
+    // ══ BARCODE SCANNER (lector USB) ══
+    let _barcodeBuffer = '', _barcodeTimer = null;
+
+    function initBarcodeListeners() {
+      // Captura global: el lector de barras envía chars rápido + Enter
+      document.addEventListener('keydown', (e) => {
+        // Ignora si el foco está en un input normal (excepto los de búsqueda)
+        const tag = document.activeElement?.tagName;
+        const id = document.activeElement?.id;
+        const isScanInput = ['pf-in', 'mf-in'].includes(id);
+        if ((tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') && !isScanInput) return;
+
+        if (e.key === 'Enter') {
+          if (_barcodeBuffer.length >= 3) {
+            const codigo = _barcodeBuffer.trim().toUpperCase();
+            _barcodeBuffer = '';
+
+            // Si el modal de búsqueda rápida está abierto, buscar ahí
+            const scanRapido = document.getElementById('m-scan-rapido');
+            if (scanRapido && scanRapido.classList.contains('on')) {
+              const inp = document.getElementById('sr-input');
+              if (inp) { inp.value = codigo; busquedaRapida(codigo); }
+              return;
+            }
+
+            // Si no, comportamiento original
+            findByFolio(codigo);
+          }
+          _barcodeBuffer = '';
+          clearTimeout(_barcodeTimer);
+          return;
+        }
+        if (e.key.length === 1) {
+          _barcodeBuffer += e.key;
+          clearTimeout(_barcodeTimer);
+          _barcodeTimer = setTimeout(() => { _barcodeBuffer = ''; }, 80);
+        }
+      });
+    }
+
+    // Auto-search cuando el input recibe Enter del lector
+    function autoSearch(input, ctx) {
+      // El lector envía chars + Enter casi simultáneamente;
+      // el evento 'input' no captura Enter, pero el keydown global lo atrapa.
+      // Esta función es backup si el usuario escribe manualmente.
+    }
+
+    function findByFolio(raw) {
+      const f = (raw || '').trim().toUpperCase();
+      if (!f) { toast('Ingresa un folio o código', 'err'); return; }
+
+      // Clear inputs
+      const mfIn = document.getElementById('mf-in'); if (mfIn) mfIn.value = '';
+      const pfIn = document.getElementById('pf-in'); if (pfIn) pfIn.value = '';
+
+      // 1. Search for Ticket Folio
+      let t = tickets.find(t => t.folio === f || (t.id && t.id === f));
+      if (t) {
+        cm('m-scan');
+        showScanPopup(t);
+        return;
+      }
+
+      // 2. Search for Article Barcode
+      let foundArt = null, foundTicket = null;
+      for (const ticket of tickets) {
+        const art = ticket.items.find(i => (i.codigo_barras || i.barcode || '').toUpperCase() === f || i.id === f);
+        if (art) {
+          foundArt = art;
+          foundTicket = ticket;
+          break;
+        }
+      }
+
+      if (foundArt) {
+        cm('m-scan');
+        showArticlePopup(foundArt, foundTicket);
+        return;
+      }
+
+      toast('No encontrado: ' + f, 'err');
+      const sr = document.getElementById('scan-result');
+      if (sr) sr.innerHTML = `<div style="text-align:center;padding:16px;background:var(--rose-p);border-radius:var(--rs);color:var(--rose)">❌ Código <strong>${f}</strong> no encontrado</div>`;
+    }
+
+    function showArticlePopup(art, ticket) {
+      const popup = document.getElementById('scan-popup');
+      const banner = document.getElementById('sp-banner');
+
+      document.getElementById('sp-folio').textContent = ticket.folio + ' · ' + (ticket.temporada || '—');
+      document.getElementById('sp-name').textContent = art.nombre;
+
+      const stMap = {
+        pendiente: { cls: 'dev-ok', icon: '📦', label: 'Pendiente', sub: 'Artículo en inventario' },
+        vendido: { cls: 'dev-ok', icon: '✅', label: 'Vendido', sub: 'Este artículo ya fue vendido' },
+        devuelto_completo: { cls: 'dev-warn', icon: '🔄', label: 'Devuelto', sub: 'Devolución completa' },
+        devuelto_vale: { cls: 'dev-warn', icon: '📄', label: 'Vale', sub: 'Se entregó vale al cliente' }
+      };
+
+      const info = stMap[art.estado] || { cls: 'dev-warn', icon: '🏷️', label: elbl(art.estado), sub: '' };
+      banner.className = 'sc-banner ' + info.cls;
+      document.getElementById('sp-icon').textContent = info.icon;
+      document.getElementById('sp-status').textContent = info.label;
+      document.getElementById('sp-sub').textContent = info.sub;
+
+      // Calculate potential dev status based on ticket date
+      const ds = calcDevStatus(ticket);
+      document.getElementById('sp-dates').innerHTML = `Límite devolución: <strong>${fDate(ds.limDate.toISOString())}</strong> (${ds.days} días)`;
+
+      // Quick Actions for Article
+      const actions = document.querySelector('.sc-actions');
+      const artId = art.id;
+      const ticketId = ticket.id;
+      if (['pendiente', 'apartado'].includes(art.estado)) {
+        actions.innerHTML = `
+          <button class="btn btn-sage" onclick="patchArticulo('${artId}',{estado:'vendido'}); document.getElementById('scan-popup').classList.remove('on')">✅ Confirmar Venta</button>
+          <button class="btn btn-rose" onclick="patchArticulo('${artId}',{estado:'devuelto_completo'}); document.getElementById('scan-popup').classList.remove('on')">🔄 Es Devolución</button>
+          <button class="btn btn-out btn-sm" onclick="document.getElementById('scan-popup').classList.remove('on'); setTimeout(()=>openDet('${ticketId}'),100)">Ver Ticket</button>
+        `;
+      } else if (art.estado === 'vendido') {
+        actions.innerHTML = `
+          <button class="btn btn-rose" onclick="patchArticulo('${artId}',{estado:'devuelto_completo'}); document.getElementById('scan-popup').classList.remove('on')">🔄 Procesar Devolución</button>
+          <button class="btn btn-out btn-sm" onclick="document.getElementById('scan-popup').classList.remove('on')">Cerrar</button>
+        `;
+      } else {
+        actions.innerHTML = `
+          <button class="btn btn-out" onclick="document.getElementById('scan-popup').classList.remove('on')">Cerrar</button>
+          <button class="btn btn-out btn-sm" onclick="document.getElementById('scan-popup').classList.remove('on'); setTimeout(()=>openDet('${ticketId}'),100)">Ver Ticket</button>
+        `;
+      }
+
+      popup.classList.add('on');
+    }
+
+    function showScanPopup(t) {
+      const ds = ['pendiente', 'apartado'].includes(t.estado) ? calcDevStatus(t) : null;
+      document.getElementById('sp-folio').textContent = t.folio + ' · ' + (t.temporada || '—');
+      document.getElementById('sp-name').textContent = t.items.map(i => i.nombre).join(', ') || 'Ticket Vacío';
+      const banner = document.getElementById('sp-banner');
+      if (ds) {
+        banner.className = 'sc-banner ' + ds.cls;
+        document.getElementById('sp-icon').textContent = ds.icon;
+        document.getElementById('sp-status').textContent = ds.label;
+        document.getElementById('sp-sub').textContent = ds.sub;
+        const regStr = fDate(t.fecha_registro ? t.fecha_registro + 'T00:00:00' : t.created_at);
+        document.getElementById('sp-dates').innerHTML = `Registro: <strong>${regStr}</strong> · Límite: <strong>${fDate(ds.limDate.toISOString())}</strong>`;
+      } else {
+        const stMap = {
+          vendido: { cls: 'dev-ok', icon: '✅', label: 'Vendido', sub: 'Este ticket ya fue vendido' },
+          devuelto_completo: { cls: 'dev-ok', icon: '✅', label: 'Devuelto — Completo', sub: 'Devolución recibida' },
+          devuelto_vale: { cls: 'dev-warn', icon: '📄', label: 'Devuelto — Vale', sub: 'Cliente recibió vale' }
+        };
+        const info = stMap[t.estado] || { cls: 'dev-warn', icon: '🏷️', label: elbl(t.estado), sub: '' };
+        banner.className = 'sc-banner ' + info.cls;
+        document.getElementById('sp-icon').textContent = info.icon;
+        document.getElementById('sp-status').textContent = info.label;
+        document.getElementById('sp-sub').textContent = info.sub;
+        document.getElementById('sp-dates').textContent = '';
+      }
+      document.getElementById('sp-det-btn').onclick = () => {
+        document.getElementById('scan-popup').classList.remove('on');
+        setTimeout(() => openDet(t.id), 100);
+      };
+      document.getElementById('scan-popup').classList.add('on');
+    }
+
+    // Close scan popup on Escape
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('scan-popup').classList.remove('on'); });
+
+    function exportExcel() {
+      const te = document.getElementById('ex-t').value;
+      const es = document.getElementById('ex-e').value;
+      const filtered = tickets.filter(t => (!te || t.temporada === te) && (!es || t.estado === es));
+
+      const data = [];
+      let totalRev = 0, totalCost = 0, totalQty = 0;
+
+      filtered.forEach(t => {
+        (t.items || []).forEach(i => {
+          const rev = (+i.precio_unitario || 0) * (+i.cantidad || 1);
+          const cost = (+i.precio_compra || 0) * (+i.cantidad || 1);
+          const gan = rev - cost;
+
+          totalRev += rev; totalCost += cost; totalQty += (+i.cantidad || 1);
+
+          data.push([
+            t.folio,
+            t.proveedor || 'N/A',
+            i.nombre,
+            i.codigo_barras || '—',
+            t.temporada || 'General',
+            +i.precio_compra || 0,
+            +i.precio_unitario || 0,
+            +i.cantidad || 1,
+            rev,
+            gan,
+            elbl(i.estado),
+            fDate(t.created_at)
+          ]);
+        });
+      });
+
+      // Headers and Totals
+      const headers = [
+        ['DELIRIUM DECOR - REPORTE DE INVENTARIO Y VENTAS'],
+        ['Fecha de reporte:', new Date().toLocaleString(), '', 'Filtros:', (te || 'Todas') + ' / ' + (es || 'Todos')],
+        [],
+        ['FOLIO', 'PROVEEDOR', 'ARTÍCULO', 'CÓDIGO', 'TEMPORADA', 'COSTO U.', 'VENTA U.', 'CANT', 'SUBTOTAL', 'UTILIDAD', 'ESTADO', 'FECHA']
+      ];
+
+      const footer = [
+        [],
+        ['', '', '', '', 'TOTALES:', '', '', totalQty, totalRev, totalRev - totalCost]
+      ];
+
+      const ws = XLSX.utils.aoa_to_sheet([...headers, ...data, ...footer]);
+
+      // Column widths
+      ws['!cols'] = [
+        { wch: 10 }, { wch: 20 }, { wch: 35 }, { wch: 15 }, { wch: 15 },
+        { wch: 10 }, { wch: 10 }, { wch: 6 }, { wch: 12 }, { wch: 12 },
+        { wch: 15 }, { wch: 15 }
+      ];
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Reporte Detallado');
+      XLSX.writeFile(wb, 'DeliriumDecor_Reporte_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+      toast('✓ Excel Detallado exportado', 'ok');
+    }
+
+    function exportUnsold() {
+      const te = document.getElementById('us-temp')?.value || '';
+      let rows = [];
+      tickets.filter(t => !te || t.temporada === te).forEach(t => {
+        (t.items || []).forEach(i => {
+          if (['pendiente', 'apartado', 'descuento'].includes(i.estado)) {
+            const promo = typeof getActivePromo === 'function' ? getActivePromo(i.id) : null;
+            const finalPrice = promo ? +promo.precio_promocional : (+i.precio_unitario || 0);
+            rows.push({ 
+              Folio: t.folio, 
+              Artículo: i.nombre + (promo ? ' (PROMO)' : ''), 
+              Código: i.codigo_barras || '', 
+              Temporada: t.temporada || '', 
+              'Precio Original': +i.precio_unitario || 0,
+              'Precio Final': finalPrice,
+              Estado: elbl(i.estado), 
+              Fecha: fDate(t.created_at) 
+            });
+          }
+        });
+      });
+      const ws = XLSX.utils.json_to_sheet(rows); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'No_Vendidos');
+      XLSX.writeFile(wb, 'DeliriumDecor_NoVendidosDetailed_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+      toast('✓ Excel No Vendidos exportado', 'ok');
+    }
+
+    function exportSeason() {
+      const byS = {};
+      tickets.forEach(t => {
+        const s = t.temporada || 'Sin temporada';
+        if (!byS[s]) byS[s] = { tot: 0, sold: 0, rev: 0, cost: 0 };
+        (t.items || []).forEach(i => {
+          byS[s].tot += (+i.cantidad || 1);
+          if (i.estado === 'vendido') {
+            byS[s].sold += (+i.cantidad || 1);
+            byS[s].rev += (+i.precio_unitario || 0) * (+i.cantidad || 1);
+            byS[s].cost += (+i.precio_compra || 0) * (+i.cantidad || 1);
+          }
+        });
+      });
+      const rows = Object.entries(byS).map(([s, d]) => ({
+        Temporada: s,
+        'Cant. Total': d.tot,
+        'Cant. Vendida': d.sold,
+        'Ingresos ($)': +d.rev.toFixed(2),
+        'Costos ($)': +d.cost.toFixed(2),
+        'Utilidad ($)': +(d.rev - d.cost).toFixed(2),
+        '% Venta': d.tot ? Math.round(d.sold / d.tot * 100) + '%' : '0%'
+      }));
+      const ws = XLSX.utils.json_to_sheet(rows); ws['!cols'] = [{ wch: 20 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 12 }];
+      const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Resumen_Temporadas');
+      XLSX.writeFile(wb, 'DeliriumDecor_ResumenTemporadas_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+      toast('✓ Resumen exportado', 'ok');
+    }
+
+    function exportDev() {
+      const te = document.getElementById('dev-temp')?.value || '';
+      let rows = [];
+      tickets.filter(t => !te || t.temporada === te).forEach(t => {
+        const ds = calcDevStatus(t);
+        (t.items || []).forEach(i => {
+          if (['pendiente', 'apartado'].includes(i.estado)) {
+            rows.push({ Folio: t.folio, Artículo: i.nombre, Temporada: t.temporada || '', 'Fecha Registro': fDate(t.fecha_registro || t.created_at), 'Fecha Límite': fDate(ds.limDate.toISOString()), 'Días': ds.days, Urgencia: ds.days > 7 ? 'OK' : ds.days > 0 ? 'PRÓXIMO' : 'VENCIDO' });
+          }
+        });
+      });
+      const ws = XLSX.utils.json_to_sheet(rows); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Devoluciones');
+      XLSX.writeFile(wb, 'DeliriumDecor_ReporteDevoluciones_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+      toast('✓ Reporte Devoluciones exportado', 'ok');
+    }
+
+    // ══ VENTAS GRANDES ══
+
+    function openVentaGrande() {
+      document.getElementById('vg-fecha').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('vg-cliente').value = '';
+      document.getElementById('vg-notas').value = '';
+      document.getElementById('vg-pago').value = 'efectivo';
+      document.getElementById('vg-body').innerHTML = '';
+      document.getElementById('vg-tot').innerHTML = '';
+      // Datalist de clientes existentes
+      const clientesDL = document.getElementById('vg-clientes-list');
+      const clientes = [...new Set(ventasGrandes.map(v => v.cliente).filter(Boolean))];
+      clientesDL.innerHTML = clientes.map(c => `<option value="${c}">`).join('');
+      // Datalist de productos en inventario
+      actualizarDatalistProductos();
+      om('m-ventas');
+      setTimeout(() => addVGRow(), 60);
+    }
+
+    function actualizarDatalistProductos() {
+      let dl = document.getElementById('vg-productos-dl');
+      if (!dl) {
+        dl = document.createElement('datalist');
+        dl.id = 'vg-productos-dl';
+        document.body.appendChild(dl);
+      }
+      const prods = [];
+      tickets.forEach(t => {
+        (t.items || []).forEach(i => {
+          if (['pendiente', 'apartado', 'descuento'].includes(i.estado) && (i.cantidad == null || +i.cantidad > 0)) {
+            prods.push(i.nombre);
+          }
+        });
+      });
+      dl.innerHTML = [...new Set(prods)].map(p => `<option value="${encodeURIComponent(p).replace(/%20/g, ' ')}">`).join('');
+    }
+
+    function addVGRow() {
+      const tb = document.getElementById('vg-body'); if (!tb) return;
+      const tr = document.createElement('tr');
+      const S = 'padding:6px 8px;font-size:12.5px;border:1px solid var(--bs);border-radius:var(--rx);background:#1f2333;color:#3b82f6;font-weight:600;width:100%;outline:none;';
+      tr.innerHTML = `
+        <td style="padding:5px 6px;border-bottom:1px solid var(--b)">
+          <input type="text" list="vg-productos-dl" placeholder="Nombre del producto…"
+            style="${S}min-width:170px" oninput="onVGProductoInput(this)">
+          <div class="vg-art-ref" style="font-size:10px;color:var(--muted);margin-top:2px;display:none"></div>
+        </td>
+        <td style="padding:5px 6px;border-bottom:1px solid var(--b)">
+          <input type="number" value="1" min="1" style="${S}width:55px;text-align:center" oninput="calcVGRow(this)">
+        </td>
+        <td style="padding:5px 6px;border-bottom:1px solid var(--b)">
+          <input type="number" value="0" min="0" step="0.5" style="${S}width:80px" oninput="calcVGRow(this)">
+        </td>
+        <td style="padding:5px 6px;border-bottom:1px solid var(--b)">
+          <input type="number" value="0" min="0" step="0.5" style="${S}width:80px" oninput="calcVGRow(this)">
+        </td>
+        <td class="vg-stock" style="padding:5px 10px;border-bottom:1px solid var(--b)">—</td>
+        <td style="padding:5px 6px;border-bottom:1px solid var(--b)">
+          <button onclick="this.closest('tr').remove();calcVGTotals()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:2px 5px">✕</button>
+        </td>`;
+      tb.appendChild(tr);
+      tr.querySelector('input[type=text]').focus();
+    }
+
+    function onVGProductoInput(inp) {
+      const query = inp.value.trim().toLowerCase();
+      const tr = inp.closest('tr');
+      const refDiv = tr.querySelector('.vg-art-ref');
+      const stockCell = tr.querySelector('.vg-stock');
+      const numInputs = tr.querySelectorAll('input[type=number]');
+      const costInput = numInputs[1];
+      const saleInput = numInputs[2];
+
+      if (!query) return;
+
+      // Buscar en inventario disponible (Nombre o Código de Barras)
+      let found = null, foundTicket = null;
+      for (const t of tickets) {
+        for (const i of (t.items || [])) {
+          const matchNombre = i.nombre.toLowerCase() === query;
+          const matchBarcode = (i.codigo_barras || '').toLowerCase() === query;
+
+          if ((matchNombre || matchBarcode) &&
+            ['pendiente', 'apartado', 'descuento'].includes(i.estado) &&
+            (i.cantidad == null || +i.cantidad > 0)) {
+            found = i; foundTicket = t; break;
+          }
+        }
+        if (found) break;
+      }
+
+      if (found) {
+        // Si se buscó por código, actualizar el texto con el nombre del producto
+        if (found.codigo_barras && found.codigo_barras.toLowerCase() === query) {
+          inp.value = found.nombre;
+        }
+
+        costInput.value = +found.precio_compra || 0;
+        saleInput.value = +found.precio_unitario || +found.precio_venta || 0;
+
+        const cant = found.cantidad == null ? '∞' : +found.cantidad;
+        const isLow = typeof cant === 'number' && cant <= 2;
+        if (found.id) tr.dataset.artId = found.id;
+        else delete tr.dataset.artId;
+        stockCell.innerHTML = `<span class="inv-badge${isLow ? ' low' : ''}">${cant} disp.</span>`;
+        refDiv.style.display = 'block';
+        refDiv.textContent = foundTicket ? foundTicket.folio : '';
+        calcVGRow(costInput);
+      } else {
+        delete tr.dataset.artId;
+        stockCell.innerHTML = '<span style="color:var(--muted);font-size:12px">—</span>';
+        refDiv.style.display = 'none';
+      }
+    }
+
+    function calcVGRow(inp) {
+      const tr = inp.closest('tr');
+      const ns = tr.querySelectorAll('input[type=number]');
+      const qty = +ns[0].value || 1;
+      const cost = +ns[1].value || 0;
+      const sale = +ns[2].value || 0;
+      calcVGTotals();
+    }
+
+    function calcVGTotals() {
+      const tb = document.getElementById('vg-body'); if (!tb) return;
+      let tV = 0, tC = 0;
+      tb.querySelectorAll('tr').forEach(tr => {
+        const ns = tr.querySelectorAll('input[type=number]');
+        if (ns.length < 3) return;
+        const qty = +ns[0].value || 1;
+        tC += (+ns[1].value || 0) * qty;
+        tV += (+ns[2].value || 0) * qty;
+      });
+      const cIva = tC * 1.0875;
+      const gNeta = tV - cIva;
+      const el = document.getElementById('vg-tot'); if (!el) return;
+      el.innerHTML = `<div style="display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap;padding:12px 0;border-top:1px solid var(--b)">
+        <div style="text-align:right">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Total costo</div>
+          <div style="font-size:15px;font-weight:700">$${tC.toFixed(2)}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Costo + IVA</div>
+          <div style="font-size:15px;font-weight:700">$${cIva.toFixed(2)}</div>
+          <div style="font-size:9px;color:var(--muted);margin-top:2px">IVA 8.75% incluido</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Total venta</div>
+          <div style="font-size:15px;font-weight:700">$${tV.toFixed(2)}</div>
+        </div>
+        <div style="text-align:right;background:var(--sage-p);border-radius:var(--rs);padding:6px 14px;border:1px solid rgba(74,122,90,.2)">
+          <div style="font-size:10px;color:var(--sage);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Ganancia Neta</div>
+          <div style="font-size:19px;font-weight:800;color:${gNeta >= 0 ? 'var(--sage)' : 'var(--rose)'}">
+            ${gNeta >= 0 ? '+' : '-'}$${Math.abs(gNeta).toFixed(2)}
+          </div>
+        </div>
+      </div>`;
+    }
+
+    function getVGItems() {
+      const tb = document.getElementById('vg-body'); if (!tb) return [];
+      return [...tb.querySelectorAll('tr')].map(tr => {
+        const nombre = tr.querySelector('input[type=text]')?.value.trim();
+        if (!nombre) return null;
+        const ns = tr.querySelectorAll('input[type=number]');
+        return {
+          artId: (tr.dataset.artId && tr.dataset.artId !== 'undefined') ? tr.dataset.artId : null,
+          nombre,
+          cantidad: +ns[0].value || 1,
+          precio_compra: +ns[1].value || 0,
+          precio_venta: +ns[2].value || 0
+        };
+      }).filter(Boolean);
+    }
+
+    // Descuenta inventario unidad por unidad
+    async function descontarInventario(artId, cantidadVendida) {
+      if (!artId || artId === 'undefined') return { ok: false, msg: 'Artículo no identificado o sin ID válido' };
+      let foundTicket = null, foundArt = null;
+      for (const t of tickets) {
+        const art = t.items.find(i => String(i.id) === String(artId));
+        if (art) { foundTicket = t; foundArt = art; break; }
+      }
+      if (!foundArt) return { ok: false, msg: 'Artículo no encontrado' };
+
+      const cantActual = foundArt.cantidad == null ? 1 : +foundArt.cantidad;
+      if (cantActual < cantidadVendida) {
+        return { ok: false, msg: `Solo hay ${cantActual} unidad(es) disponible(s) de "${foundArt.nombre}"` };
+      }
+
+      const nuevaCant = cantActual - cantidadVendida;
+
+      if (nuevaCant <= 0) {
+        // Stock agotado: marca como vendido y desaparece del listado
+        foundArt.cantidad = 0;
+        foundArt.estado = 'vendido';
+        if (DB) {
+          const { error } = await DB.from('articulos').update({ cantidad: 0, estado: 'vendido' }).eq('id', artId);
+          if (error) return { ok: false, msg: error.message };
+        }
+        // OPCIÓN ALTERNATIVA (dejar comentada): marcar como agotado en lugar de vendido
+        // foundArt.estado = 'agotado';
+        // await DB.from('articulos').update({ cantidad: 0, estado: 'agotado' }).eq('id', artId);
+      } else {
+        // Reducir cantidad — artículo sigue en listado con stock actualizado
+        foundArt.cantidad = nuevaCant;
+        if (DB) {
+          const { error } = await DB.from('articulos').update({ cantidad: nuevaCant }).eq('id', artId);
+          if (error) return { ok: false, msg: error.message };
+        }
+      }
+
+      // Recalcular estado del ticket padre
+      if (foundTicket) {
+        const newStatus = calcTicketStatus(foundTicket.items);
+        if (newStatus !== foundTicket.estado) {
+          foundTicket.estado = newStatus;
+          if (DB) await DB.from('tickets').update({ estado: newStatus, updated_at: new Date().toISOString() }).eq('id', foundTicket.id);
+        }
+      }
+
+      return { ok: true, nuevaCant };
+    }
+
+    async function saveVentaGrande() {
+      const cliente = document.getElementById('vg-cliente').value.trim();
+      if (!cliente) { toast('Ingresa el nombre del cliente', 'err'); return; }
+      const fecha = document.getElementById('vg-fecha').value || new Date().toISOString().slice(0, 10);
+      const notas = document.getElementById('vg-notas').value.trim();
+      const metodoPago = document.getElementById('vg-pago').value;
+      const items = getVGItems();
+      if (!items.length) { toast('Agrega al menos un producto', 'err'); return; }
+
+      // Validar stock disponible para todos los artículos antes de guardar
+      for (const item of items) {
+        if (item.artId && item.artId !== 'undefined') {
+          let foundArt = null;
+          for (const t of tickets) { foundArt = t.items.find(i => String(i.id) === String(item.artId)); if (foundArt) break; }
+          if (foundArt) {
+            const cantActual = foundArt.cantidad == null ? 1 : +foundArt.cantidad;
+            if (cantActual < item.cantidad) {
+              toast(`⚠️ Stock insuficiente: "${item.nombre}" — solo ${cantActual} disponible(s)`, 'err');
+              return;
+            }
+          }
+        }
+      }
+
+      // Procesar cada artículo con un ID de venta único para agruparlos luego
+      const ventaId = crypto.randomUUID();
+      let guardados = 0;
+      for (const item of items) {
+        // 1. Descontar inventario
+        if (item.artId && item.artId !== 'undefined') {
+          const res = await descontarInventario(item.artId, item.cantidad);
+          if (!res.ok) { toast('⚠️ ' + res.msg, 'err'); continue; }
+          if (res.nuevaCant === 0) toast(`"${item.nombre}" agotado — retirado del listado`, 'ok');
+        }
+
+        // 2. Guardar en Supabase / demo
+        const groupTag = `[V:${ventaId.slice(0, 8)}]`;
+        const row = {
+          cliente, fecha, notas: notas ? (notas + ' ' + groupTag) : groupTag,
+          producto: item.nombre,
+          articulo_id: item.artId || null,
+          cantidad: item.cantidad,
+          precio_compra: item.precio_compra,
+          precio_venta: item.precio_venta,
+          metodo_pago: metodoPago,
+          venta_id: ventaId
+        };
+
+        if (DB) {
+          const { data, error } = await DB.from('ventas_grandes').insert([row]).select().single();
+          if (error) { toast('Error guardando: ' + error.message, 'err'); continue; }
+          ventasGrandes.unshift(data);
+        } else {
+          // Modo demo (sin Supabase)
+          const ganU = item.precio_venta - item.precio_compra;
+          ventasGrandes.unshift({
+            ...row, id: crypto.randomUUID(), created_at: new Date().toISOString(),
+            ganancia_unit: ganU, total: ganU * item.cantidad
+          });
+        }
+        guardados++;
+      }
+
+      if (guardados > 0) {
+        cm('m-ventas');
+        toast(`✓ Venta Grande registrada — ${guardados} producto(s)`, 'ok');
+        render();
+      }
+    }
+
+    async function pullVentasGrandes() {
+      if (!DB) return;
+      const { data, error } = await DB.from('ventas_grandes').select('*').order('created_at', { ascending: false });
+      if (error) { toast('Error cargando ventas grandes: ' + error.message, 'err'); return; }
+      ventasGrandes = data || [];
+      renderVentas();
+    }
+
+    function renderVentas() {
+      const tb = document.getElementById('vg-list-body'); if (!tb) return;
+      const q = (document.getElementById('vg-search')?.value || '').toLowerCase();
+      
+      const groups = {};
+      ventasGrandes.forEach(v => {
+        const match = v.notas && v.notas.match(/\[V:([a-f0-9]+)\]/);
+        const key = v.venta_id || (match ? match[1] : `${v.cliente}|${v.fecha}|${v.metodo_pago}`);
+        if (!groups[key]) groups[key] = {
+          cliente: v.cliente,
+          fecha: v.fecha,
+          created_at: v.created_at,
+          metodo_pago: v.metodo_pago,
+          notas: v.notas ? v.notas.replace(/\[V:[a-f0-9]+\]/, '').trim() : '',
+          venta_id: key,
+          items: []
+        };
+        groups[key].items.push(v);
+      });
+
+      const filtered = Object.values(groups).filter(g =>
+        !q || g.cliente.toLowerCase().includes(q) || g.items.some(i => i.producto.toLowerCase().includes(q))
+      );
+
+      const metricsEl = document.getElementById('vg-metrics');
+      if (metricsEl) {
+        const totalVenta = ventasGrandes.reduce((s, v) => s + (+v.precio_venta * +v.cantidad), 0);
+        const totalCostIVA = ventasGrandes.reduce((s, v) => s + (+v.precio_compra * +v.cantidad * 1.0875), 0);
+        const totalGan = totalVenta - totalCostIVA;
+        const clientes = new Set(ventasGrandes.map(v => v.cliente)).size;
+        metricsEl.innerHTML = `
+          <div class="mc gold"><div class="ml">Total ventas mayoristas</div>
+            <div class="mv" style="font-size:20px">$${totalVenta.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</div>
+            <div class="ms">ingresos</div></div>
+          <div class="mc sage"><div class="ml">Ganancia acumulada Neta</div>
+            <div class="mv" 
+              style="font-size:20px;color:var(--sage)">$${totalGan.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</div>
+            <div class="ms">utilidad (IVA incl)</div></div>
+          <div class="mc"><div class="ml">Clientes atendidos</div><div class="mv">${clientes}</div><div class="ms">distintos</div></div>
+          <div class="mc"><div class="ml">Pedidos registrados</div><div class="mv">${Object.keys(groups).length}</div><div class="ms">ventas completas</div></div>`;
+      }
+
+      if (!filtered.length) {
+        tb.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="ei">💼</div><h3>Sin ventas</h3><p>No se encontraron resultados.</p></div></td></tr>`;
+        return;
+      }
+
+      const pagoMap = {
+        efectivo: ['st st-v', '💵 Efectivo'],
+        transferencia: ['st st-dc', '🏦 Transferencia'],
+        adelanto: ['st st-p', '⏳ Adelanto'],
+        pendiente: ['st st-a', '🕐 Por cobrar']
+      };
+
+      tb.innerHTML = filtered.map(g => {
+        const tV = g.items.reduce((s, i) => s + (+i.precio_venta * +i.cantidad), 0);
+        const tC = g.items.reduce((s, i) => s + (+i.precio_compra * +i.cantidad), 0);
+        const gN = tV - (tC * 1.0875);
+        
+        const fechaStr = g.fecha ? fDate(g.fecha + 'T12:00:00') : fDate(g.created_at);
+        const [pagoCls, pagoLabel] = pagoMap[g.metodo_pago] || ['st st-a', '—'];
+        
+        return `<tr>
+          <td style="font-size:12.5px;color:var(--muted)">${fechaStr}</td>
+          <td><span class="an">${g.cliente}</span></td>
+          <td style="text-align:center">${g.items.length} prod. (${g.items.reduce((s,i)=>s+(+i.cantidad),0)} und.)</td>
+          <td style="font-weight:700">$${tV.toFixed(2)}</td>
+          <td style="font-weight:700;color:${gN >= 0 ? 'var(--sage)' : 'var(--rose)'}">${gN >= 0 ? '+' : '-'}$${Math.abs(gN).toFixed(2)}</td>
+          <td><span class="${pagoCls}">${pagoLabel}</span></td>
+          <td><button class="btn btn-xs btn-out" onclick="openVGDet('${g.venta_id}')">📄 Ver Venta</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    function openVGDet(ventaId) {
+      const items = ventasGrandes.filter(v => {
+        const match = v.notas && v.notas.match(/\[V:([a-f0-9]+)\]/);
+        const key = v.venta_id || (match ? match[1] : `${v.cliente}|${v.fecha}|${v.metodo_pago}`);
+        return key === ventaId;
+      });
+      if (!items.length) return;
+      
+      const g = items[0];
+      const tVenta = items.reduce((s, i) => s + (+i.precio_venta * +i.cantidad), 0);
+      const tCosto = items.reduce((s, i) => s + (+i.precio_compra * +i.cantidad), 0);
+      const cIva = tCosto * 1.0875;
+      const gNeta = tVenta - cIva;
+
+      document.getElementById('vg-det-title').textContent = `Venta: ${g.cliente}`;
+      
+      let itemsHTML = items.map(i => `
+        <tr>
+          <td style="padding:8px; border-bottom:1px solid var(--b)">${i.producto}</td>
+          <td style="padding:8px; border-bottom:1px solid var(--b); text-align:center">${i.cantidad}</td>
+          <td style="padding:8px; border-bottom:1px solid var(--b)">$${(+i.precio_compra).toFixed(2)}</td>
+          <td style="padding:8px; border-bottom:1px solid var(--b)">$${(+i.precio_venta).toFixed(2)}</td>
+          <td style="padding:8px; border-bottom:1px solid var(--b); font-weight:600">$${(i.precio_venta * i.cantidad).toFixed(2)}</td>
+        </tr>
+      `).join('');
+
+      document.getElementById('vg-det-body').innerHTML = `
+        <div style="background:var(--cream); padding:12px; border-radius:var(--rs); margin-bottom:16px; font-size:13px; display:grid; grid-template-columns:1fr 1fr; gap:10px">
+          <div><span style="color:var(--muted)">Cliente:</span><br><strong>${g.cliente}</strong></div>
+          <div><span style="color:var(--muted)">Fecha:</span><br><strong>${fDate(g.fecha + 'T12:00:00')}</strong></div>
+          <div><span style="color:var(--muted)">Pago:</span><br><span style="text-transform:uppercase; font-weight:600">${g.metodo_pago}</span></div>
+          ${g.notas ? `<div style="grid-column:1/-1"><span style="color:var(--muted)">Notas:</span><br>${g.notas}</div>` : ''}
+        </div>
+        <div style="max-height:300px; overflow-y:auto; border:1px solid var(--b); border-radius:var(--rs)">
+          <table style="width:100%; border-collapse:collapse; font-size:12.5px">
+            <thead>
+              <tr style="background:var(--cream)">
+                <th style="padding:8px; text-align:left; border-bottom:1px solid var(--b); font-size:10px; text-transform:uppercase; color:var(--muted)">Producto</th>
+                <th style="padding:8px; text-align:center; border-bottom:1px solid var(--b); font-size:10px; text-transform:uppercase; color:var(--muted)">Cant.</th>
+                <th style="padding:8px; text-align:left; border-bottom:1px solid var(--b); font-size:10px; text-transform:uppercase; color:var(--muted)">Costo U.</th>
+                <th style="padding:8px; text-align:left; border-bottom:1px solid var(--b); font-size:10px; text-transform:uppercase; color:var(--muted)">Venta U.</th>
+                <th style="padding:8px; text-align:left; border-bottom:1px solid var(--b); font-size:10px; text-transform:uppercase; color:var(--muted)">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>${itemsHTML}</tbody>
+          </table>
+        </div>
+        <div style="margin-top:16px; display:flex; flex-direction:column; align-items:flex-end; gap:4px">
+          <div style="font-size:11px; color:var(--muted)">Subtotal Costo: $${tCosto.toFixed(2)}</div>
+          <div style="font-size:11px; color:var(--muted)">Costo + IVA (8.75%): $${cIva.toFixed(2)}</div>
+          <div style="font-size:13px; font-weight:600">Total Venta: $${tVenta.toFixed(2)}</div>
+          <div style="background:var(--sage-p); padding:10px 16px; border-radius:var(--rs); border:1px solid rgba(74,122,90,.2); margin-top:8px; text-align:right">
+            <div style="font-size:10px; font-weight:700; color:var(--sage); text-transform:uppercase; letter-spacing:0.05em">Ganancia Neta</div>
+            <div style="font-size:22px; font-weight:800; color:${gNeta >= 0 ? 'var(--sage)' : 'var(--rose)'}">${gNeta >= 0 ? '+' : '-'}$${Math.abs(gNeta).toFixed(2)}</div>
+          </div>
+        </div>
+      `;
+      om('m-vg-det');
+    }
+
+    function exportarVentasGrandesExcel() {
+      if (!ventasGrandes.length) { toast('No hay ventas grandes para exportar', 'err'); return; }
+      const headers = [
+        ['DELIRIUM DECOR — VENTAS GRANDES / PEDIDOS MAYORISTAS'],
+        ['Fecha de reporte:', new Date().toLocaleString()],
+        [],
+        ['CLIENTE', 'PRODUCTO', 'CANTIDAD', 'PRECIO COMPRA', 'PRECIO VENTA', 'GANANCIA/UNIT', 'TOTAL GANANCIA', 'FECHA']
+      ];
+      const data = ventasGrandes.map(v => {
+        const ganU = v.ganancia_unit != null ? +v.ganancia_unit : (+v.precio_venta - +v.precio_compra);
+        const total = v.total != null ? +v.total : ganU * +v.cantidad;
+        const fechaStr = v.fecha ? fDate(v.fecha + 'T12:00:00') : fDate(v.created_at);
+        return [v.cliente, v.producto, +v.cantidad, +v.precio_compra, +v.precio_venta,
+        +ganU.toFixed(2), +total.toFixed(2), fechaStr];
+      });
+      const ws = XLSX.utils.aoa_to_sheet([...headers, ...data]);
+      ws['!cols'] = [{ wch: 22 }, { wch: 30 }, { wch: 10 }, { wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 14 }];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Ventas Grandes');
+      XLSX.writeFile(wb, 'DeliriumDecor_VentasGrandes_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+      toast('✓ Excel Ventas Grandes exportado', 'ok');
+    }
+
+    // ══ CIERRE MENSUAL ══
+    const MESES = ['', 'Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+    function generarCierre() {
+      const mes = +document.getElementById('cierre-mes').value;
+      const anio = +document.getElementById('cierre-anio').value;
+      const mesLabel = MESES[mes];
+
+      // Filtrar artículos vendidos de tickets en ese mes/año
+      const artsVendidos = [];
+      tickets.forEach(t => {
+        (t.items || []).forEach(i => {
+          if (i.estado === 'vendido') {
+            const ref = i.updated_at || t.created_at;
+            if (ref) {
+              const d = new Date(ref);
+              if (d.getMonth() + 1 === mes && d.getFullYear() === anio) {
+                artsVendidos.push({ ...i, temporada: t.temporada || '—', folio: t.folio });
+              }
+            }
+          }
+        });
+      });
+
+      // Filtrar ventas grandes del mes/año
+      const vgMes = ventasGrandes.filter(v => {
+        const ref = v.fecha ? v.fecha + 'T12:00:00' : v.created_at;
+        if (!ref) return false;
+        const d = new Date(ref);
+        return d.getMonth() + 1 === mes && d.getFullYear() === anio;
+      });
+
+      // Calcular métricas
+      const ingresosArts = artsVendidos.reduce((s, i) => s + (+i.precio_venta || 0) * (+i.cantidad || 1), 0);
+      const costosArts   = artsVendidos.reduce((s, i) => s + (+i.precio_compra || 0) * (+i.cantidad || 1), 0);
+      const ingresosVG   = vgMes.reduce((s, v) => s + (+v.precio_venta || 0) * (+v.cantidad || 1), 0);
+      const costosVG     = vgMes.reduce((s, v) => s + (+v.precio_compra || 0) * (+v.cantidad || 1), 0);
+      const totalIngresos = ingresosArts + ingresosVG;
+      const totalCostos   = costosArts + costosVG;
+      const ganancia      = totalIngresos - totalCostos;
+
+      // Agrupar artículos por temporada
+      const porTemp = {};
+      artsVendidos.forEach(i => {
+        const t = i.temporada || '—';
+        if (!porTemp[t]) porTemp[t] = { cant: 0, ingresos: 0, costos: 0 };
+        porTemp[t].cant     += (+i.cantidad || 1);
+        porTemp[t].ingresos += (+i.precio_venta || 0) * (+i.cantidad || 1);
+        porTemp[t].costos   += (+i.precio_compra || 0) * (+i.cantidad || 1);
+      });
+
+      const fmt = n => '$' + (+n).toLocaleString('es-MX', { minimumFractionDigits: 2 });
+
+      let html = `<h3 style="font-size:15px;font-weight:600;margin-bottom:14px;color:var(--gold)">Cierre ${mesLabel} ${anio}</h3>`;
+
+      // Metric cards
+      html += `<div class="mg" style="margin-bottom:20px">
+        <div class="mc sage"><div class="ml">Total Ingresos</div><div class="mv">${fmt(totalIngresos)}</div><div class="ms">venta + mayoreo</div></div>
+        <div class="mc"><div class="ml">Total Costos</div><div class="mv">${fmt(totalCostos)}</div><div class="ms">compras del período</div></div>
+        <div class="mc gold"><div class="ml">Ganancia Neta</div><div class="mv" style="color:${ganancia>=0?'var(--sage)':'var(--rose)'}">${fmt(ganancia)}</div><div class="ms">utilidad</div></div>
+        <div class="mc"><div class="ml">Artículos Vendidos</div><div class="mv">${artsVendidos.length}</div><div class="ms">unidades</div></div>
+        <div class="mc"><div class="ml">Ventas</div><div class="mv">${vgMes.length}</div><div class="ms">pedidos mayoristas</div></div>
+      </div>`;
+
+      // Tabla ventas grandes del mes
+      if (vgMes.length) {
+        html += `<p style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">💼 Ventas del mes</p>`;
+        html += `<div class="tw" style="margin-bottom:18px"><table><thead><tr><th>Cliente</th><th>Producto</th><th>Cant.</th><th>P.Venta</th><th>Ganancia</th><th>Fecha</th></tr></thead><tbody>`;
+        vgMes.forEach(v => {
+          const ganU = v.ganancia_unit != null ? +v.ganancia_unit : (+v.precio_venta - +v.precio_compra);
+          const tot  = v.total != null ? +v.total : ganU * +v.cantidad;
+          const fd   = v.fecha ? fDate(v.fecha + 'T12:00:00') : fDate(v.created_at);
+          html += `<tr><td>${v.cliente}</td><td>${v.producto}</td><td style="text-align:center">${v.cantidad}</td><td>${fmt(+v.precio_venta)}</td><td style="color:${tot>=0?'var(--sage)':'var(--rose)'};font-weight:700">${fmt(tot)}</td><td style="font-size:12px;color:var(--muted)">${fd}</td></tr>`;
+        });
+        html += `</tbody></table></div>`;
+      }
+
+      // Tabla artículos por temporada
+      if (artsVendidos.length) {
+        html += `<p style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">📦 Artículos vendidos por temporada</p>`;
+        html += `<div class="tw" style="margin-bottom:18px"><table><thead><tr><th>Temporada</th><th>Cant.</th><th>Ingresos</th><th>Costos</th><th>Ganancia</th></tr></thead><tbody>`;
+        Object.entries(porTemp).forEach(([temp, d]) => {
+          const g = d.ingresos - d.costos;
+          html += `<tr><td><span class="sbadge">${temp}</span></td><td style="text-align:center;font-weight:600">${d.cant}</td><td>${fmt(d.ingresos)}</td><td>${fmt(d.costos)}</td><td style="color:${g>=0?'var(--sage)':'var(--rose)'};font-weight:700">${fmt(g)}</td></tr>`;
+        });
+        html += `</tbody></table></div>`;
+      }
+
+      if (!artsVendidos.length && !vgMes.length) {
+        html += `<div class="empty"><div class="ei">📅</div><h3>Sin datos para este mes</h3><p>No hay ventas registradas en ${mesLabel} ${anio}.</p></div>`;
+      } else {
+        // Total final resaltado
+        html += `<div style="text-align:right;background:var(--sage-p);border:1px solid rgba(16,185,129,.2);border-radius:var(--rs);padding:14px 18px;margin-top:8px">
+          <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--sage)">GANANCIA TOTAL DEL MES</div>
+          <div style="font-size:26px;font-weight:700;color:${ganancia>=0?'var(--sage)':'var(--rose)'}">${fmt(ganancia)}</div>
+        </div>`;
+      }
+
+      document.getElementById('cierre-body').innerHTML = html;
+    }
+
+    function exportarCierre() {
+      const mes   = +document.getElementById('cierre-mes').value;
+      const anio  = +document.getElementById('cierre-anio').value;
+      const mesLabel = MESES[mes];
+
+      const artsVendidos = [];
+      tickets.forEach(t => {
+        (t.items || []).forEach(i => {
+          if (i.estado === 'vendido') {
+            const ref = i.updated_at || t.created_at;
+            if (ref) {
+              const d = new Date(ref);
+              if (d.getMonth() + 1 === mes && d.getFullYear() === anio) {
+                artsVendidos.push({ ...i, temporada: t.temporada || '—', folio: t.folio });
+              }
+            }
+          }
+        });
+      });
+
+      const vgMes = ventasGrandes.filter(v => {
+        const ref = v.fecha ? v.fecha + 'T12:00:00' : v.created_at;
+        if (!ref) return false;
+        const d = new Date(ref);
+        return d.getMonth() + 1 === mes && d.getFullYear() === anio;
+      });
+
+      const header = [
+        [`DELIRIUM DECOR — CIERRE MENSUAL ${mesLabel.toUpperCase()} ${anio}`],
+        ['Generado:', new Date().toLocaleString()],
+        []
+      ];
+
+      const secVG = vgMes.length ? [
+        ['--- VENTAS GRANDES ---'],
+        ['Cliente','Producto','Cantidad','P.Compra','P.Venta','Ganancia','Fecha'],
+        ...vgMes.map(v => {
+          const ganU = v.ganancia_unit != null ? +v.ganancia_unit : (+v.precio_venta - +v.precio_compra);
+          const tot  = v.total != null ? +v.total : ganU * +v.cantidad;
+          const fd   = v.fecha ? fDate(v.fecha + 'T12:00:00') : fDate(v.created_at);
+          return [v.cliente, v.producto, +v.cantidad, +v.precio_compra, +v.precio_venta, +tot.toFixed(2), fd];
+        }),
+        []
+      ] : [];
+
+      const secArts = artsVendidos.length ? [
+        ['--- ARTÍCULOS VENDIDOS ---'],
+        ['Folio','Nombre','Temporada','Cantidad','P.Compra','P.Venta','Ganancia'],
+        ...artsVendidos.map(i => {
+          const cant = +i.cantidad || 1;
+          const gan  = ((+i.precio_venta || 0) - (+i.precio_compra || 0)) * cant;
+          return [i.folio, i.nombre, i.temporada, cant, +i.precio_compra, +i.precio_venta, +gan.toFixed(2)];
+        }),
+        []
+      ] : [];
+
+      const rows = [...header, ...secVG, ...secArts];
+      if (!rows.length || rows.length <= 3) { toast('Sin datos para exportar en este período', 'err'); return; }
+
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      ws['!cols'] = [{wch:20},{wch:30},{wch:10},{wch:12},{wch:12},{wch:14},{wch:14}];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, `Cierre ${mesLabel} ${anio}`);
+      XLSX.writeFile(wb, `DeliriumDecor_Cierre_${mesLabel}${anio}.xlsx`);
+      toast(`✓ Cierre ${mesLabel} ${anio} exportado`, 'ok');
+    }
+
+    // ══ DEMO ══
+    function loadDemo() {
+      const d = (offset) => new Date(Date.now() - 86400000 * offset).toISOString();
+      tickets = [
+        { id: 'd1', folio: 'TKT-0001', nombre: 'Taza Halloween calavera, Plato renos', temporada: 'Halloween', estado: 'vendido', precio: 430, notas: '', created_at: d(5), fecha_registro: null, items: [{ id: 'i1', ticket_id: 'd1', nombre: 'Taza Halloween calavera', categoria: 'Tazas', cantidad: 1, precio_compra: 80, precio_venta: 180 }, { id: 'i2', ticket_id: 'd1', nombre: 'Plato renos', categoria: 'Platos', cantidad: 1, precio_compra: 100, precio_venta: 250 }] },
+        { id: 'd2', folio: 'TKT-0002', nombre: 'Figura Día de Muertos', temporada: 'Día de Muertos', estado: 'pendiente', precio: 320, notas: '', created_at: d(28), fecha_registro: null, items: [{ id: 'i3', ticket_id: 'd2', nombre: 'Figura Día de Muertos', categoria: 'Figuras', cantidad: 2, precio_compra: 120, precio_venta: 320 }] },
+        { id: 'd3', folio: 'TKT-0003', nombre: 'Taza San Valentín', temporada: 'San Valentín', estado: 'apartado', precio: 165, notas: 'Reservado Sra. García', created_at: d(25), fecha_registro: null, items: [{ id: 'i4', ticket_id: 'd3', nombre: 'Taza San Valentín corazones', categoria: 'Tazas', cantidad: 1, precio_compra: 70, precio_venta: 165 }] },
+        { id: 'd4', folio: 'TKT-0004', nombre: 'Adorno Navidad árbol', temporada: 'Navidad', estado: 'descuento', precio: 95, notas: '50% descuento', created_at: d(1), fecha_registro: null, items: [{ id: 'i5', ticket_id: 'd4', nombre: 'Adorno Navidad árbol', categoria: 'Adornos', cantidad: 3, precio_compra: 20, precio_venta: 95 }] },
+        { id: 'd5', folio: 'TKT-0005', nombre: 'Jarra Pascua conejitos', temporada: 'Pascua', estado: 'pendiente', precio: 210, notas: '', created_at: d(32), fecha_registro: null, items: [{ id: 'i6', ticket_id: 'd5', nombre: 'Jarra Pascua conejitos', categoria: 'Jarras', cantidad: 1, precio_compra: 90, precio_venta: 210 }] },
+        { id: 'd6', folio: 'TKT-0006', nombre: 'Servilletero Halloween murciélago', temporada: 'Halloween', estado: 'pendiente', precio: 185, notas: '', created_at: d(10), fecha_registro: null, items: [{ id: 'i7', ticket_id: 'd6', nombre: 'Servilletero murciélago', categoria: 'Servilleteros', cantidad: 1, precio_compra: 60, precio_venta: 185 }] },
+      ];
+    }
+
+    // ══ BÚSQUEDA RÁPIDA (FAB) ══
+    function abrirScanRapido() {
+      document.getElementById('sr-input').value = '';
+      document.getElementById('sr-results').innerHTML = '';
+      om('m-scan-rapido');
+      document.getElementById('fab-scan').style.display = 'none';
+      setTimeout(() => document.getElementById('sr-input').focus(), 120);
+    }
+
+    function cerrarScanRapido() {
+      cm('m-scan-rapido');
+      document.getElementById('fab-scan').style.display = 'flex';
+    }
+
+    function busquedaRapida(query) {
+      const q = (query || '').trim().toLowerCase();
+      const el = document.getElementById('sr-results');
+      if (!el) return;
+
+      if (q.length < 2) {
+        el.innerHTML = '<p style="font-size:12.5px;color:var(--muted);text-align:center;padding:16px 0">Escribe al menos 2 caracteres...</p>';
+        return;
+      }
+
+      let resultados = [];
+      tickets.forEach(t => {
+        (t.items || []).forEach(i => {
+          const matchNombre = (i.nombre || '').toLowerCase().includes(q);
+          const matchBarcode = (i.codigo_barras || '').toLowerCase().includes(q);
+          const matchFolio = (t.folio || '').toLowerCase().includes(q);
+          const matchTemp = (t.temporada || '').toLowerCase().includes(q);
+          if (matchNombre || matchBarcode || matchFolio || matchTemp) {
+            resultados.push({ art: i, ticket: t });
+          }
+        });
+      });
+
+      if (!resultados.length) {
+        el.innerHTML = `
+          <div style="text-align:center;padding:20px;background:var(--rose-p);border-radius:var(--rs)">
+            <div style="font-size:28px;margin-bottom:8px">🔍</div>
+            <div style="color:var(--rose);font-weight:600;font-size:14px">No encontrado</div>
+            <div style="color:var(--muted);font-size:12px;margin-top:4px">"${query}"</div>
+          </div>`;
+        return;
+      }
+
+      resultados.sort((a, b) => {
+        const order = { pendiente: 0, apartado: 1, descuento: 2, vendido: 3, devuelto_completo: 4, devuelto_vale: 4 };
+        return (order[a.art.estado] ?? 5) - (order[b.art.estado] ?? 5);
+      });
+
+      el.innerHTML = `
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:500">
+          ${resultados.length} resultado${resultados.length !== 1 ? 's' : ''} encontrado${resultados.length !== 1 ? 's' : ''}
+        </div>
+        ${resultados.slice(0, 8).map(({ art, ticket }) => {
+          const promo = typeof getActivePromo === 'function' ? getActivePromo(art.id) : null;
+          const precio = promo ? +promo.precio_promocional : (+art.precio_unitario || 0);
+          const ganancia = precio - (+art.precio_compra || 0);
+          const esVendible = ['pendiente', 'apartado', 'descuento'].includes(art.estado);
+          return `
+            <div style="background:var(--cream);border:1px solid var(--b);border-radius:var(--r);padding:14px 16px;margin-bottom:10px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+                <div style="flex:1;min-width:0">
+                  <div style="font-weight:600;font-size:14.5px;margin-bottom:3px">${art.nombre}</div>
+                  <div style="font-size:11.5px;color:var(--muted)">${ticket.folio} · ${sEmoji(ticket.temporada)} ${ticket.temporada || '—'}</div>
+                  ${art.codigo_barras ? `<div style="font-family:monospace;font-size:11px;color:var(--cobalt);margin-top:2px">${art.codigo_barras}</div>` : ''}
+                </div>
+                <div>${stBadge(art.estado)}</div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+                <div style="background:#0f1117;border-radius:var(--rs);padding:8px 10px">
+                  <div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Costo</div>
+                  <div style="font-weight:700;font-size:14px">$${(+art.precio_compra || 0).toFixed(2)}</div>
+                </div>
+                <div style="background:#0f1117;border-radius:var(--rs);padding:8px 10px">
+                  <div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Venta</div>
+                  <div style="font-weight:700;font-size:14px;color:var(--gold)">$${precio.toFixed(2)}</div>
+                </div>
+                <div style="background:#0f1117;border-radius:var(--rs);padding:8px 10px">
+                  <div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Ganancia</div>
+                  <div style="font-weight:700;font-size:14px;color:${ganancia >= 0 ? 'var(--sage)' : 'var(--rose)'}">$${Math.abs(ganancia).toFixed(2)}</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:7px;flex-wrap:wrap">
+                ${esVendible ? `
+                  <button class="btn btn-sage btn-sm" style="flex:1"
+                    onclick="patchArticulo('${art.id}',{estado:'vendido'}); cerrarScanRapido(); toast('✓ ${art.nombre.replace(/'/g, "'")} marcado como vendido','ok')">
+                    ✅ Marcar vendido
+                  </button>
+                  <button class="btn btn-rose btn-sm"
+                    onclick="patchArticulo('${art.id}',{estado:'devuelto_completo'}); cerrarScanRapido(); toast('🔄 Devolución registrada','ok')">
+                    🔄 Devolver
+                  </button>
+                ` : ''}
+                <button class="btn btn-out btn-sm"
+                  onclick="cerrarScanRapido(); setTimeout(()=>openDet('${ticket.id}'),100)">
+                  Ver ticket
+                </button>
+              </div>
+            </div>`;
+        }).join('')}
+        ${resultados.length > 8 ? `<div style="text-align:center;font-size:12px;color:var(--muted);padding:8px">+${resultados.length - 8} resultados más — escribe más para filtrar</div>` : ''}
+      `;
+    }
+  </script>
+  <script src="js/promos.js"></script>
+
+  <!-- MODAL: Búsqueda Rápida -->
+  <div class="mo" id="m-scan-rapido">
+    <div class="md" style="max-width:460px">
+      <div class="mh">
+        <h2>🔍 Buscar artículo</h2>
+        <button class="mx" onclick="cerrarScanRapido()">✕</button>
+      </div>
+      <div class="mb">
+        <div style="background:var(--gold-p);border:1px solid rgba(201,168,76,0.25);border-radius:var(--rs);padding:11px 14px;margin-bottom:14px;font-size:12.5px;color:var(--ink2);line-height:1.6">
+          Escanea el código de barras del artículo <strong>o escribe su nombre</strong> para encontrarlo en bodega.
+        </div>
+        <input type="text" id="sr-input"
+          placeholder="Escanea o escribe nombre del artículo..."
+          autocomplete="off"
+          oninput="busquedaRapida(this.value)"
+          style="font-size:15px;padding:12px 14px;margin-bottom:12px;letter-spacing:.02em">
+        <div id="sr-results"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAB: Botón flotante de escaneo -->
+  <button id="fab-scan" onclick="abrirScanRapido()" style="
+    position: fixed;
+    bottom: 28px;
+    right: 22px;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: #c9a84c;
+    color: #0f1117;
+    font-size: 24px;
+    border: none;
+    cursor: pointer;
+    z-index: 300;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform .15s, box-shadow .15s;
+  " title="Escanear artículo">🔍</button>
+</body>
+
+</html>
