@@ -1487,7 +1487,7 @@
         <div id="mi-tot"></div>
       </div>
       <div class="mf"><button class="btn btn-out" onclick="cm('m-new')">Cancelar</button><button class="btn btn-gold"
-          onclick="saveModalTicket()">✓ Guardar ticket</button></div>
+          onclick="saveModalTicket(event)">✓ Guardar ticket</button></div>
     </div>
   </div>
 
@@ -1706,7 +1706,7 @@
       </div>
       <div class="mf">
         <button class="btn btn-out" onclick="cm('m-ventas')">Cancelar</button>
-        <button class="btn btn-gold" onclick="saveVentaGrande()">💼 Confirmar Venta</button>
+        <button class="btn btn-gold" onclick="saveVentaGrande(event)">💼 Confirmar Venta</button>
       </div>
     </div>
   </div>
@@ -2010,8 +2010,8 @@
               <div id="pi-tot"></div>
               <div style="margin-top:18px;display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap">
                 <button class="btn btn-out" onclick="clearPForm()">Limpiar</button>
-                <button class="btn btn-dark" onclick="savePageTicketOnly()">&#10003; Solo guardar</button>
-                <button class="btn btn-gold" onclick="savePageTicket()">&#10003; Guardar y ver QR</button>
+                <button class="btn btn-dark" onclick="savePageTicketOnly(event)">&#10003; Solo guardar</button>
+                <button class="btn btn-gold" onclick="savePageTicket(event)">&#10003; Guardar y ver QR</button>
               </div>
             </div>
           </div>
@@ -2884,13 +2884,22 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       setTimeout(() => addItemRow('mi-body', 'mi-tot'), 50);
     }
 
-    async function saveModalTicket() {
+    async function saveModalTicket(event) {
+      const btn = event?.target;
+      const originalText = btn ? btn.innerHTML : '';
+      
       const te = document.getElementById('nt2').value;
       if (!te) { toast('Selecciona la temporada', 'err'); return; }
       const folioVal = document.getElementById('n-folio')?.value.trim();
       if (!folioVal) { toast('Ingresa el código del ticket (Folio)', 'err'); return; }
       const items = getItems('mi-body');
       if (!items.length) { toast('Agrega al menos un producto', 'err'); return; }
+      
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '⌛ Guardando...';
+      }
+
       const tv = items.reduce((s, i) => s + (+i.precio_venta || 0) * (+i.cantidad || 1), 0);
       const row = {
         folio: folioVal,
@@ -2902,17 +2911,36 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         proveedor: document.getElementById('np2').value || null,
         metodo_pago: document.getElementById('nt-pago').value
       };
-      const t = await push(row, items);
-      if (t) { cm('m-new'); toast('\u2713 Ticket ' + t.folio + ' creado (' + items.length + ' prod.)', 'ok'); }
+      
+      try {
+        const t = await push(row, items);
+        if (t) { cm('m-new'); toast('\u2713 Ticket ' + t.folio + ' creado (' + items.length + ' prod.)', 'ok'); }
+      } catch (e) {
+        toast('Error al guardar: ' + e.message, 'err');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }
+      }
     }
 
-    async function savePageTicket() {
+    async function savePageTicket(event) {
+      const btn = event?.target;
+      const originalText = btn ? btn.innerHTML : '';
+
       const te = document.getElementById('pt').value;
       if (!te) { toast('Selecciona la temporada', 'err'); return; }
       const folioVal = document.getElementById('p-folio')?.value.trim();
       if (!folioVal) { toast('Ingresa el código del ticket (Folio)', 'err'); return; }
       const items = getItems('pi-body');
       if (!items.length) { toast('Agrega al menos un producto', 'err'); return; }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '⌛ Guardando...';
+      }
+
       const tv = items.reduce((s, i) => s + (+i.precio_venta || 0) * (+i.cantidad || 1), 0);
       const fechaVal = document.getElementById('p-fecha')?.value || null;
       const row = {
@@ -2926,17 +2954,36 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         proveedor: document.getElementById('pp').value || null,
         metodo_pago: document.getElementById('p-pago').value
       };
-      const t = await push(row, items);
-      if (t) { toast('\u2713 Ticket ' + t.folio + ' guardado', 'ok'); clearPForm(); setTimeout(() => showQR(t.id), 250); }
+
+      try {
+        const t = await push(row, items);
+        if (t) { toast('\u2713 Ticket ' + t.folio + ' guardado', 'ok'); clearPForm(); setTimeout(() => showQR(t.id), 250); }
+      } catch (e) {
+        toast('Error al guardar: ' + e.message, 'err');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }
+      }
     }
 
-    async function savePageTicketOnly() {
+    async function savePageTicketOnly(event) {
+      const btn = event?.target;
+      const originalText = btn ? btn.innerHTML : '';
+
       const te = document.getElementById('pt').value;
       if (!te) { toast('Selecciona la temporada', 'err'); return; }
       const folioVal = document.getElementById('p-folio')?.value.trim();
       if (!folioVal) { toast('Ingresa el código del ticket (Folio)', 'err'); return; }
       const items = getItems('pi-body');
       if (!items.length) { toast('Agrega al menos un producto', 'err'); return; }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '⌛ Guardando...';
+      }
+
       const tv = items.reduce((s, i) => s + (+i.precio_venta || 0) * (+i.cantidad || 1), 0);
       const fechaVal = document.getElementById('p-fecha')?.value || null;
       const row = {
@@ -2950,10 +2997,20 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         proveedor: document.getElementById('pp').value || null,
         metodo_pago: document.getElementById('p-pago').value
       };
-      const t = await push(row, items);
-      if (t) {
-        toast('\u2713 Ticket ' + t.folio + ' guardado', 'ok');
-        clearPForm();
+
+      try {
+        const t = await push(row, items);
+        if (t) {
+          toast('\u2713 Ticket ' + t.folio + ' guardado', 'ok');
+          clearPForm();
+        }
+      } catch (e) {
+        toast('Error al guardar: ' + e.message, 'err');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }
       }
     }
 
@@ -3852,7 +3909,10 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       return { ok: true, nuevaCant };
     }
 
-    async function saveVentaGrande() {
+    async function saveVentaGrande(event) {
+      const btn = event?.target;
+      const originalText = btn ? btn.innerHTML : '';
+      
       const cliente = document.getElementById('vg-cliente').value.trim();
       if (!cliente) { toast('Ingresa el nombre del cliente', 'err'); return; }
       const fecha = document.getElementById('vg-fecha').value || new Date().toISOString().slice(0, 10);
@@ -3860,6 +3920,11 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       const metodoPago = document.getElementById('vg-pago').value;
       const items = getVGItems();
       if (!items.length) { toast('Agrega al menos un producto', 'err'); return; }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '⌛ Guardando...';
+      }
 
       // Validar stock disponible para todos los artículos antes de guardar
       for (const item of items) {
@@ -3879,46 +3944,56 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       // Procesar cada artículo con un ID de venta único para agruparlos luego
       const ventaId = crypto.randomUUID();
       let guardados = 0;
-      for (const item of items) {
-        // 1. Descontar inventario
-        if (item.artId && item.artId !== 'undefined') {
-          const res = await descontarInventario(item.artId, item.cantidad);
-          if (!res.ok) { toast('⚠️ ' + res.msg, 'err'); continue; }
-          if (res.nuevaCant === 0) toast(`"${item.nombre}" agotado — retirado del listado`, 'ok');
+      
+      try {
+        for (const item of items) {
+          // 1. Descontar inventario
+          if (item.artId && item.artId !== 'undefined') {
+            const res = await descontarInventario(item.artId, item.cantidad);
+            if (!res.ok) { toast('⚠️ ' + res.msg, 'err'); continue; }
+            if (res.nuevaCant === 0) toast(`"${item.nombre}" agotado — retirado del listado`, 'ok');
+          }
+
+          // 2. Guardar en Supabase / demo
+          const groupTag = `[V:${ventaId.slice(0, 8)}]`;
+          const row = {
+            cliente, fecha, notas: notas ? (notas + ' ' + groupTag) : groupTag,
+            producto: item.nombre,
+            articulo_id: item.artId || null,
+            cantidad: item.cantidad,
+            precio_compra: item.precio_compra,
+            precio_venta: item.precio_venta,
+            metodo_pago: metodoPago,
+            venta_id: ventaId
+          };
+
+          if (DB) {
+            const { data, error } = await DB.from('ventas_grandes').insert([row]).select().single();
+            if (error) { toast('Error guardando: ' + error.message, 'err'); continue; }
+            ventasGrandes.unshift(data);
+          } else {
+            // Modo demo (sin Supabase)
+            const ganU = item.precio_venta - item.precio_compra;
+            ventasGrandes.unshift({
+              ...row, id: crypto.randomUUID(), created_at: new Date().toISOString(),
+              ganancia_unit: ganU, total: ganU * item.cantidad
+            });
+          }
+          guardados++;
         }
 
-        // 2. Guardar en Supabase / demo
-        const groupTag = `[V:${ventaId.slice(0, 8)}]`;
-        const row = {
-          cliente, fecha, notas: notas ? (notas + ' ' + groupTag) : groupTag,
-          producto: item.nombre,
-          articulo_id: item.artId || null,
-          cantidad: item.cantidad,
-          precio_compra: item.precio_compra,
-          precio_venta: item.precio_venta,
-          metodo_pago: metodoPago,
-          venta_id: ventaId
-        };
-
-        if (DB) {
-          const { data, error } = await DB.from('ventas_grandes').insert([row]).select().single();
-          if (error) { toast('Error guardando: ' + error.message, 'err'); continue; }
-          ventasGrandes.unshift(data);
-        } else {
-          // Modo demo (sin Supabase)
-          const ganU = item.precio_venta - item.precio_compra;
-          ventasGrandes.unshift({
-            ...row, id: crypto.randomUUID(), created_at: new Date().toISOString(),
-            ganancia_unit: ganU, total: ganU * item.cantidad
-          });
+        if (guardados > 0) {
+          cm('m-ventas');
+          toast(`✓ Venta Grande registrada — ${guardados} producto(s)`, 'ok');
+          render();
         }
-        guardados++;
-      }
-
-      if (guardados > 0) {
-        cm('m-ventas');
-        toast(`✓ Venta Grande registrada — ${guardados} producto(s)`, 'ok');
-        render();
+      } catch (e) {
+        toast('Error crítico al guardar venta: ' + e.message, 'err');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }
       }
     }
 
@@ -4023,7 +4098,12 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
           <td style="font-weight:700">$${tV.toFixed(2)}</td>
           <td style="font-weight:700;color:${gN >= 0 ? 'var(--sage)' : 'var(--rose)'}">${gN >= 0 ? '+' : '-'}$${Math.abs(gN).toFixed(2)}</td>
           <td><span class="${pagoCls}">${pagoLabel}</span></td>
-          <td><button class="btn btn-xs btn-out" onclick="openVGDet('${g.venta_id}')">📄 Ver Venta</button></td>
+          <td>
+            <div style="display:flex;gap:5px">
+              <button class="btn btn-xs btn-out" onclick="openVGDet('${g.venta_id}')">📄 Ver</button>
+              <button class="btn btn-xs btn-rose" onclick="deleteVentaGrande('${g.venta_id}')">✕</button>
+            </div>
+          </td>
         </tr>`;
       }).join('');
     }
@@ -4086,6 +4166,81 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         </div>
       `;
       om('m-vg-det');
+    }
+
+    async function deleteVentaGrande(ventaId) {
+      const itemsToDelete = ventasGrandes.filter(v => {
+        const match = v.notas && v.notas.match(/\[V:([a-f0-9]+)\]/);
+        return v.venta_id === ventaId || (match && match[1] === ventaId);
+      });
+      
+      if (!itemsToDelete.length) {
+        toast('No se encontraron registros para esta venta', 'err');
+        return;
+      }
+
+      const cliente = itemsToDelete[0].cliente;
+      
+      askConf(`¿Estás seguro de eliminar la venta de "${cliente}"? Los productos volverán al inventario.`, async () => {
+        try {
+          // 1. Restaurar inventario
+          for (const item of itemsToDelete) {
+            if (item.articulo_id) {
+              await reponerInventario(item.articulo_id, item.cantidad);
+            }
+          }
+
+          // 2. Eliminar de Supabase
+          if (DB) {
+            const { error } = await DB.from('ventas_grandes').delete().or(`venta_id.eq.${ventaId},notas.ilike.%[V:${ventaId}]%`);
+            if (error) throw error;
+          }
+
+          // 3. Actualizar estado local
+          ventasGrandes = ventasGrandes.filter(v => {
+            const match = v.notas && v.notas.match(/\[V:([a-f0-9]+)\]/);
+            return v.venta_id !== ventaId && (!match || match[1] !== ventaId);
+          });
+
+          render();
+          toast('✓ Venta eliminada y stock restaurado', 'ok');
+        } catch (e) {
+          toast('Error al eliminar venta: ' + e.message, 'err');
+        }
+      });
+    }
+
+    async function reponerInventario(artId, cantidad) {
+      let foundTicket = null, foundArt = null;
+      for (const t of tickets) {
+        foundArt = t.items.find(i => String(i.id) === String(artId));
+        if (foundArt) { foundTicket = t; break; }
+      }
+      if (!foundArt) return;
+
+      const nuevaCant = (+foundArt.cantidad || 0) + (+cantidad);
+      foundArt.cantidad = nuevaCant;
+      
+      // Si estaba vendido (porque llegó a 0), volver a pendiente
+      if (foundArt.estado === 'vendido' && nuevaCant > 0) {
+        foundArt.estado = 'pendiente';
+      }
+
+      if (DB) {
+        await DB.from('articulos').update({ 
+          cantidad: nuevaCant, 
+          estado: foundArt.estado 
+        }).eq('id', artId);
+        
+        // Recalcular ticket
+        if (foundTicket) {
+          const newStatus = calcTicketStatus(foundTicket.items);
+          if (newStatus !== foundTicket.estado) {
+            foundTicket.estado = newStatus;
+            await DB.from('tickets').update({ estado: newStatus, updated_at: new Date().toISOString() }).eq('id', foundTicket.id);
+          }
+        }
+      }
     }
 
     function exportarVentasGrandesExcel() {
