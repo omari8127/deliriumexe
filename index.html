@@ -1512,7 +1512,7 @@
 
   <!-- MODAL: Detail -->
   <div class="mo" id="m-det">
-    <div class="md md-lg">
+    <div class="md md-xl">
       <div class="mh">
         <h2 id="det-title">Ticket</h2><button class="mx" onclick="cm('m-det')">✕</button>
       </div>
@@ -1521,6 +1521,76 @@
         <div id="det-body"></div>
       </div>
       <div class="mf" id="det-foot"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: Editar Ticket -->
+  <div class="mo" id="m-edit-ticket">
+    <div class="md md-xl">
+      <div class="mh">
+        <h2>✏️ Editar Ticket</h2><button class="mx" onclick="cm('m-edit-ticket')">✕</button>
+      </div>
+      <div class="mb">
+        <input type="hidden" id="edit-ticket-id">
+        <div class="fg" style="margin-bottom:16px">
+          <div class="fi"><label>Temporada</label><select id="edit-temporada">
+            <option value="">Seleccionar…</option>
+            <option>Halloween</option>
+            <option>Navidad</option>
+            <option>Día de Muertos</option>
+            <option>San Valentín</option>
+            <option>Pascua</option>
+            <option>Primavera</option>
+            <option>Día de las Madres</option>
+            <option>Spring</option>
+            <option>Cocina</option>
+            <option>Otoño</option>
+            <option>Ocasión Especial</option>
+            <option>General</option>
+          </select></div>
+          <div class="fi"><label>Estado</label><select id="edit-estado">
+            <option value="pendiente">Bodega</option>
+            <option value="apartado">Apartado</option>
+            <option value="vendido">Vendido</option>
+            <option value="descuento">En descuento</option>
+            <option value="devuelto">Devuelto</option>
+            <option value="archivado">Archivado</option>
+          </select></div>
+          <div class="fi"><label>Método de pago</label><select id="edit-pago">
+            <option value="efectivo">💵 Efectivo</option>
+            <option value="transferencia">🏦 Transferencia</option>
+            <option value="adelanto">⏳ Adelanto / Parcial</option>
+            <option value="pendiente">🕐 Por cobrar</option>
+          </select></div>
+          <div class="fi"><label>Proveedor</label><input type="text" id="edit-proveedor" placeholder="Nombre del proveedor…"></div>
+          <div class="fi"><label>Folio / Código</label><input type="text" id="edit-folio" style="font-family:monospace;font-weight:700;color:var(--cobalt);letter-spacing:.05em"></div>
+          <div class="fi"><label>Fecha de registro</label><input type="date" id="edit-fecha"></div>
+          <div class="fi full"><label>Notas generales</label><textarea id="edit-notas" style="min-height:50px" placeholder="Observaciones del ticket…"></textarea></div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <span style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">📦 Artículos del ticket</span>
+        </div>
+        <div style="overflow-x:auto;border:1px solid var(--b);border-radius:var(--rs);margin-bottom:10px">
+          <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:620px">
+            <thead>
+              <tr style="background:var(--cream)">
+                <th style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">Código Barras</th>
+                <th style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">Nombre</th>
+                <th style="padding:7px 10px;text-align:center;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">Cant.</th>
+                <th style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">Costo $</th>
+                <th style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">Venta $</th>
+                <th style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--sage);border-bottom:1px solid var(--b)">Ganancia</th>
+              </tr>
+            </thead>
+            <tbody id="edit-items-body"></tbody>
+          </table>
+        </div>
+        <div id="edit-items-tot"></div>
+      </div>
+      <div class="mf">
+        <button class="btn btn-out" onclick="cm('m-edit-ticket')">Cancelar</button>
+        <button class="btn btn-gold" onclick="saveEditTicket(event)">✓ Guardar cambios</button>
+      </div>
     </div>
   </div>
 
@@ -2556,6 +2626,153 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       if (curDetId === id) openDet(id);
     }
 
+    // ══ EDITAR TICKET ══
+    function openEditTicket(id) {
+      const t = tickets.find(t => t.id === id);
+      if (!t) return;
+
+      document.getElementById('edit-ticket-id').value = id;
+      document.getElementById('edit-temporada').value = t.temporada || '';
+      document.getElementById('edit-estado').value = t.estado || 'pendiente';
+      document.getElementById('edit-pago').value = t.metodo_pago || 'efectivo';
+      document.getElementById('edit-proveedor').value = t.proveedor || '';
+      document.getElementById('edit-folio').value = t.folio || '';
+      document.getElementById('edit-notas').value = t.notas || '';
+
+      // Fecha de registro
+      const fechaEl = document.getElementById('edit-fecha');
+      if (t.fecha_registro) fechaEl.value = t.fecha_registro;
+      else if (t.created_at) fechaEl.value = t.created_at.slice(0, 10);
+      else fechaEl.value = '';
+
+      // Render editable articles
+      const EIS = 'padding:6px 8px;font-size:12.5px;border:1px solid var(--bs);border-radius:var(--rx);background:var(--input-bg);color:var(--ink);width:100%;outline:none;';
+      const tb = document.getElementById('edit-items-body');
+      tb.innerHTML = (t.items || []).map((i, idx) => {
+        const gain = ((+i.precio_unitario || 0) - (+i.precio_compra || 0)) * (+i.cantidad || 1);
+        return `<tr data-art-id="${i.id}">
+          <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><input type="text" value="${i.codigo_barras || i.barcode || ''}" placeholder="—" style="${EIS}min-width:100px;font-family:monospace;"></td>
+          <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><input type="text" value="${i.nombre || ''}" placeholder="Nombre…" style="${EIS}min-width:140px"></td>
+          <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><input type="number" value="${i.cantidad || 1}" min="1" oninput="calcEditRow(this)" style="${EIS}width:55px;text-align:center"></td>
+          <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><input type="number" value="${(+i.precio_compra || 0).toFixed(2)}" min="0" step="0.5" oninput="calcEditRow(this)" style="${EIS}width:90px"></td>
+          <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><input type="number" value="${(+i.precio_unitario || +i.precio_venta || 0).toFixed(2)}" min="0" step="0.5" oninput="calcEditRow(this)" style="${EIS}width:90px"></td>
+          <td class="egc" style="padding:5px 10px;border-bottom:1px solid var(--b);font-weight:700;color:${gain >= 0 ? 'var(--sage)' : 'var(--rose)'}">${gain >= 0 ? '+' : ''}$${Math.abs(gain).toFixed(2)}</td>
+        </tr>`;
+      }).join('');
+
+      calcEditTotals();
+      om('m-edit-ticket');
+    }
+
+    function calcEditRow(inp) {
+      const tr = inp.closest('tr');
+      const ns = tr.querySelectorAll('input[type=number]');
+      const gain = ((+ns[2].value || 0) - (+ns[1].value || 0)) * (+ns[0].value || 1);
+      const gc = tr.querySelector('.egc');
+      if (gc) {
+        gc.textContent = (gain >= 0 ? '+' : '') + '$' + Math.abs(gain).toFixed(2);
+        gc.style.color = gain >= 0 ? 'var(--sage)' : 'var(--rose)';
+      }
+      calcEditTotals();
+    }
+
+    function calcEditTotals() {
+      const tb = document.getElementById('edit-items-body');
+      const el = document.getElementById('edit-items-tot');
+      if (!tb || !el) return;
+      let tC = 0, tV = 0, tQ = 0;
+      tb.querySelectorAll('tr').forEach(tr => {
+        const ns = tr.querySelectorAll('input[type=number]');
+        if (ns.length < 3) return;
+        const c = +ns[0].value || 1, p = +ns[1].value || 0, v = +ns[2].value || 0;
+        tC += p * c; tV += v * c; tQ += c;
+      });
+      const g = tV - tC;
+      el.innerHTML = `<div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--b)">
+        <div style="text-align:right"><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Total Artículos</div><div style="font-size:15px;font-weight:700">${tQ}</div></div>
+        <div style="text-align:right"><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Total Costo</div><div style="font-size:15px;font-weight:700">$${tC.toFixed(2)}</div></div>
+        <div style="text-align:right"><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Total Venta</div><div style="font-size:15px;font-weight:700">$${tV.toFixed(2)}</div></div>
+        <div style="text-align:right;background:var(--sage-p);border-radius:var(--rs);padding:6px 12px;border:1px solid rgba(74,122,90,.2)">
+          <div style="font-size:10px;color:var(--sage);font-weight:600;text-transform:uppercase">Ganancia</div>
+          <div style="font-size:17px;font-weight:700;color:${g >= 0 ? 'var(--sage)' : 'var(--rose)'}">${g >= 0 ? '+' : ''}$${Math.abs(g).toFixed(2)}</div>
+        </div>
+      </div>`;
+    }
+
+    async function saveEditTicket(event) {
+      const btn = event?.target;
+      const originalText = btn ? btn.innerHTML : '';
+      const id = document.getElementById('edit-ticket-id').value;
+      const t = tickets.find(t => t.id === id);
+      if (!t) return;
+
+      const newFolio = document.getElementById('edit-folio').value.trim().toUpperCase();
+      if (!newFolio) { toast('El folio no puede estar vacío', 'err'); return; }
+      const folioConflict = tickets.find(x => x.folio === newFolio && x.id !== id);
+      if (folioConflict) { toast('⚠️ Ese folio ya existe en otro ticket', 'err'); return; }
+
+      if (btn) { btn.disabled = true; btn.innerHTML = '⌛ Guardando...'; }
+
+      try {
+        // Save ticket header fields
+        const headerFields = {
+          folio: newFolio,
+          temporada: document.getElementById('edit-temporada').value,
+          estado: document.getElementById('edit-estado').value,
+          metodo_pago: document.getElementById('edit-pago').value,
+          proveedor: document.getElementById('edit-proveedor').value.trim() || null,
+          notas: document.getElementById('edit-notas').value.trim() || null,
+          fecha_registro: document.getElementById('edit-fecha').value || null
+        };
+
+        // Update ticket header in state and DB
+        Object.assign(t, headerFields);
+        if (DB) {
+          const { error } = await DB.from('tickets').update({ ...headerFields, updated_at: new Date().toISOString() }).eq('id', id);
+          if (error) { toast('Error actualizando ticket: ' + error.message, 'err'); return; }
+        }
+
+        // Save each article's updated fields
+        const rows = document.getElementById('edit-items-body').querySelectorAll('tr');
+        for (const tr of rows) {
+          const artId = tr.dataset.artId;
+          const art = t.items.find(i => i.id === artId);
+          if (!art) continue;
+          const texts = tr.querySelectorAll('input[type=text]');
+          const nums = tr.querySelectorAll('input[type=number]');
+          const updFields = {
+            codigo_barras: texts[0]?.value.trim() || null,
+            nombre: texts[1]?.value.trim() || art.nombre,
+            cantidad: +nums[0]?.value || 1,
+            precio_compra: +nums[1]?.value || 0,
+            precio_unitario: +nums[2]?.value || 0
+          };
+          Object.assign(art, updFields);
+          if (DB) {
+            const { error } = await DB.from('articulos').update(updFields).eq('id', artId);
+            if (error) toast('Error artículo ' + art.nombre + ': ' + error.message, 'err');
+          }
+        }
+
+        // Recalculate derived fields on local ticket object
+        const tv = (t.items || []).reduce((s, i) => s + (+i.precio_unitario || 0) * (+i.cantidad || 1), 0);
+        t.nombre = (t.items || []).map(i => i.nombre).join(', ').substring(0, 100);
+        t.precio = tv;
+        if (DB) {
+          await DB.from('tickets').update({ nombre: t.nombre, precio: tv }).eq('id', id).catch(() => {});
+        }
+
+        render();
+        cm('m-edit-ticket');
+        if (curDetId === id) openDet(id);
+        toast('✓ Ticket actualizado correctamente', 'ok');
+      } catch (e) {
+        toast('Error al guardar: ' + e.message, 'err');
+      } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = originalText; }
+      }
+    }
+
     async function updateFolio(id) {
       const t = tickets.find(t => t.id === id);
       if (!t) return;
@@ -3161,7 +3378,10 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       </div>
     </div>`;
 
-      document.getElementById('det-foot').innerHTML = `<button class="btn btn-out" onclick="curDetId=null; cm('m-det')">Cerrar</button>`;
+      document.getElementById('det-foot').innerHTML = `
+        <button class="btn btn-out" onclick="curDetId=null; cm('m-det')">Cerrar</button>
+        <button class="btn btn-gold" onclick="openEditTicket('${t.id}')">✏️ Editar Ticket</button>
+      `;
       om('m-det');
     }
 
