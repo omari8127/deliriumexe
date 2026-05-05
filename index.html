@@ -2584,7 +2584,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         
         // Track seller in DB column (if exists)
         if (DB) {
-          await DB.from('articulos').update({ vendedor: curUser }).eq('id', artId).catch(()=>{});
+          try { await DB.from('articulos').update({ vendedor: curUser }).eq('id', artId); } catch (_) {}
         }
 
         const nota = {
@@ -2602,7 +2602,10 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         };
         notasVenta.unshift(nota);
         if (DB) {
-          await DB.from('notas_venta').insert([nota]).catch(e => console.warn('notas_venta:', e.message));
+          try {
+            const { error: ne } = await DB.from('notas_venta').insert([nota]);
+            if (ne) console.warn('notas_venta:', ne.message);
+          } catch (_) {}
         }
       }
     }
@@ -2759,7 +2762,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         t.nombre = (t.items || []).map(i => i.nombre).join(', ').substring(0, 100);
         t.precio = tv;
         if (DB) {
-          await DB.from('tickets').update({ nombre: t.nombre, precio: tv }).eq('id', id).catch(() => {});
+          try { await DB.from('tickets').update({ nombre: t.nombre, precio: tv }).eq('id', id); } catch (_) {}
         }
 
         render();
