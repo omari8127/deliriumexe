@@ -2181,6 +2181,10 @@
         </div>
         <div style="padding:26px">
           <div style="display:flex;gap:9px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+            <div class="siw" style="flex:1;min-width:180px">
+            <span class="sico">🔍</span>
+            <input type="text" id="dev-search" placeholder="Buscar artículo, folio, código…" oninput="renderDev()">
+          </div>
             <select class="fsel" id="dev-temp" onchange="renderDev()">
               <option value="">Todas las temporadas</option>
               <option>Halloween</option>
@@ -3409,6 +3413,16 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         });
       });
 
+      // Filter by search text
+      const q = (document.getElementById('dev-search')?.value || '').toLowerCase().trim();
+      if (q) {
+        allArts = allArts.filter(a =>
+          (a.nombre || '').toLowerCase().includes(q) ||
+          (a.ticket.folio || '').toLowerCase().includes(q) ||
+          (a.codigo_barras || '').toLowerCase().includes(q)
+        );
+      }
+
       // Sort by days remaining (most urgent first)
       allArts.sort((a, b) => a.ds.days - b.ds.days);
 
@@ -3444,8 +3458,8 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         <td>${daysBadge}</td>
         <td>${stBadge(a.estado)}</td>
         <td><div style="display:flex;gap:5px;flex-wrap:wrap">
-          <button class="btn btn-xs btn-sage" onclick="patchArticulo('${a.id}',{estado:'devuelto_completo'})">✓ Devuelto</button>
-          <button class="btn btn-xs btn-out" onclick="patchArticulo('${a.id}',{estado:'devuelto_vale'})">📄 Vale</button>
+          <button class="btn btn-xs btn-out" style="border-color:rgba(16,185,129,.4);color:var(--sage)" onclick="patchArticulo('${a.id}',{estado:'devuelto_completo'})">✓ Devuelto</button>
+          <button class="btn btn-xs btn-out" style="border-color:rgba(59,130,246,.35);color:var(--cobalt)" onclick="patchArticulo('${a.id}',{estado:'devuelto_vale'})">📄 Vale</button>
           <button class="btn btn-xs btn-out" onclick="openDet('${a.ticket.id}')">Ver</button>
         </div></td>
       </tr>`;
