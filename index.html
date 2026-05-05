@@ -1232,12 +1232,123 @@
       font-weight: 500;
     }
 
+    /* ══ SCAN POPUP ══ */
+    .scan-card {
+      background: linear-gradient(145deg, #1c1f2e 0%, #131620 100%);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 28px;
+      padding: 32px 28px 28px;
+      max-width: 460px;
+      width: 100%;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.85), inset 0 1px 1px rgba(255,255,255,0.07);
+      animation: mIn .3s cubic-bezier(0.16, 1, 0.3, 1);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scan-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 10%; right: 10%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.5), transparent);
+    }
+
+    .scan-card .sc-folio {
+      font-family: monospace;
+      font-size: 11.5px;
+      color: #9ca3af;
+      background: rgba(255,255,255,0.06);
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 99px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(255,255,255,0.06);
+      letter-spacing: .05em;
+    }
+
+    .scan-card .sc-name {
+      font-family: 'Inter', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(180deg, #ffffff 20%, #9ca3af 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+      line-height: 1.25;
+    }
+
+    .scan-card .sc-banner {
+      border-radius: 18px;
+      padding: 20px 18px;
+      margin-bottom: 18px;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.05);
+      box-shadow: inset 0 2px 16px rgba(0,0,0,0.25);
+    }
+
+    .scan-card .sc-icon {
+      font-size: 44px;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    .scan-card:hover .sc-icon { transform: scale(1.12); }
+
+    .scan-card .sc-status {
+      font-family: 'Inter', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+    .scan-card .sc-sub {
+      font-size: 13px;
+      opacity: .75;
+      font-weight: 500;
+    }
+
+    /* Price row inside popup */
+    .sp-price-row {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+    .sp-price-cell {
+      text-align: center;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 10px 18px;
+      min-width: 90px;
+    }
+    .sp-price-cell .spc-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: #6b7280;
+      margin-bottom: 4px;
+    }
+    .sp-price-cell .spc-val {
+      font-size: 18px;
+      font-weight: 800;
+      color: #e8e8f0;
+    }
+    .sp-price-cell.gain .spc-val { color: #10b981; }
+    .sp-price-cell.sale .spc-val { color: #c9a84c; }
+
     .scan-card .sc-actions {
       display: flex;
       gap: 8px;
       justify-content: center;
       flex-wrap: wrap;
-      margin-top: 6px
+      margin-top: 4px;
     }
 
     /* Dash two-col */
@@ -1612,17 +1723,28 @@
   <!-- SCAN POPUP (scanner USB) -->
   <div class="scan-popup" id="scan-popup" onclick="if(event.target===this)this.classList.remove('on')">
     <div class="scan-card">
+      <!-- Top pill -->
       <div class="sc-folio" id="sp-folio"></div>
+
+      <!-- Product name -->
       <div class="sc-name" id="sp-name"></div>
+
+      <!-- Status banner -->
       <div class="sc-banner" id="sp-banner">
         <div class="sc-icon" id="sp-icon"></div>
         <div class="sc-status" id="sp-status"></div>
         <div class="sc-sub" id="sp-sub"></div>
       </div>
+
+      <!-- Price / profit row -->
+      <div id="sp-price" style="display:none;margin-bottom:16px"></div>
+
+      <!-- Dates + extra info -->
       <div style="font-size:13px;color:var(--muted);margin-bottom:14px" id="sp-dates"></div>
+      <div id="sp-extra" style="margin-bottom:14px"></div>
+
       <div class="sc-actions">
-        <button class="btn btn-out" onclick="document.getElementById('scan-popup').classList.remove('on')">Cerrar
-          (Esc)</button>
+        <button class="btn btn-out" onclick="document.getElementById('scan-popup').classList.remove('on')">Cerrar (Esc)</button>
         <button class="btn btn-gold" id="sp-det-btn">Ver detalle completo</button>
       </div>
     </div>
@@ -2131,6 +2253,10 @@
         </div>
         <div style="padding:26px">
           <div style="display:flex;gap:9px;margin-bottom:16px;flex-wrap:wrap">
+            <div class="siw" style="flex:1;min-width:180px">
+            <span class="sico">🔍</span>
+            <input type="text" id="us-search" placeholder="Buscar artículo, folio, código…" oninput="renderUnsold()">
+          </div>
             <select class="fsel" id="us-temp" onchange="renderUnsold()">
               <option value="">Todas las temporadas</option>
               <option>Halloween</option>
@@ -3021,6 +3147,16 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         });
       });
 
+      // Filter by search text
+      const q = (document.getElementById('us-search')?.value || '').toLowerCase().trim();
+      if (q) {
+        allArts = allArts.filter(a =>
+          (a.nombre || '').toLowerCase().includes(q) ||
+          (a.folio || '').toLowerCase().includes(q) ||
+          (a.codigo_barras || '').toLowerCase().includes(q)
+        );
+      }
+
       if (!allArts.length) {
         tb.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="ei">📦</div><h3>¡Todo vendido!</h3><p>No hay artículos pendientes.</p></div></td></tr>`;
         return;
@@ -3719,10 +3855,12 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       document.getElementById('sp-name').textContent = art.nombre;
 
       const stMap = {
-        pendiente: { cls: 'dev-ok', icon: '📦', label: 'Pendiente', sub: 'Artículo en inventario' },
-        vendido: { cls: 'dev-ok', icon: '✅', label: 'Vendido', sub: 'Este artículo ya fue vendido' },
-        devuelto_completo: { cls: 'dev-warn', icon: '🔄', label: 'Devuelto', sub: 'Devolución completa' },
-        devuelto_vale: { cls: 'dev-warn', icon: '📄', label: 'Vale', sub: 'Se entregó vale al cliente' }
+        pendiente:        { cls: 'dev-ok',   icon: '📦', label: 'En Bodega',  sub: 'Artículo disponible en inventario' },
+        vendido:          { cls: 'dev-ok',   icon: '✅',    label: 'Vendido',   sub: 'Este artículo ya fue vendido' },
+        devuelto_completo:{ cls: 'dev-warn', icon: '🔄',    label: 'Devuelto', sub: 'Devolución completa procesada' },
+        devuelto_vale:    { cls: 'dev-warn', icon: '📄',    label: 'Vale',     sub: 'Se entregó vale al cliente' },
+        descuento:        { cls: 'dev-warn', icon: '💸',    label: 'Descuento',sub: 'Artículo con precio promocional' },
+        apartado:         { cls: 'dev-ok',   icon: '🔒',    label: 'Apartado', sub: 'Artículo reservado para cliente' }
       };
 
       const info = stMap[art.estado] || { cls: 'dev-warn', icon: '🏷️', label: elbl(art.estado), sub: '' };
@@ -3731,23 +3869,55 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       document.getElementById('sp-status').textContent = info.label;
       document.getElementById('sp-sub').textContent = info.sub;
 
-      // Calculate potential dev status based on ticket date
-      const ds = calcDevStatus(ticket);
-      document.getElementById('sp-dates').innerHTML = `Límite devolución: <strong>${fDate(ds.limDate.toISOString())}</strong> (${ds.days} días)`;
+      // Price / profit row
+      const sale   = +art.precio_unitario || +art.precio_venta || 0;
+      const cost   = +art.precio_compra || 0;
+      const profit = sale - cost;
+      const priceEl = document.getElementById('sp-price');
+      priceEl.style.display = (sale > 0 || cost > 0) ? '' : 'none';
+      priceEl.innerHTML = `
+        <div class="sp-price-row">
+          <div class="sp-price-cell sale">
+            <div class="spc-label">Precio Venta</div>
+            <div class="spc-val">$${sale.toFixed(2)}</div>
+          </div>
+          ${cost > 0 ? `<div class="sp-price-cell">
+            <div class="spc-label">Costo</div>
+            <div class="spc-val" style="color:#9ca3af">$${cost.toFixed(2)}</div>
+          </div>` : ''}
+          ${cost > 0 ? `<div class="sp-price-cell gain">
+            <div class="spc-label">Ganancia</div>
+            <div class="spc-val" style="color:${profit >= 0 ? '#10b981' : '#ef4444'}">${profit >= 0 ? '+' : ''}$${Math.abs(profit).toFixed(2)}</div>
+          </div>` : ''}
+        </div>`;
 
-      // Quick Actions for Article
+      // Extra info row: barcode + qty + season
+      const extraEl = document.getElementById('sp-extra');
+      const bc = art.codigo_barras || art.barcode;
+      const qty = +art.cantidad || 1;
+      extraEl.innerHTML = `
+        <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+          ${bc ? `<span style="font-family:monospace;font-size:11.5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:4px 10px;border-radius:8px;color:#9ca3af">🔍 ${bc}</span>` : ''}
+          <span style="font-size:11.5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:4px 10px;border-radius:8px;color:#9ca3af">📦 Cant: ${qty}</span>
+          <span style="font-size:11.5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:4px 10px;border-radius:8px;color:#9ca3af">${sEmoji(ticket.temporada)} ${ticket.temporada || 'General'}</span>
+        </div>`;
+
+      // Dev deadline
+      const ds = calcDevStatus(ticket);
+      document.getElementById('sp-dates').innerHTML = `📅 Límite devolución: <strong>${fDate(ds.limDate.toISOString())}</strong> &nbsp;·&nbsp; ${ds.days > 0 ? ds.days + ' días restantes' : '<span style="color:#ef4444">Venció</span>'}`;
+
+      // Quick Actions
       const actions = document.querySelector('.sc-actions');
       const artId = art.id;
       const ticketId = ticket.id;
       if (['pendiente', 'apartado'].includes(art.estado)) {
         actions.innerHTML = `
-          <button class="btn btn-sage" onclick="patchArticulo('${artId}',{estado:'vendido'}); document.getElementById('scan-popup').classList.remove('on')">✅ Confirmar Venta</button>
-          <button class="btn btn-rose" onclick="patchArticulo('${artId}',{estado:'devuelto_completo'}); document.getElementById('scan-popup').classList.remove('on')">🔄 Es Devolución</button>
+          <button class="btn btn-out btn-sm" style="border-color:rgba(16,185,129,.4);color:var(--sage)" onclick="patchArticulo('${artId}',{estado:'devuelto_completo'}); document.getElementById('scan-popup').classList.remove('on')">🔄 Es Devolución</button>
           <button class="btn btn-out btn-sm" onclick="document.getElementById('scan-popup').classList.remove('on'); setTimeout(()=>openDet('${ticketId}'),100)">Ver Ticket</button>
         `;
       } else if (art.estado === 'vendido') {
         actions.innerHTML = `
-          <button class="btn btn-rose" onclick="patchArticulo('${artId}',{estado:'devuelto_completo'}); document.getElementById('scan-popup').classList.remove('on')">🔄 Procesar Devolución</button>
+          <button class="btn btn-out btn-sm" style="border-color:rgba(239,68,68,.4);color:#ef4444" onclick="patchArticulo('${artId}',{estado:'devuelto_completo'}); document.getElementById('scan-popup').classList.remove('on')">🔄 Procesar Devolución</button>
           <button class="btn btn-out btn-sm" onclick="document.getElementById('scan-popup').classList.remove('on')">Cerrar</button>
         `;
       } else {
@@ -3762,21 +3932,25 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
 
     function showScanPopup(t) {
       const ds = ['pendiente', 'apartado'].includes(t.estado) ? calcDevStatus(t) : null;
+
       document.getElementById('sp-folio').textContent = t.folio + ' · ' + (t.temporada || '—');
-      document.getElementById('sp-name').textContent = t.items.map(i => i.nombre).join(', ') || 'Ticket Vacío';
+      document.getElementById('sp-name').textContent = t.proveedor || (t.items.length + ' artículos') || 'Ticket';
+
       const banner = document.getElementById('sp-banner');
       if (ds) {
         banner.className = 'sc-banner ' + ds.cls;
         document.getElementById('sp-icon').textContent = ds.icon;
         document.getElementById('sp-status').textContent = ds.label;
-        document.getElementById('sp-sub').textContent = ds.sub;
+        document.getElementById('sp-sub').textContent = t.items.map(i => i.nombre).join(', ').substring(0, 60) || 'Ticket sin artículos';
         const regStr = fDate(t.fecha_registro ? t.fecha_registro + 'T00:00:00' : t.created_at);
-        document.getElementById('sp-dates').innerHTML = `Registro: <strong>${regStr}</strong> · Límite: <strong>${fDate(ds.limDate.toISOString())}</strong>`;
+        document.getElementById('sp-dates').innerHTML = `📅 Registro: <strong>${regStr}</strong> &nbsp;·&nbsp; Límite: <strong>${fDate(ds.limDate.toISOString())}</strong>`;
       } else {
         const stMap = {
-          vendido: { cls: 'dev-ok', icon: '✅', label: 'Vendido', sub: 'Este ticket ya fue vendido' },
-          devuelto_completo: { cls: 'dev-ok', icon: '✅', label: 'Devuelto — Completo', sub: 'Devolución recibida' },
-          devuelto_vale: { cls: 'dev-warn', icon: '📄', label: 'Devuelto — Vale', sub: 'Cliente recibió vale' }
+          vendido:           { cls: 'dev-ok',   icon: '✅',    label: 'Vendido',           sub: 'Ticket completamente vendido' },
+          completado:        { cls: 'dev-ok',   icon: '✅',    label: 'Completado',        sub: 'Todos los artículos vendidos' },
+          devuelto_completo: { cls: 'dev-ok',   icon: '✅',    label: 'Devuelto — Completo', sub: 'Devolución recibida' },
+          devuelto_vale:     { cls: 'dev-warn', icon: '📄',    label: 'Devuelto — Vale',    sub: 'Cliente recibió vale' },
+          parcial:           { cls: 'dev-warn', icon: '🔄',    label: 'Parcial',           sub: 'Algunos artículos pendientes' }
         };
         const info = stMap[t.estado] || { cls: 'dev-warn', icon: '🏷️', label: elbl(t.estado), sub: '' };
         banner.className = 'sc-banner ' + info.cls;
@@ -3785,6 +3959,42 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         document.getElementById('sp-sub').textContent = info.sub;
         document.getElementById('sp-dates').textContent = '';
       }
+
+      // Price summary row
+      let tC = 0, tV = 0;
+      (t.items || []).forEach(i => {
+        tV += (+i.precio_unitario || +i.precio_venta || 0) * (+i.cantidad || 1);
+        tC += (+i.precio_compra || 0) * (+i.cantidad || 1);
+      });
+      const gan = tV - tC;
+      const priceEl = document.getElementById('sp-price');
+      priceEl.style.display = tV > 0 ? '' : 'none';
+      priceEl.innerHTML = `
+        <div class="sp-price-row">
+          <div class="sp-price-cell sale">
+            <div class="spc-label">Total Venta</div>
+            <div class="spc-val">$${tV.toFixed(2)}</div>
+          </div>
+          ${tC > 0 ? `<div class="sp-price-cell">
+            <div class="spc-label">Total Costo</div>
+            <div class="spc-val" style="color:#9ca3af">$${tC.toFixed(2)}</div>
+          </div>` : ''}
+          ${tC > 0 ? `<div class="sp-price-cell gain">
+            <div class="spc-label">Ganancia</div>
+            <div class="spc-val" style="color:${gan >= 0 ? '#10b981' : '#ef4444'}">${gan >= 0 ? '+' : ''}$${Math.abs(gan).toFixed(2)}</div>
+          </div>` : ''}
+        </div>`;
+
+      // Extra info: article count + pago
+      const pMap = { efectivo: '💵 Efectivo', transferencia: '🏦 Transferencia', adelanto: '⏳ Adelanto', pendiente: '🕐 Por cobrar' };
+      const extraEl = document.getElementById('sp-extra');
+      extraEl.innerHTML = `
+        <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+          <span style="font-size:11.5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:4px 10px;border-radius:8px;color:#9ca3af">📦 ${t.items.length} artículos</span>
+          ${t.metodo_pago ? `<span style="font-size:11.5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:4px 10px;border-radius:8px;color:#9ca3af">${pMap[t.metodo_pago] || t.metodo_pago}</span>` : ''}
+          <span style="font-size:11.5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:4px 10px;border-radius:8px;color:#9ca3af">${sEmoji(t.temporada)} ${t.temporada || 'General'}</span>
+        </div>`;
+
       document.getElementById('sp-det-btn').onclick = () => {
         document.getElementById('scan-popup').classList.remove('on');
         setTimeout(() => openDet(t.id), 100);
