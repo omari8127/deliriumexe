@@ -3303,12 +3303,18 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       </td>
       <td style="padding:9px 10px;border-bottom:1px solid var(--b)">
         <div style="display:flex;gap:4px;flex-wrap:nowrap">
-          ${['pendiente', 'vendido', 'devuelto_completo', 'devuelto_vale'].map(st => `
-            <button style="white-space:nowrap" class="btn btn-xs ${i.estado === st ? (st === 'vendido' ? 'btn-rose' : 'btn-gold') : 'btn-out'}" 
-              onclick="patchArticulo('${i.id}', {estado:'${st}'}); event.stopPropagation();">
-              ${st === 'devuelto_completo' ? 'Devolución' : st === 'devuelto_vale' ? 'Vale' : elbl(st)}
-            </button>
-          `).join('')}
+          ${['pendiente', 'vendido', 'devuelto_completo', 'devuelto_vale'].map(st => {
+            const isActive = i.estado === st;
+            const label = st === 'devuelto_completo' ? 'Devolución' : st === 'devuelto_vale' ? 'Vale' : elbl(st);
+            let activeCls = '';
+            if (isActive) {
+              activeCls = st === 'vendido' ? 'btn-rose' : st === 'devuelto_completo' ? 'btn-sage' : 'btn-gold';
+            }
+            const style = isActive
+              ? 'white-space:nowrap;pointer-events:none;cursor:default;opacity:1;'
+              : 'white-space:nowrap;pointer-events:none;cursor:default;opacity:0.35;';
+            return `<span style="${style}padding:4px 9px;border-radius:var(--rs);font-size:12px;font-weight:500;display:inline-flex;align-items:center;border:1px solid ${isActive ? 'transparent' : 'var(--b)'};" class="btn btn-xs ${isActive ? activeCls : 'btn-out'}">${label}</span>`;
+          }).join('')}
         </div>
       </td>
       <td style="padding:9px 10px;border-bottom:1px solid var(--b);font-weight:700;color:${profit >= 0 ? 'var(--sage)' : 'var(--rose)'}">
