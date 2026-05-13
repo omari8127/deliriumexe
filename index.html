@@ -5096,34 +5096,38 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
 
   <!-- MODAL: Registrar Perdida -->
   <div class="mo" id="m-perdida">
-    <div class="md" style="max-width:500px">
+    <div class="md" style="max-width:700px">
       <div class="mh">
-        <h2>📉 Registrar Pérdida / Daño</h2>
+        <h2>📉 Registro de Pérdidas y Daños</h2>
         <button class="mx" onclick="cm('m-perdida')">✕</button>
       </div>
       <div class="mb">
-        <p style="font-size:13px; color:var(--muted); margin-bottom:15px">Busca el producto y especifica la cantidad a dar de baja del inventario.</p>
-        
+        <div style="background:var(--rose-p); border:1px solid rgba(244,63,94,0.1); padding:12px; border-radius:var(--rs); margin-bottom:20px; font-size:13px; color:var(--rose)">
+          Los productos agregados aquí serán <strong>descontados del inventario</strong> una vez confirmados.
+        </div>
+
         <div class="siw" style="margin-bottom:15px">
           <span class="sico">🔍</span>
-          <input type="text" id="lp-search" placeholder="Buscar producto por nombre o código..." oninput="searchPerdidaProd(this.value)">
+          <input type="text" id="lp-search" placeholder="Buscar producto para agregar..." oninput="searchPerdidaProd(this.value)">
         </div>
-        <div id="lp-results" style="max-height:200px; overflow-y:auto; margin-bottom:15px; border-radius:var(--rs)"></div>
+        <div id="lp-results" style="max-height:180px; overflow-y:auto; margin-bottom:15px; border-radius:var(--rs)"></div>
 
-        <div id="lp-form" style="display:none; background:var(--cream); padding:15px; border-radius:var(--rs); border:1px solid var(--b)">
-          <div style="font-weight:600; margin-bottom:10px" id="lp-prod-name"></div>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px">
-            <div>
-              <label style="display:block; font-size:11px; color:var(--muted); margin-bottom:4px">CANTIDAD</label>
-              <input type="number" id="lp-cant" value="1" min="1" style="font-size:14px">
-              <div id="lp-stock-info" style="font-size:11px; margin-top:4px"></div>
-            </div>
-            <div>
-              <label style="display:block; font-size:11px; color:var(--muted); margin-bottom:4px">MOTIVO</label>
-              <input type="text" id="lp-motivo" placeholder="Ej: Roto, extraviado..." style="font-size:14px">
-            </div>
-          </div>
-          <button class="btn btn-rose btn-sm" style="width:100%" onclick="savePerdidaModal()">Confirmar Baja</button>
+        <div class="tw" style="max-height:300px; overflow-y:auto; margin-bottom:20px; border:1px solid var(--b); border-radius:var(--rs)">
+          <table style="width:100%; border-collapse:collapse; font-size:13px">
+            <thead style="background:var(--cream); position:sticky; top:0">
+              <tr>
+                <th style="text-align:left; padding:10px">Producto</th>
+                <th style="text-align:center; padding:10px; width:80px">Cant.</th>
+                <th style="text-align:left; padding:10px">Motivo</th>
+                <th style="text-align:center; padding:10px; width:40px"></th>
+              </tr>
+            </thead>
+            <tbody id="lp-cart-body"></tbody>
+          </table>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end">
+          <button class="btn btn-rose" onclick="confirmarTodasPerdidas()">📦 Confirmar Registro de Pérdidas</button>
         </div>
       </div>
     </div>
@@ -5177,10 +5181,12 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       `).join('');
     }
 
+    let lpCart = [];
     function openNewPerdida() {
+      lpCart = [];
       document.getElementById('lp-search').value = '';
       document.getElementById('lp-results').innerHTML = '';
-      document.getElementById('lp-form').style.display = 'none';
+      renderLPCart();
       om('m-perdida');
       setTimeout(() => document.getElementById('lp-search').focus(), 150);
     }
@@ -5191,7 +5197,6 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       if (q.length < 2) { resEl.innerHTML = ''; return; }
 
       const results = [];
-      // Buscar en el índice
       Object.values(inventoryIndex.byName).forEach(art => {
         if (art.nombre.toLowerCase().includes(q) || (art.codigo_barras && art.codigo_barras.toLowerCase().includes(q))) {
           results.push(art);
@@ -5204,80 +5209,112 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       }
 
       resEl.innerHTML = results.slice(0, 5).map(art => `
-        <div class="si" onclick="selectPerdidaProd('${art.id}')" style="cursor:pointer; padding:10px; border-bottom:1px solid var(--b); background:var(--cream); margin-bottom:4px; border-radius:var(--rs)">
+        <div class="si" onclick="addPerdidaToCart('${art.id}')" style="cursor:pointer; padding:10px; border-bottom:1px solid var(--b); background:var(--cream); margin-bottom:4px; border-radius:var(--rs)">
           <div style="font-weight:600; font-size:13px">${art.nombre}</div>
-          <div style="font-size:11px; color:var(--muted)">Stock: ${art.cantidad} · ${art.codigo_barras || 'Sin código'}</div>
+          <div style="font-size:11px; color:var(--muted)">Stock: ${art.cantidad} · ${art.codigo_barras || '—'}</div>
         </div>
       `).join('');
     }
 
-    let selectedPerdidaArt = null;
-    function selectPerdidaProd(id) {
+    function addPerdidaToCart(id) {
       const art = Object.values(inventoryIndex.byName).find(a => String(a.id) === String(id));
       if (!art) return;
-      selectedPerdidaArt = art;
+      if (lpCart.find(i => i.id === art.id)) { toast('Producto ya en la lista', 'warn'); return; }
       
+      lpCart.push({ ...art, reportCant: 1, reportMotivo: 'Dañado/Roto' });
+      document.getElementById('lp-search').value = '';
       document.getElementById('lp-results').innerHTML = '';
-      document.getElementById('lp-prod-name').textContent = art.nombre;
-      document.getElementById('lp-stock-info').innerHTML = `<span style="color:var(--sage)">Disponible: ${art.cantidad}</span>`;
-      document.getElementById('lp-cant').value = 1;
-      document.getElementById('lp-cant').max = art.cantidad;
-      document.getElementById('lp-motivo').value = '';
-      document.getElementById('lp-form').style.display = 'block';
+      renderLPCart();
     }
 
-    async function savePerdidaModal() {
-      if (!selectedPerdidaArt) return;
-      const cant = +document.getElementById('lp-cant').value;
-      const motivo = document.getElementById('lp-motivo').value.trim() || 'Dañado/Roto';
-
-      if (cant <= 0) { toast('La cantidad debe ser mayor a 0', 'err'); return; }
-      if (cant > selectedPerdidaArt.cantidad) { toast('No hay suficiente stock', 'err'); return; }
-
-      await confirmarPerdida(selectedPerdidaArt, cant, motivo);
-      cm('m-perdida');
+    function renderLPCart() {
+      const tb = document.getElementById('lp-cart-body');
+      if (!lpCart.length) {
+        tb.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px; color:var(--muted)">Busca productos para agregarlos a la lista</td></tr>';
+        return;
+      }
+      tb.innerHTML = lpCart.map((i, idx) => `
+        <tr>
+          <td style="padding:10px"><strong>${i.nombre}</strong><br><small style="color:var(--muted)">Disp: ${i.cantidad}</small></td>
+          <td style="padding:10px"><input type="number" value="${i.reportCant}" min="1" max="${i.cantidad}" onchange="updateLPCant(${idx}, this.value)" style="width:60px; padding:4px"></td>
+          <td style="padding:10px"><input type="text" value="${i.reportMotivo}" onchange="updateLPMotivo(${idx}, this.value)" style="width:100%; padding:4px"></td>
+          <td style="padding:10px; text-align:center"><button class="btn btn-xs btn-rose" onclick="removePerdidaFromCart(${idx})">✕</button></td>
+        </tr>
+      `).join('');
     }
 
-    async function confirmarPerdida(art, cant, motivo) {
+    function updateLPCant(idx, val) { lpCart[idx].reportCant = +val; }
+    function updateLPMotivo(idx, val) { lpCart[idx].reportMotivo = val; }
+    function removePerdidaFromCart(idx) { lpCart.splice(idx, 1); renderLPCart(); }
+
+    async function confirmarTodasPerdidas() {
+      if (!lpCart.length) { toast('No hay productos en la lista', 'err'); return; }
+      
+      for (const item of lpCart) {
+        if (item.reportCant > item.cantidad) {
+          toast(`Stock insuficiente para "${item.nombre}"`, 'err');
+          return;
+        }
+      }
+
       const curUser = sessionStorage.getItem('dd_user') || 'desconocido';
-      const row = {
-        articulo_id: art.id,
-        producto: art.nombre,
-        cantidad: cant,
-        motivo: motivo,
-        vendedor: curUser,
-        fecha: new Date().toISOString().slice(0, 10)
-      };
+      const fecha = new Date().toISOString().slice(0, 10);
 
       try {
-        // 1. Descontar inventario
-        await reponerInventario(art.id, -cant);
+        for (const item of lpCart) {
+          // 1. Descontar inventario
+          await reponerInventario(item.id, -item.reportCant);
 
-        // 2. Guardar en DB
-        if (DB) {
-          const { data, error } = await DB.from('perdidas').insert([row]).select().single();
-          if (error) throw error;
-          perdidas.unshift(data);
-        } else {
-          perdidas.unshift({ ...row, id: crypto.randomUUID(), created_at: new Date().toISOString() });
+          // 2. Guardar en DB
+          const row = {
+            articulo_id: item.id,
+            producto: item.nombre,
+            cantidad: item.reportCant,
+            motivo: item.reportMotivo,
+            vendedor: curUser,
+            fecha: fecha
+          };
+
+          if (DB) {
+            const { data, error } = await DB.from('perdidas').insert([row]).select().single();
+            if (error) throw error;
+            perdidas.unshift(data);
+          } else {
+            perdidas.unshift({ ...row, id: crypto.randomUUID(), created_at: new Date().toISOString() });
+          }
         }
 
         renderPerdidas();
-        toast('✓ Pérdida registrada y descontada', 'ok');
+        cm('m-perdida');
+        toast('✓ Registro de pérdidas completado y descontado', 'ok');
       } catch (e) {
         toast('Error: ' + e.message, 'err');
       }
     }
 
     async function deletePerdida(id) {
-      askConf('¿Eliminar registro de pérdida? Esto NO devolverá el producto al inventario automáticamente.', async () => {
-        if (DB) {
-          const { error } = await DB.from('perdidas').delete().eq('id', id);
-          if (error) { toast('Error: ' + error.message, 'err'); return; }
+      const p = perdidas.find(x => x.id === id);
+      if (!p) return;
+
+      askConf(`¿Eliminar registro de pérdida? Esto devolverá ${p.cantidad} unidad(es) de "${p.producto}" al inventario.`, async () => {
+        try {
+          // 1. Restaurar stock
+          if (p.articulo_id) {
+            await reponerInventario(p.articulo_id, p.cantidad);
+          }
+
+          // 2. Eliminar de DB
+          if (DB) {
+            const { error } = await DB.from('perdidas').delete().eq('id', id);
+            if (error) throw error;
+          }
+
+          perdidas = perdidas.filter(x => x.id !== id);
+          renderPerdidas();
+          toast('✓ Registro eliminado y stock restaurado', 'ok');
+        } catch (e) {
+          toast('Error: ' + e.message, 'err');
         }
-        perdidas = perdidas.filter(p => p.id !== id);
-        renderPerdidas();
-        toast('✓ Registro eliminado', 'ok');
       });
     }
   </script>
