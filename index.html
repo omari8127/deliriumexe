@@ -5094,6 +5094,41 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
     </div>
   </div>
 
+  <!-- MODAL: Registrar Perdida -->
+  <div class="mo" id="m-perdida">
+    <div class="md" style="max-width:500px">
+      <div class="mh">
+        <h2>📉 Registrar Pérdida / Daño</h2>
+        <button class="mx" onclick="cm('m-perdida')">✕</button>
+      </div>
+      <div class="mb">
+        <p style="font-size:13px; color:var(--muted); margin-bottom:15px">Busca el producto y especifica la cantidad a dar de baja del inventario.</p>
+        
+        <div class="siw" style="margin-bottom:15px">
+          <span class="sico">🔍</span>
+          <input type="text" id="lp-search" placeholder="Buscar producto por nombre o código..." oninput="searchPerdidaProd(this.value)">
+        </div>
+        <div id="lp-results" style="max-height:200px; overflow-y:auto; margin-bottom:15px; border-radius:var(--rs)"></div>
+
+        <div id="lp-form" style="display:none; background:var(--cream); padding:15px; border-radius:var(--rs); border:1px solid var(--b)">
+          <div style="font-weight:600; margin-bottom:10px" id="lp-prod-name"></div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px">
+            <div>
+              <label style="display:block; font-size:11px; color:var(--muted); margin-bottom:4px">CANTIDAD</label>
+              <input type="number" id="lp-cant" value="1" min="1" style="font-size:14px">
+              <div id="lp-stock-info" style="font-size:11px; margin-top:4px"></div>
+            </div>
+            <div>
+              <label style="display:block; font-size:11px; color:var(--muted); margin-bottom:4px">MOTIVO</label>
+              <input type="text" id="lp-motivo" placeholder="Ej: Roto, extraviado..." style="font-size:14px">
+            </div>
+          </div>
+          <button class="btn btn-rose btn-sm" style="width:100%" onclick="savePerdidaModal()">Confirmar Baja</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- FAB: Botón flotante de escaneo -->
   <button id="fab-scan" onclick="abrirScanRapido()" style="
     position: fixed;
@@ -5143,23 +5178,64 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
     }
 
     function openNewPerdida() {
-      const p = prompt('¿Qué producto se perdió/dañó? (Nombre o Código):');
-      if (!p) return;
-      const query = p.trim().toLowerCase();
-      const found = inventoryIndex.byBarcode[query] || inventoryIndex.byName[query];
-      
-      if (!found) {
-        toast('Producto no encontrado en inventario', 'err');
+      document.getElementById('lp-search').value = '';
+      document.getElementById('lp-results').innerHTML = '';
+      document.getElementById('lp-form').style.display = 'none';
+      om('m-perdida');
+      setTimeout(() => document.getElementById('lp-search').focus(), 150);
+    }
+
+    function searchPerdidaProd(query) {
+      const q = query.trim().toLowerCase();
+      const resEl = document.getElementById('lp-results');
+      if (q.length < 2) { resEl.innerHTML = ''; return; }
+
+      const results = [];
+      // Buscar en el índice
+      Object.values(inventoryIndex.byName).forEach(art => {
+        if (art.nombre.toLowerCase().includes(q) || (art.codigo_barras && art.codigo_barras.toLowerCase().includes(q))) {
+          results.push(art);
+        }
+      });
+
+      if (!results.length) {
+        resEl.innerHTML = '<div style="padding:10px; font-size:12px; color:var(--muted)">No se encontraron productos</div>';
         return;
       }
 
-      const cant = prompt(`Cantidad de "${found.nombre}" a dar de baja (Disponible: ${found.cantidad}):`, '1');
-      if (!cant || isNaN(cant) || +cant <= 0) return;
-      if (+cant > found.cantidad) { toast('No puedes dar de baja más de lo que hay', 'err'); return; }
+      resEl.innerHTML = results.slice(0, 5).map(art => `
+        <div class="si" onclick="selectPerdidaProd('${art.id}')" style="cursor:pointer; padding:10px; border-bottom:1px solid var(--b); background:var(--cream); margin-bottom:4px; border-radius:var(--rs)">
+          <div style="font-weight:600; font-size:13px">${art.nombre}</div>
+          <div style="font-size:11px; color:var(--muted)">Stock: ${art.cantidad} · ${art.codigo_barras || 'Sin código'}</div>
+        </div>
+      `).join('');
+    }
 
-      const motivo = prompt('Motivo (opcional):', 'Dañado/Roto');
+    let selectedPerdidaArt = null;
+    function selectPerdidaProd(id) {
+      const art = Object.values(inventoryIndex.byName).find(a => String(a.id) === String(id));
+      if (!art) return;
+      selectedPerdidaArt = art;
       
-      confirmarPerdida(found, +cant, motivo);
+      document.getElementById('lp-results').innerHTML = '';
+      document.getElementById('lp-prod-name').textContent = art.nombre;
+      document.getElementById('lp-stock-info').innerHTML = `<span style="color:var(--sage)">Disponible: ${art.cantidad}</span>`;
+      document.getElementById('lp-cant').value = 1;
+      document.getElementById('lp-cant').max = art.cantidad;
+      document.getElementById('lp-motivo').value = '';
+      document.getElementById('lp-form').style.display = 'block';
+    }
+
+    async function savePerdidaModal() {
+      if (!selectedPerdidaArt) return;
+      const cant = +document.getElementById('lp-cant').value;
+      const motivo = document.getElementById('lp-motivo').value.trim() || 'Dañado/Roto';
+
+      if (cant <= 0) { toast('La cantidad debe ser mayor a 0', 'err'); return; }
+      if (cant > selectedPerdidaArt.cantidad) { toast('No hay suficiente stock', 'err'); return; }
+
+      await confirmarPerdida(selectedPerdidaArt, cant, motivo);
+      cm('m-perdida');
     }
 
     async function confirmarPerdida(art, cant, motivo) {
