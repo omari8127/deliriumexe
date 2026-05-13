@@ -2,7 +2,7 @@
 <html lang="es">
 
 <head>
-  <!-- â•â• AUTH GUARD â€” redirect to login if not authenticated â•â• -->
+  <!-- ══ AUTH GUARD — redirect to login if not authenticated ══ -->
   <script>
     if (!sessionStorage.getItem('dd_auth')) {
       window.location.replace('login.html');
@@ -10,7 +10,7 @@
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Delirium Decor â€” Tickets</title>
+  <title>Delirium Decor — Tickets</title>
   <link rel="icon" type="image/png" href="favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
@@ -1232,7 +1232,7 @@
       font-weight: 500;
     }
 
-    /* â•â• SCAN POPUP â•â• */
+    /* ══ SCAN POPUP ══ */
     .scan-card {
       background: linear-gradient(145deg, #1c1f2e 0%, #131620 100%);
       border: 1px solid rgba(255,255,255,0.07);
@@ -1458,7 +1458,7 @@
       }
     }
 
-    /* â•â• Ventas Grandes â•â• */
+    /* ══ Ventas Grandes ══ */
     .inv-badge {
       display: inline-flex;
       align-items: center;
@@ -1515,23 +1515,23 @@
   <div class="mo" id="m-new">
     <div class="md md-xl">
       <div class="mh">
-        <h2>Nuevo Ticket</h2><button class="mx" onclick="cm('m-new')">âœ•</button>
+        <h2>Nuevo Ticket</h2><button class="mx" onclick="cm('m-new')">✕</button>
       </div>
       <div class="mb">
         <div class="fg" style="margin-bottom:16px">
           <div class="fi"><label>Temporada *</label><select id="nt2">
-              <option value="">Seleccionarâ€¦</option>
+              <option value="">Seleccionar…</option>
               <option>Halloween</option>
               <option>Navidad</option>
-              <option>DÃ­a de Muertos</option>
-              <option>San ValentÃ­n</option>
+              <option>Día de Muertos</option>
+              <option>San Valentín</option>
               <option>Pascua</option>
               <option>Primavera</option>
-              <option>DÃ­a de las Madres</option>
+              <option>Día de las Madres</option>
               <option>Spring</option>
               <option>Cocina</option>
-              <option>OtoÃ±o</option>
-              <option>OcasiÃ³n Especial</option>
+              <option>Otoño</option>
+              <option>Ocasión Especial</option>
               <option>General</option>
             </select></div>
           <div class="fi"><label>Estado inicial</label><select id="ne">
@@ -1541,17 +1541,17 @@
               <option value="descuento">En descuento</option>
             </select></div>
           <div class="fi">
-            <label>MÃ©todo de pago</label>
+            <label>Método de pago</label>
             <select id="nt-pago">
-              <option value="efectivo">ðŸ’µ Efectivo</option>
-              <option value="transferencia">ðŸ¦ Transferencia</option>
-              <option value="adelanto">â³ Adelanto / Parcial</option>
-              <option value="pendiente">ðŸ• Por cobrar</option>
+              <option value="efectivo">💵 Efectivo</option>
+              <option value="transferencia">🏦 Transferencia</option>
+              <option value="adelanto">⏳ Adelanto / Parcial</option>
+              <option value="pendiente">🕐 Por cobrar</option>
             </select>
           </div>
           <div class="fi"><label>Proveedor</label><input type="text" id="np2" placeholder="Nombre del proveedor&hellip;"></div>
           <div class="fi">
-            <label>CÃ³digo del ticket (Folio) * <small style="font-weight:400;text-transform:none;opacity:0.75">(Escribe BD, HL o HB para generar)</small></label>
+            <label>Código del ticket (Folio) * <small style="font-weight:400;text-transform:none;opacity:0.75">(Escribe BD, HL o HB para generar)</small></label>
             <input type="text" id="n-folio"
               style="font-family:monospace;font-weight:700;color:var(--cobalt);letter-spacing:.05em;font-size:14px"
               placeholder="Ej: 123456789"
@@ -1562,10 +1562,10 @@
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <span
-            style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">ðŸ“¦
-            ArtÃ­culos del ticket</span>
+            style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">📦
+            Artículos del ticket</span>
           <button class="btn btn-gold btn-sm" style="font-size:14px;padding:9px 16px"
-            onclick="addItemRow('mi-body','mi-tot')">&#10010; Agregar artÃ­culo</button>
+            onclick="addItemRow('mi-body','mi-tot')">&#10010; Agregar artículo</button>
         </div>
         <div style="overflow-x:auto;border:1px solid var(--b);border-radius:var(--rs);margin-bottom:10px">
           <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px">
@@ -1573,7 +1573,7 @@
               <tr style="background:var(--cream)">
                 <th
                   style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">
-                  CÃ³digo Barras</th>
+                  Código Barras</th>
                 <th
                   style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">
                   Nombre *</th>
@@ -1598,7 +1598,7 @@
         <div id="mi-tot"></div>
       </div>
       <div class="mf"><button class="btn btn-out" onclick="cm('m-new')">Cancelar</button><button class="btn btn-gold"
-          onclick="saveModalTicket(event)">âœ“ Guardar ticket</button></div>
+          onclick="saveModalTicket(event)">✓ Guardar ticket</button></div>
     </div>
   </div>
 
@@ -1606,7 +1606,7 @@
   <div class="mo" id="m-qr">
     <div class="md">
       <div class="mh">
-        <h2>CÃ³digo QR</h2><button class="mx" onclick="cm('m-qr')">âœ•</button>
+        <h2>Código QR</h2><button class="mx" onclick="cm('m-qr')">✕</button>
       </div>
       <div class="mb">
         <div id="qr-info"
@@ -1617,7 +1617,7 @@
         <div id="lbl-print" style="display:none"></div>
       </div>
       <div class="mf"><button class="btn btn-out btn-sm" onclick="cm('m-qr')">Cerrar</button><button
-          class="btn btn-gold btn-sm" onclick="printLbl()">ðŸ–¨ï¸ Imprimir etiqueta</button></div>
+          class="btn btn-gold btn-sm" onclick="printLbl()">🖨️ Imprimir etiqueta</button></div>
     </div>
   </div>
 
@@ -1625,7 +1625,7 @@
   <div class="mo" id="m-det">
     <div class="md md-xl">
       <div class="mh">
-        <h2 id="det-title">Ticket</h2><button class="mx" onclick="cm('m-det')">âœ•</button>
+        <h2 id="det-title">Ticket</h2><button class="mx" onclick="cm('m-det')">✕</button>
       </div>
       <div class="mb">
         <div id="det-dev-banner"></div>
@@ -1639,24 +1639,24 @@
   <div class="mo" id="m-edit-ticket">
     <div class="md md-xl">
       <div class="mh">
-        <h2>âœï¸ Editar Ticket</h2><button class="mx" onclick="cm('m-edit-ticket')">âœ•</button>
+        <h2>✏️ Editar Ticket</h2><button class="mx" onclick="cm('m-edit-ticket')">✕</button>
       </div>
       <div class="mb">
         <input type="hidden" id="edit-ticket-id">
         <div class="fg" style="margin-bottom:16px">
           <div class="fi"><label>Temporada</label><select id="edit-temporada">
-            <option value="">Seleccionarâ€¦</option>
+            <option value="">Seleccionar…</option>
             <option>Halloween</option>
             <option>Navidad</option>
-            <option>DÃ­a de Muertos</option>
-            <option>San ValentÃ­n</option>
+            <option>Día de Muertos</option>
+            <option>San Valentín</option>
             <option>Pascua</option>
             <option>Primavera</option>
-            <option>DÃ­a de las Madres</option>
+            <option>Día de las Madres</option>
             <option>Spring</option>
             <option>Cocina</option>
-            <option>OtoÃ±o</option>
-            <option>OcasiÃ³n Especial</option>
+            <option>Otoño</option>
+            <option>Ocasión Especial</option>
             <option>General</option>
           </select></div>
           <div class="fi"><label>Estado</label><select id="edit-estado">
@@ -1667,25 +1667,25 @@
             <option value="devuelto">Devuelto</option>
             <option value="archivado">Archivado</option>
           </select></div>
-          <div class="fi"><label>MÃ©todo de pago</label><select id="edit-pago">
-            <option value="efectivo">ðŸ’µ Efectivo</option>
-            <option value="transferencia">ðŸ¦ Transferencia</option>
-            <option value="adelanto">â³ Adelanto / Parcial</option>
-            <option value="pendiente">ðŸ• Por cobrar</option>
+          <div class="fi"><label>Método de pago</label><select id="edit-pago">
+            <option value="efectivo">💵 Efectivo</option>
+            <option value="transferencia">🏦 Transferencia</option>
+            <option value="adelanto">⏳ Adelanto / Parcial</option>
+            <option value="pendiente">🕐 Por cobrar</option>
           </select></div>
-          <div class="fi"><label>Proveedor</label><input type="text" id="edit-proveedor" placeholder="Nombre del proveedorâ€¦"></div>
-          <div class="fi"><label>Folio / CÃ³digo</label><input type="text" id="edit-folio" style="font-family:monospace;font-weight:700;color:var(--cobalt);letter-spacing:.05em"></div>
+          <div class="fi"><label>Proveedor</label><input type="text" id="edit-proveedor" placeholder="Nombre del proveedor…"></div>
+          <div class="fi"><label>Folio / Código</label><input type="text" id="edit-folio" style="font-family:monospace;font-weight:700;color:var(--cobalt);letter-spacing:.05em"></div>
           <div class="fi"><label>Fecha de registro</label><input type="date" id="edit-fecha"></div>
-          <div class="fi full"><label>Notas generales</label><textarea id="edit-notas" style="min-height:50px" placeholder="Observaciones del ticketâ€¦"></textarea></div>
+          <div class="fi full"><label>Notas generales</label><textarea id="edit-notas" style="min-height:50px" placeholder="Observaciones del ticket…"></textarea></div>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <span style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">ðŸ“¦ ArtÃ­culos del ticket</span>
+          <span style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">📦 Artículos del ticket</span>
         </div>
         <div style="overflow-x:auto;border:1px solid var(--b);border-radius:var(--rs);margin-bottom:10px">
           <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:620px">
             <thead>
               <tr style="background:var(--cream)">
-                <th style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">CÃ³digo Barras</th>
+                <th style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">Código Barras</th>
                 <th style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">Nombre</th>
                 <th style="padding:7px 10px;text-align:center;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">Cant.</th>
                 <th style="padding:7px 10px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--b)">Costo $</th>
@@ -1700,7 +1700,7 @@
       </div>
       <div class="mf">
         <button class="btn btn-out" onclick="cm('m-edit-ticket')">Cancelar</button>
-        <button class="btn btn-gold" onclick="saveEditTicket(event)">âœ“ Guardar cambios</button>
+        <button class="btn btn-gold" onclick="saveEditTicket(event)">✓ Guardar cambios</button>
       </div>
     </div>
   </div>
@@ -1709,7 +1709,7 @@
   <div class="mo" id="m-vg-det">
     <div class="md md-lg">
       <div class="mh">
-        <h2 id="vg-det-title">Detalle de Venta Grande</h2><button class="mx" onclick="cm('m-vg-det')">âœ•</button>
+        <h2 id="vg-det-title">Detalle de Venta Grande</h2><button class="mx" onclick="cm('m-vg-det')">✕</button>
       </div>
       <div class="mb">
         <div id="vg-det-body"></div>
@@ -1754,19 +1754,19 @@
   <div class="mo" id="m-scan">
     <div class="md">
       <div class="mh">
-        <h2>ðŸ” Buscar ticket</h2><button class="mx" onclick="cm('m-scan')">âœ•</button>
+        <h2>🔍 Buscar ticket</h2><button class="mx" onclick="cm('m-scan')">✕</button>
       </div>
       <div class="mb">
-        <p style="font-size:13px;color:var(--muted);margin-bottom:13px">Escanea el cÃ³digo de barras con el lector o
+        <p style="font-size:13px;color:var(--muted);margin-bottom:13px">Escanea el código de barras con el lector o
           ingresa el folio manualmente.</p>
         <div style="display:flex;gap:8px;margin-top:8px">
-          <input type="text" id="mf-in" placeholder="TKT-0001 â€” escanea o escribe" autofocus autocomplete="off"
+          <input type="text" id="mf-in" placeholder="TKT-0001 — escanea o escribe" autofocus autocomplete="off"
             oninput="autoSearch(this,'modal')">
           <button class="btn btn-dark btn-sm"
             onclick="findByFolio(document.getElementById('mf-in').value)">Buscar</button>
         </div>
-        <p style="font-size:11px;color:var(--muted);margin-top:8px">ðŸ’¡ El lector de barras envÃ­a el cÃ³digo
-          automÃ¡ticamente â€” no necesitas presionar Buscar.</p>
+        <p style="font-size:11px;color:var(--muted);margin-top:8px">💡 El lector de barras envía el código
+          automáticamente — no necesitas presionar Buscar.</p>
       </div>
     </div>
   </div>
@@ -1775,7 +1775,7 @@
   <div class="mo" id="m-conf">
     <div class="md" style="max-width:400px">
       <div class="mh">
-        <h2>ConfirmaciÃ³n</h2><button class="mx" onclick="cm('m-conf')">âœ•</button>
+        <h2>Confirmación</h2><button class="mx" onclick="cm('m-conf')">✕</button>
       </div>
       <div class="mb">
         <p id="conf-msg" style="font-size:14px;line-height:1.5;color:var(--ink2)"></p>
@@ -1791,7 +1791,7 @@
   <div class="mo" id="m-cierre">
     <div class="md md-xl">
       <div class="mh">
-        <h2>ðŸ“… Cierre Mensual</h2><button class="mx" onclick="cm('m-cierre')">âœ•</button>
+        <h2>📅 Cierre Mensual</h2><button class="mx" onclick="cm('m-cierre')">✕</button>
       </div>
       <div class="mb">
         <div class="fg" style="margin-bottom:16px">
@@ -1813,7 +1813,7 @@
             </select>
           </div>
           <div class="fi">
-            <label>AÃ±o</label>
+            <label>Año</label>
             <select id="cierre-anio">
               <option value="2024">2024</option>
               <option value="2025">2025</option>
@@ -1822,8 +1822,8 @@
           </div>
         </div>
         <div style="margin-bottom:16px;display:flex;gap:9px">
-          <button class="btn btn-gold" onclick="generarCierre()">ðŸ“Š Generar Cierre</button>
-          <button class="btn btn-dark" onclick="exportarCierre()">ðŸ“Š Exportar Excel</button>
+          <button class="btn btn-gold" onclick="generarCierre()">📊 Generar Cierre</button>
+          <button class="btn btn-dark" onclick="exportarCierre()">📊 Exportar Excel</button>
         </div>
         <div id="cierre-body"></div>
       </div>
@@ -1834,13 +1834,13 @@
   <div class="mo" id="m-ventas">
     <div class="md md-xl">
       <div class="mh">
-        <h2>ðŸ’¼ Nueva Venta</h2><button class="mx" onclick="cm('m-ventas')">âœ•</button>
+        <h2>💼 Nueva Venta</h2><button class="mx" onclick="cm('m-ventas')">✕</button>
       </div>
       <div class="mb">
         <div class="fg" style="margin-bottom:16px">
           <div class="fi">
             <label>Cliente *</label>
-            <input type="text" id="vg-cliente" placeholder="Nombre del cliente o empresaâ€¦" list="vg-clientes-list"
+            <input type="text" id="vg-cliente" placeholder="Nombre del cliente o empresa…" list="vg-clientes-list"
               autocomplete="off">
             <datalist id="vg-clientes-list"></datalist>
           </div>
@@ -1849,22 +1849,22 @@
             <input type="date" id="vg-fecha">
           </div>
           <div class="fi">
-            <label>MÃ©todo de pago</label>
+            <label>Método de pago</label>
             <select id="vg-pago">
-              <option value="efectivo">ðŸ’µ Efectivo</option>
-              <option value="transferencia">ðŸ¦ Transferencia</option>
-              <option value="adelanto">â³ Adelanto / Parcial</option>
-              <option value="pendiente">ðŸ• Por cobrar</option>
+              <option value="efectivo">💵 Efectivo</option>
+              <option value="transferencia">🏦 Transferencia</option>
+              <option value="adelanto">⏳ Adelanto / Parcial</option>
+              <option value="pendiente">🕐 Por cobrar</option>
             </select>
           </div>
           <div class="fi full">
             <label>Notas (opcional)</label>
-            <textarea id="vg-notas" placeholder="Observaciones de la ventaâ€¦" style="min-height:46px"></textarea>
+            <textarea id="vg-notas" placeholder="Observaciones de la venta…" style="min-height:46px"></textarea>
           </div>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <span
-            style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">ðŸ“¦
+            style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">📦
             Productos de la venta</span>
           <button class="btn btn-gold btn-sm" style="font-size:14px" onclick="addVGRow()">&#10010; Agregar
             producto</button>
@@ -1898,7 +1898,7 @@
       </div>
       <div class="mf">
         <button class="btn btn-out" onclick="cm('m-ventas')">Cancelar</button>
-        <button class="btn btn-gold" onclick="saveVentaGrande(event)">ðŸ’¼ Confirmar Venta</button>
+        <button class="btn btn-gold" onclick="saveVentaGrande(event)">💼 Confirmar Venta</button>
       </div>
     </div>
   </div>
@@ -1907,7 +1907,7 @@
   <div class="mo" id="m-promo">
     <div class="md">
       <div class="mh">
-        <h2>Asignar PromociÃ³n</h2><button class="mx" onclick="cm('m-promo')">âœ•</button>
+        <h2>Asignar Promoción</h2><button class="mx" onclick="cm('m-promo')">✕</button>
       </div>
       <div class="mb">
         <div id="promo-art-info" style="margin-bottom:16px; padding:12px; background:var(--gold-p); border-radius:var(--rs)"></div>
@@ -1921,7 +1921,7 @@
       </div>
       <div class="mf">
         <button class="btn btn-out" onclick="cm('m-promo')">Cancelar</button>
-        <button class="btn btn-gold" onclick="savePromo()">Aplicar PromociÃ³n</button>
+        <button class="btn btn-gold" onclick="savePromo()">Aplicar Promoción</button>
       </div>
     </div>
   </div>
@@ -1937,26 +1937,26 @@
       </div>
       <nav class="sb-nav">
         <button class="ni on" id="ni-dash" onclick="go('dash')"><span
-            class="ico">ðŸ“Š</span><span>Dashboard</span></button>
+            class="ico">📊</span><span>Dashboard</span></button>
         <span class="sb-sec">Tickets</span>
-        <button class="ni" id="ni-list" onclick="go('list')"><span class="ico">ðŸŽ«</span><span>Todos los
+        <button class="ni" id="ni-list" onclick="go('list')"><span class="ico">🎫</span><span>Todos los
             tickets</span></button>
-        <button class="ni" id="ni-new" onclick="go('new')"><span class="ico">âž•</span><span>Nuevo ticket</span></button>
-        <button class="ni" id="ni-scan" onclick="go('scan')"><span class="ico">ðŸ“±</span><span>Escanear
-            cÃ³digo</span></button>
-        <span class="sb-sec">AnÃ¡lisis</span>
-        <button class="ni" id="ni-dev" onclick="go('dev')"><span class="ico">ðŸ”„</span><span>Devoluciones</span><span
+        <button class="ni" id="ni-new" onclick="go('new')"><span class="ico">➕</span><span>Nuevo ticket</span></button>
+        <button class="ni" id="ni-scan" onclick="go('scan')"><span class="ico">📱</span><span>Escanear
+            código</span></button>
+        <span class="sb-sec">Análisis</span>
+        <button class="ni" id="ni-dev" onclick="go('dev')"><span class="ico">🔄</span><span>Devoluciones</span><span
             class="nbadge" id="devbadge" style="background:var(--warn)">0</span></button>
-        <button class="ni" id="ni-unsold" onclick="go('unsold')"><span class="ico">ðŸ“¦</span><span>Bodega</span><span class="nbadge" id="ubadge">0</span></button>
-        <button class="ni" id="ni-perdidas" onclick="go('perdidas')"><span class="ico">ðŸ“‰</span><span>Perdidas/DaÃ±os</span></button>
+        <button class="ni" id="ni-unsold" onclick="go('unsold')"><span class="ico">📦</span><span>Bodega</span><span class="nbadge" id="ubadge">0</span></button>
+        <button class="ni" id="ni-perdidas" onclick="go('perdidas')"><span class="ico">📉</span><span>Perdidas/Daños</span></button>
         <button class="ni" id="ni-export" onclick="go('export')"><span
-            class="ico">ðŸ“¤</span><span>Exportar</span></button>
+            class="ico">📤</span><span>Exportar</span></button>
         <span class="sb-sec">Mayoreo</span>
         <button class="ni" id="ni-ventas" onclick="go('ventas')" style="border:1px solid rgba(201,150,58,.25)"><span
-            class="ico">ðŸ’¼</span><span>Ventas</span></button>
+            class="ico">💼</span><span>Ventas</span></button>
         <button class="ni" id="ni-promos" onclick="go('promos')"
           style="margin-top:8px; border:1px solid rgba(201,150,58,.25); font-weight: 600;"><span
-            class="ico">ðŸ·ï¸</span><span>Promociones</span></button>
+            class="ico">🏷️</span><span>Promociones</span></button>
       </nav>
       <div class="sb-foot">
         <div class="sb-user">
@@ -1977,7 +1977,7 @@
             <polyline points="16 17 21 12 16 7"/>
             <line x1="21" y1="12" x2="9" y2="12"/>
           </svg>
-          Cerrar sesiÃ³n
+          Cerrar sesión
         </button>
       </div>
     </aside>
@@ -1992,13 +1992,13 @@
             <div class="tb-sub" id="today-date"></div>
           </div>
           <div style="display:flex;gap:12px;align-items:center">
-            <button class="btn btn-dark btn-sm" id="theme-toggle" onclick="toggleTheme()" style="width:36px;height:36px;padding:0;justify-content:center;font-size:18px">ðŸŒ—</button>
+            <button class="btn btn-dark btn-sm" id="theme-toggle" onclick="toggleTheme()" style="width:36px;height:36px;padding:0;justify-content:center;font-size:18px">🌗</button>
             <div style="width:1px;height:24px;background:var(--b);margin:0 4px"></div>
           </div>
           <div style="display:flex;gap:8px">
-            <button class="btn btn-dark btn-sm" onclick="om('m-cierre')">ðŸ“… Cierre Mensual</button>
-            <button class="btn btn-dark btn-sm" onclick="openVentaGrande()">ðŸ’¼ Venta</button>
-            <button class="btn btn-gold btn-sm" onclick="openNewTicket()">âž• Nuevo ticket</button>
+            <button class="btn btn-dark btn-sm" onclick="om('m-cierre')">📅 Cierre Mensual</button>
+            <button class="btn btn-dark btn-sm" onclick="openVentaGrande()">💼 Venta</button>
+            <button class="btn btn-gold btn-sm" onclick="openNewTicket()">➕ Nuevo ticket</button>
           </div>
         </div>
         <div style="padding:26px">
@@ -2030,7 +2030,7 @@
               <div class="ms">utilidad neta</div>
             </div>
             <div class="mc warn">
-              <div class="ml">â° Vencen esta semana</div>
+              <div class="ml">⏰ Vencen esta semana</div>
               <div class="mv" id="m-exp">0</div>
               <div class="ms">devoluciones urgentes</div>
             </div>
@@ -2054,12 +2054,12 @@
           <div>
             <div class="tb-title">Todos los tickets</div>
             <div class="tb-sub" id="list-sub">0 tickets</div>
-          </div><button class="btn btn-gold btn-sm" onclick="openNewTicket()">âž• Nuevo</button>
+          </div><button class="btn btn-gold btn-sm" onclick="openNewTicket()">➕ Nuevo</button>
         </div>
         <div style="padding:26px">
           <div class="srow">
-            <div class="siw"><span class="sico">ðŸ”</span><input type="text" id="q-search"
-                placeholder="Buscar nombre, folioâ€¦" oninput="filterList()"></div>
+            <div class="siw"><span class="sico">🔍</span><input type="text" id="q-search"
+                placeholder="Buscar nombre, folio…" oninput="filterList()"></div>
             <select class="fsel" id="q-estado" onchange="filterList()">
               <option value="">Todos los estados</option>
               <option value="pendiente">Bodega</option>
@@ -2072,20 +2072,20 @@
               <option value="">Todas las temporadas</option>
               <option>Halloween</option>
               <option>Navidad</option>
-              <option>DÃ­a de Muertos</option>
-              <option>San ValentÃ­n</option>
+              <option>Día de Muertos</option>
+              <option>San Valentín</option>
               <option>Pascua</option>
               <option>Primavera</option>
-              <option>DÃ­a de las Madres</option>
+              <option>Día de las Madres</option>
               <option>Spring</option>
               <option>Cocina</option>
-              <option>OtoÃ±o</option>
-              <option>OcasiÃ³n Especial</option>
+              <option>Otoño</option>
+              <option>Ocasión Especial</option>
               <option>General</option>
             </select>
             <button class="btn btn-out btn-sm"
-              onclick="om('m-scan');setTimeout(()=>document.getElementById('mf-in').focus(),100)">ðŸ” Buscar por
-              cÃ³digo</button>
+              onclick="om('m-scan');setTimeout(()=>document.getElementById('mf-in').focus(),100)">🔍 Buscar por
+              código</button>
           </div>
           <div class="card">
             <div class="tw">
@@ -2093,8 +2093,8 @@
                 <thead>
                   <tr>
                     <th>Folio</th>
-                    <th>ArtÃ­culo</th>
-                    <th>CategorÃ­a</th>
+                    <th>Artículo</th>
+                    <th>Categoría</th>
                     <th>Temporada</th>
                     <th>Precio</th>
                     <th>Estado</th>
@@ -2116,7 +2116,7 @@
         </div>
         <div style="padding:26px">
           <div class="card" style="max-width:850px">
-            <div class="ch"><span class="ct">Registrar ticket con mÃºltiples artÃ­culos</span></div>
+            <div class="ch"><span class="ct">Registrar ticket con múltiples artículos</span></div>
             <div class="cb">
               <div class="fg" style="margin-bottom:18px">
                 <div class="fi"><label>Temporada *</label><select id="pt">
@@ -2130,8 +2130,8 @@
                     <option>D&iacute;a de las Madres</option>
                     <option>Spring</option>
                     <option>Cocina</option>
-                    <option>OtoÃ±o</option>
-                    <option>OcasiÃ³n Especial</option>
+                    <option>Otoño</option>
+                    <option>Ocasión Especial</option>
                     <option>General</option>
                   </select></div>
                 <div class="fi"><label>Estado inicial</label><select id="pe">
@@ -2141,21 +2141,21 @@
                     <option value="descuento">En descuento</option>
                   </select></div>
                 <div class="fi">
-                  <label>MÃ©todo de pago</label>
+                  <label>Método de pago</label>
                   <select id="p-pago">
-                    <option value="efectivo">ðŸ’µ Efectivo</option>
-                    <option value="transferencia">ðŸ¦ Transferencia</option>
-                    <option value="adelanto">â³ Adelanto / Parcial</option>
-                    <option value="pendiente">ðŸ• Por cobrar</option>
+                    <option value="efectivo">💵 Efectivo</option>
+                    <option value="transferencia">🏦 Transferencia</option>
+                    <option value="adelanto">⏳ Adelanto / Parcial</option>
+                    <option value="pendiente">🕐 Por cobrar</option>
                   </select>
                 </div>
                 <div class="fi"><label>Proveedor</label><input type="text" id="pp"
                     placeholder="Nombre del proveedor&hellip;"></div>
                 <div class="fi">
-                  <label>CÃ³digo del ticket (Folio) * <small style="font-weight:400;text-transform:none;opacity:0.75">(Escribe BD, HL o HB para generar)</small></label>
+                  <label>Código del ticket (Folio) * <small style="font-weight:400;text-transform:none;opacity:0.75">(Escribe BD, HL o HB para generar)</small></label>
                   <input type="text" id="p-folio"
                     style="font-family:monospace;font-weight:700;color:var(--cobalt);letter-spacing:.05em;font-size:14px"
-                    placeholder="Ej: 123456789 (CÃ³digo del ticket Ross)"
+                    placeholder="Ej: 123456789 (Código del ticket Ross)"
                     oninput="onFolioInput(this)">
                 </div>
                 <div class="fi">
@@ -2168,9 +2168,9 @@
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
                 <span
                   style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">&#128230;
-                  ArtÃ­culos individuales</span>
+                  Artículos individuales</span>
                 <button class="btn btn-gold btn-sm" style="font-size:14px;padding:9px 16px"
-                  onclick="addItemRow('pi-body','pi-tot')">&#10010; Agregar artÃ­culo</button>
+                  onclick="addItemRow('pi-body','pi-tot')">&#10010; Agregar artículo</button>
               </div>
               <div style="overflow-x:auto;border:1px solid var(--b);border-radius:var(--rs);margin-bottom:10px">
                 <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px">
@@ -2214,30 +2214,30 @@
       <!-- SCAN -->
       <div class="page" id="p-scan">
         <div class="topbar">
-          <div class="tb-title">Escanear cÃ³digo de barras</div>
+          <div class="tb-title">Escanear código de barras</div>
         </div>
         <div style="padding:26px">
           <div class="card" style="max-width:520px;margin:0 auto">
-            <div class="ch"><span class="ct">ðŸ” Buscar ticket por cÃ³digo de barras</span></div>
+            <div class="ch"><span class="ct">🔍 Buscar ticket por código de barras</span></div>
             <div class="cb">
               <div
                 style="background:var(--gold-p);border:1.5px solid var(--gold-l);border-radius:var(--rs);padding:14px 16px;margin-bottom:18px;font-size:13px;color:var(--ink2);line-height:1.6">
-                <strong>Â¿CÃ³mo usar?</strong><br>
-                1. Conecta el lector de cÃ³digos de barras USB.<br>
+                <strong>¿Cómo usar?</strong><br>
+                1. Conecta el lector de códigos de barras USB.<br>
                 2. Haz clic en el campo de abajo para enfocarlo.<br>
-                3. Escanea el cÃ³digo â€” se busca automÃ¡ticamente.
+                3. Escanea el código — se busca automáticamente.
               </div>
-              <label style="font-size:11.5px;font-weight:500;color:var(--muted);margin-bottom:6px;display:block">CÃ³digo
+              <label style="font-size:11.5px;font-weight:500;color:var(--muted);margin-bottom:6px;display:block">Código
                 / Folio del ticket</label>
               <div style="display:flex;gap:8px">
-                <input type="text" id="pf-in" placeholder="Escanea o escribe TKT-0001â€¦" autofocus autocomplete="off"
+                <input type="text" id="pf-in" placeholder="Escanea o escribe TKT-0001…" autofocus autocomplete="off"
                   oninput="autoSearch(this,'page')"
                   style="font-size:15px;padding:11px 14px;font-family:monospace;letter-spacing:.03em">
                 <button class="btn btn-dark"
                   onclick="findByFolio(document.getElementById('pf-in').value)">Buscar</button>
               </div>
-              <p style="font-size:11.5px;color:var(--muted);margin-top:10px">ðŸ’¡ El lector envÃ­a automÃ¡ticamente un Enter
-                al terminar â€” la bÃºsqueda ocurre sin hacer clic.</p>
+              <p style="font-size:11.5px;color:var(--muted);margin-top:10px">💡 El lector envía automáticamente un Enter
+                al terminar — la búsqueda ocurre sin hacer clic.</p>
               <div id="scan-result" style="margin-top:16px"></div>
             </div>
           </div>
@@ -2249,32 +2249,32 @@
         <div class="topbar">
           <div>
             <div class="tb-title">Bodega</div>
-            <div class="tb-sub">Pendientes Â· Apartados Â· En descuento</div>
-          </div><button class="btn btn-out btn-sm" onclick="exportUnsold()">ðŸ“¤ Exportar</button>
+            <div class="tb-sub">Pendientes · Apartados · En descuento</div>
+          </div><button class="btn btn-out btn-sm" onclick="exportUnsold()">📤 Exportar</button>
         </div>
         <div style="padding:26px">
           <div style="display:flex;gap:9px;margin-bottom:16px;flex-wrap:wrap">
             <div class="siw" style="flex:1;min-width:180px">
-            <span class="sico">ðŸ”</span>
-            <input type="text" id="us-search" placeholder="Buscar artÃ­culo, folio, cÃ³digoâ€¦" oninput="renderUnsold()">
+            <span class="sico">🔍</span>
+            <input type="text" id="us-search" placeholder="Buscar artículo, folio, código…" oninput="renderUnsold()">
           </div>
             <select class="fsel" id="us-temp" onchange="renderUnsold()">
               <option value="">Todas las temporadas</option>
               <option>Halloween</option>
               <option>Navidad</option>
-              <option>DÃ­a de Muertos</option>
-              <option>San ValentÃ­n</option>
+              <option>Día de Muertos</option>
+              <option>San Valentín</option>
               <option>Pascua</option>
               <option>Primavera</option>
-              <option>DÃ­a de las Madres</option>
+              <option>Día de las Madres</option>
               <option>Spring</option>
               <option>Cocina</option>
-              <option>OtoÃ±o</option>
-              <option>OcasiÃ³n Especial</option>
+              <option>Otoño</option>
+              <option>Ocasión Especial</option>
               <option>General</option>
             </select>
             <div style="flex:1"></div>
-            <button class="btn btn-out btn-sm" onclick="bulkDiscount()">ðŸ’¸ Marcar selecciÃ³n en descuento</button>
+            <button class="btn btn-out btn-sm" onclick="bulkDiscount()">💸 Marcar selección en descuento</button>
           </div>
           <div class="card">
             <div class="tw">
@@ -2283,8 +2283,8 @@
                   <tr>
                     <th><input type="checkbox" id="chk-all" onchange="selAll(this)"></th>
                     <th>Folio</th>
-                    <th>ArtÃ­culo</th>
-                    <th>CategorÃ­a</th>
+                    <th>Artículo</th>
+                    <th>Categoría</th>
                     <th>Temporada</th>
                     <th>Precio</th>
                     <th>Estado</th>
@@ -2303,28 +2303,28 @@
         <div class="topbar">
           <div>
             <div class="tb-title">Devoluciones</div>
-            <div class="tb-sub">ArtÃ­culos pendientes ordenados por urgencia de devoluciÃ³n</div>
-          </div><button class="btn btn-out btn-sm" onclick="exportDev()">ðŸ“¤ Exportar</button>
+            <div class="tb-sub">Artículos pendientes ordenados por urgencia de devolución</div>
+          </div><button class="btn btn-out btn-sm" onclick="exportDev()">📤 Exportar</button>
         </div>
         <div style="padding:26px">
           <div style="display:flex;gap:9px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
             <div class="siw" style="flex:1;min-width:180px">
-            <span class="sico">ðŸ”</span>
-            <input type="text" id="dev-search" placeholder="Buscar artÃ­culo, folio, cÃ³digoâ€¦" oninput="renderDev()">
+            <span class="sico">🔍</span>
+            <input type="text" id="dev-search" placeholder="Buscar artículo, folio, código…" oninput="renderDev()">
           </div>
             <select class="fsel" id="dev-temp" onchange="renderDev()">
               <option value="">Todas las temporadas</option>
               <option>Halloween</option>
               <option>Navidad</option>
-              <option>DÃ­a de Muertos</option>
-              <option>San ValentÃ­n</option>
+              <option>Día de Muertos</option>
+              <option>San Valentín</option>
               <option>Pascua</option>
               <option>Primavera</option>
-              <option>DÃ­a de las Madres</option>
+              <option>Día de las Madres</option>
               <option>Spring</option>
               <option>Cocina</option>
-              <option>OtoÃ±o</option>
-              <option>OcasiÃ³n Especial</option>
+              <option>Otoño</option>
+              <option>Ocasión Especial</option>
               <option>General</option>
             </select>
             <select class="fsel" id="dev-filter" onchange="renderDev()">
@@ -2340,11 +2340,11 @@
                 <thead>
                   <tr>
                     <th>Folio</th>
-                    <th>ArtÃ­culo</th>
+                    <th>Artículo</th>
                     <th>Temporada</th>
                     <th>Fecha Registro</th>
-                    <th>Fecha LÃ­mite</th>
-                    <th>DÃ­as Restantes</th>
+                    <th>Fecha Límite</th>
+                    <th>Días Restantes</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                   </tr>
@@ -2372,8 +2372,8 @@
                     <option value="">Todas</option>
                     <option>Spring</option>
                     <option>Cocina</option>
-                    <option>OtoÃ±o</option>
-                    <option>OcasiÃ³n Especial</option>
+                    <option>Otoño</option>
+                    <option>Ocasión Especial</option>
                     <option>General</option>
                   </select></div>
                 <div class="fi" style="margin-bottom:14px"><label>Estado</label><select id="ex-e">
@@ -2383,28 +2383,28 @@
                     <option value="devuelto">Devuelto</option>
                     <option value="descuento">En descuento</option>
                   </select></div>
-                <button class="btn btn-gold" onclick="exportExcel()">ðŸ“Š Exportar Excel</button>
+                <button class="btn btn-gold" onclick="exportExcel()">📊 Exportar Excel</button>
               </div>
             </div>
             <div class="card">
               <div class="ch"><span class="ct">Resumen por temporada</span></div>
               <div class="cb">
                 <div id="exp-preview" style="margin-bottom:14px"></div>
-                <button class="btn btn-dark" onclick="exportSeason()">ðŸ“‹ Exportar resumen</button>
+                <button class="btn btn-dark" onclick="exportSeason()">📋 Exportar resumen</button>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- PERDIDAS / DAÃ‘OS -->
+      <!-- PERDIDAS / DAÑOS -->
       <div class="page" id="p-perdidas">
         <div class="topbar">
           <div>
-            <div class="tb-title">Perdidas y DaÃ±os</div>
+            <div class="tb-title">Perdidas y Daños</div>
             <div class="tb-sub">Registro de mermas y productos rotos</div>
           </div>
-          <button class="btn btn-gold btn-sm" onclick="openNewPerdida()">ðŸ“‰ Registrar Perdida</button>
+          <button class="btn btn-gold btn-sm" onclick="openNewPerdida()">📉 Registrar Perdida</button>
         </div>
         <div style="padding:26px">
           <div class="card">
@@ -2418,7 +2418,7 @@
                     <th>Cantidad</th>
                     <th>Motivo</th>
                     <th>Vendedor</th>
-                    <th>AcciÃ³n</th>
+                    <th>Acción</th>
                   </tr>
                 </thead>
                 <tbody id="perdidas-body"></tbody>
@@ -2436,8 +2436,8 @@
             <div class="tb-sub">Pedidos mayoristas y clientes especiales</div>
           </div>
           <div style="display:flex;gap:8px">
-            <button class="btn btn-out btn-sm" onclick="exportarVentasGrandesExcel()">ðŸ“Š Exportar Excel</button>
-            <button class="btn btn-gold btn-sm" onclick="openVentaGrande()">ðŸ’¼ Nueva Venta</button>
+            <button class="btn btn-out btn-sm" onclick="exportarVentasGrandesExcel()">📊 Exportar Excel</button>
+            <button class="btn btn-gold btn-sm" onclick="openVentaGrande()">💼 Nueva Venta</button>
           </div>
         </div>
         <div style="padding:26px">
@@ -2462,12 +2462,12 @@
                   <option value="12">Diciembre</option>
                 </select>
                 <select id="vg-anio" onchange="renderVentas()" class="fsel" style="width:85px;padding:6px;font-size:12px">
-                  <option value="">AÃ±o</option>
+                  <option value="">Año</option>
                   <option value="2024">2024</option>
                   <option value="2025">2025</option>
                   <option value="2026" selected>2026</option>
                 </select>
-                <input type="text" id="vg-search" placeholder="Buscar cliente o productoâ€¦" oninput="renderVentas()"
+                <input type="text" id="vg-search" placeholder="Buscar cliente o producto…" oninput="renderVentas()"
                   style="padding:7px 12px;font-size:13px;border:1px solid var(--bs);border-radius:var(--rs);outline:none;width:200px">
               </div>
             </div>
@@ -2477,7 +2477,7 @@
                   <tr>
                     <th>Fecha</th>
                     <th>Cliente</th>
-                    <th>ArtÃ­culos</th>
+                    <th>Artículos</th>
                     <th>Total Venta</th>
                     <th>Ganancia Neta</th>
                     <th>Pago</th>
@@ -2496,25 +2496,25 @@
         <div class="topbar">
           <div>
             <div class="tb-title">Promociones</div>
-            <div class="tb-sub">Gestiona precios temporales para artÃ­culos no vendidos</div>
+            <div class="tb-sub">Gestiona precios temporales para artículos no vendidos</div>
           </div>
         </div>
         <div style="padding:26px">
           <div class="dg2">
             <div class="card">
-              <div class="ch"><span class="ct">ArtÃ­culos disponibles para Promo</span></div>
+              <div class="ch"><span class="ct">Artículos disponibles para Promo</span></div>
               <div class="cb">
                 <div class="siw" style="margin-bottom:12px">
-                  <span class="sico">ðŸ”</span>
-                  <input type="text" id="promo-search" placeholder="Filtrar artÃ­culos no vendidos..." oninput="renderPromosList()">
+                  <span class="sico">🔍</span>
+                  <input type="text" id="promo-search" placeholder="Filtrar artículos no vendidos..." oninput="renderPromosList()">
                 </div>
                 <div class="tw" style="max-height: 400px; overflow-y: auto;">
                   <table>
                     <thead>
                       <tr>
-                        <th>ArtÃ­culo</th>
+                        <th>Artículo</th>
                         <th>Precio Actual</th>
-                        <th>AcciÃ³n</th>
+                        <th>Acción</th>
                       </tr>
                     </thead>
                     <tbody id="promo-avail-body"></tbody>
@@ -2529,10 +2529,10 @@
                   <table>
                     <thead>
                       <tr>
-                        <th>ArtÃ­culo</th>
+                        <th>Artículo</th>
                         <th>Promo</th>
                         <th>Vence</th>
-                        <th>AcciÃ³n</th>
+                        <th>Acción</th>
                       </tr>
                     </thead>
                     <tbody id="promo-active-body"></tbody>
@@ -2548,23 +2548,23 @@
   </div>
 
   <script>
-    // â•â• CONFIG SUPABASE â•â•
+    // ══ CONFIG SUPABASE ══
     const SB_URL = 'https://pzbklcnmraqyijdpnleg.supabase.co';
     const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6YmtsY25tcmFxeWlqZHBubGVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5NTI1NzUsImV4cCI6MjA5MDUyODU3NX0.sFKmxz2chZGzRZXRXi-7nez6EhY6aR2TIxWvQ5-6EU0';
 
-    // â•â• STATE â•â•
+    // ══ STATE ══
     let tickets = [], ventasGrandes = [], notasVenta = [], perdidas = [], DB = null, curQR = null, curDetId = null;
     let inventoryIndex = { byBarcode: {}, byName: {} };
     let vgTimer = null;
 
-    // â•â• AUTH â•â•
+    // ══ AUTH ══
     function logOut() {
       sessionStorage.removeItem('dd_auth');
       sessionStorage.removeItem('dd_user');
       window.location.replace('login.html');
     }
 
-    // â•â• INIT â•â•
+    // ══ INIT ══
     window.addEventListener('load', () => {
       document.querySelectorAll('.mo').forEach(modal => {
         modal.addEventListener('click', (e) => {
@@ -2602,23 +2602,23 @@
       const btn = document.getElementById('theme-toggle');
       if (!btn) return;
       const isLight = document.documentElement.classList.contains('light-mode');
-      btn.textContent = isLight ? 'â˜€ï¸' : 'ðŸŒ™';
+      btn.textContent = isLight ? '☀️' : '🌙';
       btn.className = isLight ? 'btn btn-out btn-sm' : 'btn btn-dark btn-sm';
     }
 
-    // â•â• SUPABASE â•â•
+    // ══ SUPABASE ══
     async function connect(url, key, silent) {
       try {
         DB = supabase.createClient(url, key);
         const { error } = await DB.from('tickets').select('id').limit(1);
         if (error) {
           if (error.code === '42P01') {
-            toast('Tabla "tickets" no existe â€” crÃ©ala en Supabase SQL Editor', 'err');
+            toast('Tabla "tickets" no existe — créala en Supabase SQL Editor', 'err');
             showSQLInfo();
           } else toast('Error Supabase: ' + error.message, 'err');
           DB = null; loadDemo(); render(); return;
         }
-        if (!silent) toast('âœ“ Conectado a Supabase', 'ok');
+        if (!silent) toast('✓ Conectado a Supabase', 'ok');
         const w = document.getElementById('setup-wrap'); if (w) w.innerHTML = '';
         await pull();
       } catch (e) { toast('Error al conectar: ' + e.message, 'err'); DB = null; loadDemo(); render(); }
@@ -2626,11 +2626,11 @@
 
     function showSQLInfo() {
       const w = document.getElementById('setup-wrap'); if (!w) return;
-      w.innerHTML = `<div class="setup"><span style="font-size:24px;flex-shrink:0">âš ï¸</span><div style="flex:1"><h3>Crea las tablas en Supabase</h3><p>Ejecuta este SQL en <strong>Supabase â†’ SQL Editor</strong>:</p><pre style="background:#1A1510;color:#E8C47A;padding:12px;border-radius:8px;font-size:11px;overflow-x:auto;margin-top:8px">
+      w.innerHTML = `<div class="setup"><span style="font-size:24px;flex-shrink:0">⚠️</span><div style="flex:1"><h3>Crea las tablas en Supabase</h3><p>Ejecuta este SQL en <strong>Supabase → SQL Editor</strong>:</p><pre style="background:#1A1510;color:#E8C47A;padding:12px;border-radius:8px;font-size:11px;overflow-x:auto;margin-top:8px">
 -- 1. Agregar proveedor al encabezado
 ALTER TABLE tickets ADD COLUMN proveedor text;
 
--- 2. Nueva tabla de artÃ­culos
+-- 2. Nueva tabla de artículos
 CREATE TABLE articulos (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   ticket_id uuid REFERENCES tickets(id) ON DELETE CASCADE,
@@ -2643,11 +2643,11 @@ CREATE TABLE articulos (
   created_at timestamptz DEFAULT now()
 );
 
--- 3. Desactivar RLS para evitar errores de polÃ­tica de seguridad
+-- 3. Desactivar RLS para evitar errores de política de seguridad
 ALTER TABLE articulos DISABLE ROW LEVEL SECURITY;
 ALTER TABLE tickets DISABLE ROW LEVEL SECURITY;
 
--- Ãndices
+-- Índices
 CREATE INDEX idx_articulos_barcode ON articulos(codigo_barras) WHERE codigo_barras IS NOT NULL;
 CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
 </pre></div></div>`;
@@ -2723,7 +2723,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       if (items.length) {
         const iRows = items.map(i => ({ ...i, ticket_id: data.id, estado: 'pendiente' }));
         const { error: ie } = await DB.from('articulos').insert(iRows);
-        if (ie) toast('Error guardando artÃ­culos: ' + ie.message, 'err');
+        if (ie) toast('Error guardando artículos: ' + ie.message, 'err');
         data.items = items.map(i => ({ ...i, estado: 'pendiente' }));
       } else { data.items = []; }
 
@@ -2742,7 +2742,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
 
       if (DB) {
         const { error } = await DB.from('articulos').update(fields).eq('id', artId);
-        if (error) { toast('Error actualizando artÃ­culo: ' + error.message, 'err'); return; }
+        if (error) { toast('Error actualizando artículo: ' + error.message, 'err'); return; }
 
         // Recalculate ticket status and update in DB
         const newStatus = calcTicketStatus(t.items);
@@ -2757,7 +2757,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       buildInventoryIndex();
       render();
       if (curDetId === t.id) openDet(t.id);
-      toast('âœ“ ArtÃ­culo actualizado', 'ok');
+      toast('✓ Artículo actualizado', 'ok');
 
       if (fields.estado === 'vendido') {
         const curUser = sessionStorage.getItem('dd_user') || 'desconocido';
@@ -2799,7 +2799,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         if (error) { toast('Error: ' + error.message, 'err'); return; }
       }
       buildInventoryIndex();
-      render(); toast('âœ“ Ticket: ' + (fields.estado ? elbl(fields.estado) : 'Actualizado'), 'ok');
+      render(); toast('✓ Ticket: ' + (fields.estado ? elbl(fields.estado) : 'Actualizado'), 'ok');
     }
 
     async function updateProvider(id) {
@@ -2811,7 +2811,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       if (curDetId === id) openDet(id);
     }
 
-    // â•â• EDITAR TICKET â•â•
+    // ══ EDITAR TICKET ══
     function openEditTicket(id) {
       const t = tickets.find(t => t.id === id);
       if (!t) return;
@@ -2836,8 +2836,8 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       tb.innerHTML = (t.items || []).map((i, idx) => {
         const gain = ((+i.precio_unitario || 0) - (+i.precio_compra || 0)) * (+i.cantidad || 1);
         return `<tr data-art-id="${i.id}">
-          <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><input type="text" value="${i.codigo_barras || i.barcode || ''}" placeholder="â€”" style="${EIS}min-width:100px;font-family:monospace;"></td>
-          <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><input type="text" value="${i.nombre || ''}" placeholder="Nombreâ€¦" style="${EIS}min-width:140px"></td>
+          <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><input type="text" value="${i.codigo_barras || i.barcode || ''}" placeholder="—" style="${EIS}min-width:100px;font-family:monospace;"></td>
+          <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><input type="text" value="${i.nombre || ''}" placeholder="Nombre…" style="${EIS}min-width:140px"></td>
           <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><input type="number" value="${i.cantidad || 1}" min="1" oninput="calcEditRow(this)" style="${EIS}width:55px;text-align:center"></td>
           <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><input type="number" value="${(+i.precio_compra || 0).toFixed(2)}" min="0" step="0.5" oninput="calcEditRow(this)" style="${EIS}width:90px"></td>
           <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><input type="number" value="${(+i.precio_unitario || +i.precio_venta || 0).toFixed(2)}" min="0" step="0.5" oninput="calcEditRow(this)" style="${EIS}width:90px"></td>
@@ -2874,7 +2874,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       });
       const g = tV - tC;
       el.innerHTML = `<div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--b)">
-        <div style="text-align:right"><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Total ArtÃ­culos</div><div style="font-size:15px;font-weight:700">${tQ}</div></div>
+        <div style="text-align:right"><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Total Artículos</div><div style="font-size:15px;font-weight:700">${tQ}</div></div>
         <div style="text-align:right"><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Total Costo</div><div style="font-size:15px;font-weight:700">$${tC.toFixed(2)}</div></div>
         <div style="text-align:right"><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Total Venta</div><div style="font-size:15px;font-weight:700">$${tV.toFixed(2)}</div></div>
         <div style="text-align:right;background:var(--sage-p);border-radius:var(--rs);padding:6px 12px;border:1px solid rgba(74,122,90,.2)">
@@ -2892,11 +2892,11 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       if (!t) return;
 
       const newFolio = document.getElementById('edit-folio').value.trim().toUpperCase();
-      if (!newFolio) { toast('El folio no puede estar vacÃ­o', 'err'); return; }
+      if (!newFolio) { toast('El folio no puede estar vacío', 'err'); return; }
       const folioConflict = tickets.find(x => x.folio === newFolio && x.id !== id);
-      if (folioConflict) { toast('âš ï¸ Ese folio ya existe en otro ticket', 'err'); return; }
+      if (folioConflict) { toast('⚠️ Ese folio ya existe en otro ticket', 'err'); return; }
 
-      if (btn) { btn.disabled = true; btn.innerHTML = 'âŒ› Guardando...'; }
+      if (btn) { btn.disabled = true; btn.innerHTML = '⌛ Guardando...'; }
 
       try {
         // Save ticket header fields
@@ -2935,7 +2935,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
           Object.assign(art, updFields);
           if (DB) {
             const { error } = await DB.from('articulos').update(updFields).eq('id', artId);
-            if (error) toast('Error artÃ­culo ' + art.nombre + ': ' + error.message, 'err');
+            if (error) toast('Error artículo ' + art.nombre + ': ' + error.message, 'err');
           }
         }
 
@@ -2950,7 +2950,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         render();
         cm('m-edit-ticket');
         if (curDetId === id) openDet(id);
-        toast('âœ“ Ticket actualizado correctamente', 'ok');
+        toast('✓ Ticket actualizado correctamente', 'ok');
       } catch (e) {
         toast('Error al guardar: ' + e.message, 'err');
       } finally {
@@ -2981,7 +2981,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
     }
 
     async function deleteTicket(id) {
-      askConf('Â¿EstÃ¡s seguro de eliminar este ticket? Se borrarÃ¡n tambiÃ©n todos sus artÃ­culos de forma permanente.', async () => {
+      askConf('¿Estás seguro de eliminar este ticket? Se borrarán también todos sus artículos de forma permanente.', async () => {
         if (DB) {
           const { error } = await DB.from('tickets').delete().eq('id', id);
           if (error) { toast('Error al eliminar: ' + error.message, 'err'); return; }
@@ -2989,11 +2989,11 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         tickets = tickets.filter(t => t.id !== id);
         buildInventoryIndex();
         render();
-        toast('âœ“ Ticket eliminado', 'ok');
+        toast('✓ Ticket eliminado', 'ok');
       });
     }
 
-    // â•â• UTILS â•â•
+    // ══ UTILS ══
     function om(id) { document.getElementById(id)?.classList.add('on'); }
     function cm(id) { document.getElementById(id)?.classList.remove('on'); }
     function toast(m, t = 'ok') {
@@ -3011,8 +3011,8 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       return m[s] || s;
     }
     function sEmoji(s) {
-      const m = { Halloween: 'ðŸŽƒ', Navidad: 'ðŸŽ„', 'DÃ­a de Muertos': 'ðŸ’€', 'San ValentÃ­n': 'â¤ï¸', Pascua: 'ðŸ°', Primavera: 'ðŸŒ¸', 'DÃ­a de las Madres': 'ðŸ‘©', General: 'ðŸ“¦' };
-      return m[s] || 'ðŸ“¦';
+      const m = { Halloween: '🎃', Navidad: '🎄', 'Día de Muertos': '💀', 'San Valentín': '❤️', Pascua: '🐰', Primavera: '🌸', 'Día de las Madres': '👩', General: '📦' };
+      return m[s] || '📦';
     }
 
     function getClientColor(name) {
@@ -3025,13 +3025,13 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       return colors[Math.abs(hash) % colors.length];
     }
     function fDate(d) {
-      if (!d) return 'â€”';
+      if (!d) return '—';
       const date = new Date(d);
       if (isNaN(date.getTime())) return d;
       return date.toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
     }
 
-    // â•â• NAVIGATION â•â•
+    // ══ NAVIGATION ══
     function go(page) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
       document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
@@ -3056,7 +3056,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       if (page === 'perdidas') renderPerdidas();
     }
 
-    // â•â• RENDER â•â•
+    // ══ RENDER ══
     function render() { renderDash(); renderList(); renderUnsold(); renderDev(); renderVentas(); updateBadge(); }
 
     function renderDash() {
@@ -3100,7 +3100,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       const rl = document.getElementById('recent-list');
       const rec = tickets.slice(0, 6);
       if (!rec.length) {
-        rl.innerHTML = `<div class="empty"><div class="ei">ðŸŽ«</div><p>AÃºn no hay tickets</p></div>`;
+        rl.innerHTML = `<div class="empty"><div class="ei">🎫</div><p>Aún no hay tickets</p></div>`;
       } else {
         rl.innerHTML = rec.map(t => {
           const tV = (t.items || []).reduce((acc, i) => acc + ((+i.precio_unitario || 0) * (+i.cantidad || 1)), 0);
@@ -3108,12 +3108,12 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         <div onclick="openDet('${t.id}')" style="display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--b);cursor:pointer">
           <div style="flex:1;min-width:0">
             <div style="font-weight:500;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.proveedor || 'Sin proveedor'}</div>
-            <div style="font-size:11.5px;color:var(--muted)">${t.folio} Â· ${t.items.length} art.</div>
+            <div style="font-size:11.5px;color:var(--muted)">${t.folio} · ${t.items.length} art.</div>
           </div>
           <div style="text-align:right;flex-shrink:0">
             <div style="font-weight:600;font-size:13.5px">$${tV.toFixed(2)}</div>
             ${stBadge(t.estado)}
-            <div style="margin-top:4px"><button class="btn btn-xs btn-rose" onclick="event.stopPropagation(); askConf('Â¿Eliminar este ticket y todos sus artÃ­culos?', ()=>deleteTicket('${t.id}'))">âœ•</button></div>
+            <div style="margin-top:4px"><button class="btn btn-xs btn-rose" onclick="event.stopPropagation(); askConf('¿Eliminar este ticket y todos sus artículos?', ()=>deleteTicket('${t.id}'))">✕</button></div>
           </div>
         </div>`;
         }).join('') + `<div style="padding-top:11px"><button class="btn btn-out btn-sm" style="width:100%" onclick="go('list')">Ver todos los tickets &rarr;</button></div>`;
@@ -3124,13 +3124,13 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
     <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--b);font-size:12.5px">
       <div>
         <div style="font-weight:500">${n.nombre}</div>
-        <div style="color:var(--muted);font-size:11px">${n.folio} Â· ${fDate(n.fecha)}</div>
+        <div style="color:var(--muted);font-size:11px">${n.folio} · ${fDate(n.fecha)}</div>
       </div>
       <div style="text-align:right">
         <div style="font-weight:600;color:var(--sage)">+$${(+n.ganancia).toFixed(2)}</div>
         <div style="color:var(--muted);font-size:11px">$${(+n.precio_venta).toFixed(2)} venta</div>
       </div>
-    </div>`).join('') || '<p style="font-size:12.5px;color:var(--muted)">Sin ventas registradas aÃºn</p>';
+    </div>`).join('') || '<p style="font-size:12.5px;color:var(--muted)">Sin ventas registradas aún</p>';
       }
       }
 
@@ -3151,7 +3151,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       const sl = document.getElementById('season-list');
       const ents = Object.entries(byS);
       if (!ents.length) {
-        sl.innerHTML = `<div class="empty"><div class="ei">ðŸŒ¸</div><p>Sin temporadas aÃºn</p></div>`;
+        sl.innerHTML = `<div class="empty"><div class="ei">🌸</div><p>Sin temporadas aún</p></div>`;
       } else {
         sl.innerHTML = ents.map(([s, d]) => `
       <div style="margin-bottom:13px">
@@ -3169,13 +3169,13 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       const rows = data !== undefined ? data : tickets;
       document.getElementById('list-sub').textContent = rows.length + ' ticket' + (rows.length !== 1 ? 's' : '');
       const tb = document.getElementById('list-body');
-      if (!rows.length) { tb.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="ei">ðŸŽ«</div><h3>Sin resultados</h3><p>Intenta otros filtros o registra tu primer ticket.</p></div></td></tr>`; return; }
+      if (!rows.length) { tb.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="ei">🎫</div><h3>Sin resultados</h3><p>Intenta otros filtros o registra tu primer ticket.</p></div></td></tr>`; return; }
       
       tb.innerHTML = rows.map(t => {
         const tV = (t.items || []).reduce((acc, i) => acc + ((+i.precio_unitario || +i.precio_venta || 0) * (+i.cantidad || 1)), 0);
-        const itemName = t.proveedor || t.nombre || 'Ticket MÃºltiple';
+        const itemName = t.proveedor || t.nombre || 'Ticket Múltiple';
         const catOrCount = t.categoria || ((t.items ? t.items.length : 0) + ' arts');
-        return `<tr><td><span class="fo">${t.folio}</span></td><td><span class="an">${itemName}</span></td><td style="font-size:12.5px;color:var(--muted)">${catOrCount}</td><td><span class="sbadge">${sEmoji(t.temporada)} ${t.temporada || 'â€”'}</span></td><td><span class="pr">$${tV.toFixed(2)}</span></td><td>${stBadge(t.estado)}</td><td style="font-size:12px;color:var(--muted)">${fDate(t.created_at)}</td><td><div style="display:flex;gap:5px"><button class="btn btn-xs btn-out" onclick="openDet('${t.id}')">Ver</button><button class="btn btn-xs btn-out" onclick="showQR('${t.id}')">QR</button><button class="btn btn-xs btn-rose" onclick="deleteTicket('${t.id}')">Eliminar</button></div></td></tr>`;
+        return `<tr><td><span class="fo">${t.folio}</span></td><td><span class="an">${itemName}</span></td><td style="font-size:12.5px;color:var(--muted)">${catOrCount}</td><td><span class="sbadge">${sEmoji(t.temporada)} ${t.temporada || '—'}</span></td><td><span class="pr">$${tV.toFixed(2)}</span></td><td>${stBadge(t.estado)}</td><td style="font-size:12px;color:var(--muted)">${fDate(t.created_at)}</td><td><div style="display:flex;gap:5px"><button class="btn btn-xs btn-out" onclick="openDet('${t.id}')">Ver</button><button class="btn btn-xs btn-out" onclick="showQR('${t.id}')">QR</button><button class="btn btn-xs btn-rose" onclick="deleteTicket('${t.id}')">Eliminar</button></div></td></tr>`;
       }).join('');
     }
 
@@ -3194,7 +3194,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       let allArts = [];
       tickets.filter(t => !te || t.temporada === te).forEach(t => {
         (t.items || []).forEach(i => {
-          // Ocultar artÃ­culos con stock en 0 (ya vendidos/agotados)
+          // Ocultar artículos con stock en 0 (ya vendidos/agotados)
           if (['pendiente', 'apartado', 'descuento'].includes(i.estado) && (i.cantidad == null || +i.cantidad > 0)) {
             allArts.push({ ...i, ticketId: t.id, folio: t.folio, temporada: t.temporada });
           }
@@ -3212,7 +3212,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       }
 
       if (!allArts.length) {
-        tb.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="ei">ðŸ“¦</div><h3>Â¡Todo vendido!</h3><p>No hay artÃ­culos pendientes.</p></div></td></tr>`;
+        tb.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="ei">📦</div><h3>¡Todo vendido!</h3><p>No hay artículos pendientes.</p></div></td></tr>`;
         return;
       }
 
@@ -3225,8 +3225,8 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
     <tr class="ur">
       <td><input type="checkbox" class="uch" data-id="${a.id}"></td>
       <td><span class="fo">${a.folio}</span></td>
-      <td><span class="an">${a.nombre}</span> ${promoBadge} <br> <small style="color:var(--muted);font-family:monospace">${a.codigo_barras || 'â€”'}</small></td>
-      <td><span class="sbadge">${sEmoji(a.temporada)} ${a.temporada || 'â€”'}</span></td>
+      <td><span class="an">${a.nombre}</span> ${promoBadge} <br> <small style="color:var(--muted);font-family:monospace">${a.codigo_barras || '—'}</small></td>
+      <td><span class="sbadge">${sEmoji(a.temporada)} ${a.temporada || '—'}</span></td>
       <td>
         ${promo ? `<small style="text-decoration:line-through; color:var(--muted); display:block">$${(+a.precio_unitario).toFixed(2)}</small>` : ''}
         <span class="pr" style="${promo ? 'color:var(--rose)' : ''}">$${(+displayPrice).toFixed(2)}</span>
@@ -3234,8 +3234,8 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       <td>${stBadge(a.estado)}</td>
       <td>
         <div style="display:flex;gap:5px">
-          <button class="btn btn-xs btn-sage" onclick="patchArticulo('${a.id}',{estado:'vendido'})">âœ“ Vendido</button>
-          <button class="btn btn-xs btn-out" onclick="patchArticulo('${a.id}',{estado:'descuento'})">ðŸ’¸</button>
+          <button class="btn btn-xs btn-sage" onclick="patchArticulo('${a.id}',{estado:'vendido'})">✓ Vendido</button>
+          <button class="btn btn-xs btn-out" onclick="patchArticulo('${a.id}',{estado:'descuento'})">💸</button>
           <button class="btn btn-xs btn-out" onclick="openDet('${a.ticketId}')">Ver</button>
         </div>
       </td>
@@ -3267,13 +3267,13 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       tickets.forEach(t => { const s = t.temporada || 'Sin temporada'; if (!byS[s]) byS[s] = { tot: 0, sold: 0, rev: 0 }; byS[s].tot++; if (t.estado === 'vendido') { byS[s].sold++; byS[s].rev += (+t.precio || 0); } });
       const el = document.getElementById('exp-preview'); if (!el) return;
       const ents = Object.entries(byS);
-      el.innerHTML = ents.length ? ents.map(([s, d]) => `<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--b)"><span>${sEmoji(s)} ${s}</span><span style="color:var(--muted)">${d.sold}/${d.tot} Â· $${d.rev.toFixed(2)}</span></div>`).join('') : '<p style="font-size:13px;color:var(--muted)">Sin datos</p>';
+      el.innerHTML = ents.length ? ents.map(([s, d]) => `<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--b)"><span>${sEmoji(s)} ${s}</span><span style="color:var(--muted)">${d.sold}/${d.tot} · $${d.rev.toFixed(2)}</span></div>`).join('') : '<p style="font-size:13px;color:var(--muted)">Sin datos</p>';
     }
 
     function selAll(cb) { document.querySelectorAll('.uch').forEach(c => c.checked = cb.checked); }
-    function bulkDiscount() { const ids = [...document.querySelectorAll('.uch:checked')].map(c => c.dataset.id); if (!ids.length) { toast('Selecciona artÃ­culos primero', 'err'); return; } ids.forEach(id => patch(id, { estado: 'descuento' })); }
+    function bulkDiscount() { const ids = [...document.querySelectorAll('.uch:checked')].map(c => c.dataset.id); if (!ids.length) { toast('Selecciona artículos primero', 'err'); return; } ids.forEach(id => patch(id, { estado: 'descuento' })); }
 
-    // â•â• TICKET â•â•
+    // ══ TICKET ══
     function folio() {
       if (!tickets.length) return 'TKT-0001';
       const nums = tickets.map(t => {
@@ -3305,13 +3305,13 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       const te = document.getElementById('nt2').value;
       if (!te) { toast('Selecciona la temporada', 'err'); return; }
       const folioVal = document.getElementById('n-folio')?.value.trim();
-      if (!folioVal) { toast('Ingresa el cÃ³digo del ticket (Folio)', 'err'); return; }
+      if (!folioVal) { toast('Ingresa el código del ticket (Folio)', 'err'); return; }
       const items = getItems('mi-body');
       if (!items.length) { toast('Agrega al menos un producto', 'err'); return; }
       
       if (btn) {
         btn.disabled = true;
-        btn.innerHTML = 'âŒ› Guardando...';
+        btn.innerHTML = '⌛ Guardando...';
       }
 
       const tv = items.reduce((s, i) => s + (+i.precio_venta || 0) * (+i.cantidad || 1), 0);
@@ -3346,13 +3346,13 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       const te = document.getElementById('pt').value;
       if (!te) { toast('Selecciona la temporada', 'err'); return; }
       const folioVal = document.getElementById('p-folio')?.value.trim();
-      if (!folioVal) { toast('Ingresa el cÃ³digo del ticket (Folio)', 'err'); return; }
+      if (!folioVal) { toast('Ingresa el código del ticket (Folio)', 'err'); return; }
       const items = getItems('pi-body');
       if (!items.length) { toast('Agrega al menos un producto', 'err'); return; }
 
       if (btn) {
         btn.disabled = true;
-        btn.innerHTML = 'âŒ› Guardando...';
+        btn.innerHTML = '⌛ Guardando...';
       }
 
       const tv = items.reduce((s, i) => s + (+i.precio_venta || 0) * (+i.cantidad || 1), 0);
@@ -3389,13 +3389,13 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       const te = document.getElementById('pt').value;
       if (!te) { toast('Selecciona la temporada', 'err'); return; }
       const folioVal = document.getElementById('p-folio')?.value.trim();
-      if (!folioVal) { toast('Ingresa el cÃ³digo del ticket (Folio)', 'err'); return; }
+      if (!folioVal) { toast('Ingresa el código del ticket (Folio)', 'err'); return; }
       const items = getItems('pi-body');
       if (!items.length) { toast('Agrega al menos un producto', 'err'); return; }
 
       if (btn) {
         btn.disabled = true;
-        btn.innerHTML = 'âŒ› Guardando...';
+        btn.innerHTML = '⌛ Guardando...';
       }
 
       const tv = items.reduce((s, i) => s + (+i.precio_venta || 0) * (+i.cantidad || 1), 0);
@@ -3442,15 +3442,15 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       if (fechaEl) fechaEl.value = new Date().toISOString().slice(0, 10);
     }
 
-    // â•â• DEVOLUCIÃ“N STATUS â•â•
+    // ══ DEVOLUCIÓN STATUS ══
     function calcDevStatus(t) {
       const regDate = t.fecha_registro ? new Date(t.fecha_registro + 'T00:00:00') : new Date(t.created_at);
       const limDate = new Date(regDate); limDate.setDate(limDate.getDate() + 30);
       const now = new Date(); now.setHours(0, 0, 0, 0);
       const days = Math.ceil((limDate - now) / 86400000);
-      if (days > 7) return { days, limDate, regDate, cls: 'dev-ok', icon: 'âœ…', label: days + ' dÃ­as para devolver', sub: 'DevoluciÃ³n a tiempo Â· lÃ­mite ' + fDate(limDate.toISOString()) };
-      if (days > 0) return { days, limDate, regDate, cls: 'dev-warn', icon: 'âš ï¸', label: 'Urgente: ' + days + ' dÃ­a' + (days === 1 ? '' : 's'), sub: 'Â¡Menos de una semana! Â· lÃ­mite ' + fDate(limDate.toISOString()) };
-      return { days, limDate, regDate, cls: 'dev-expired', icon: 'ðŸ”´', label: 'VENCIÃ“ â€” Solo vale', sub: 'VenciÃ³ hace ' + Math.abs(days) + ' dÃ­a' + (Math.abs(days) === 1 ? '' : 's') + ' (' + fDate(limDate.toISOString()) + ')' };
+      if (days > 7) return { days, limDate, regDate, cls: 'dev-ok', icon: '✅', label: days + ' días para devolver', sub: 'Devolución a tiempo · límite ' + fDate(limDate.toISOString()) };
+      if (days > 0) return { days, limDate, regDate, cls: 'dev-warn', icon: '⚠️', label: 'Urgente: ' + days + ' día' + (days === 1 ? '' : 's'), sub: '¡Menos de una semana! · límite ' + fDate(limDate.toISOString()) };
+      return { days, limDate, regDate, cls: 'dev-expired', icon: '🔴', label: 'VENCIÓ — Solo vale', sub: 'Venció hace ' + Math.abs(days) + ' día' + (Math.abs(days) === 1 ? '' : 's') + ' (' + fDate(limDate.toISOString()) + ')' };
     }
 
     function devBannerHTML(t) {
@@ -3458,19 +3458,19 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       const ds = calcDevStatus(t);
       return `<div class="devbanner ${ds.cls}">
     <div class="dbi">${ds.icon}</div>
-    <div class="dbt"><strong>${ds.label}</strong><span>Registrado: ${fDate((t.fecha_registro ? t.fecha_registro + 'T00:00:00' : t.created_at))} Â· LÃ­mite: ${fDate(ds.limDate.toISOString())}</span></div>
-    <div class="dbd">${ds.days > 0 ? ds.days : 0}<small>${ds.days > 0 ? 'dÃ­as' : 'venciÃ³'}</small></div>
+    <div class="dbt"><strong>${ds.label}</strong><span>Registrado: ${fDate((t.fecha_registro ? t.fecha_registro + 'T00:00:00' : t.created_at))} · Límite: ${fDate(ds.limDate.toISOString())}</span></div>
+    <div class="dbd">${ds.days > 0 ? ds.days : 0}<small>${ds.days > 0 ? 'días' : 'venció'}</small></div>
   </div>`;
     }
 
-    // â•â• DETAIL â•â•
+    // ══ DETAIL ══
     function openDet(id) {
       curDetId = id;
       const t = tickets.find(t => t.id === id); if (!t) return;
       const items = t.items || [];
 
-      const pMap = { efectivo: 'ðŸ’µ Efectivo', transferencia: 'ðŸ¦ Transferencia', adelanto: 'â³ Adelanto', pendiente: 'ðŸ• Por cobrar' };
-      const pagoLabel = t.metodo_pago ? (pMap[t.metodo_pago] || t.metodo_pago) : 'â€”';
+      const pMap = { efectivo: '💵 Efectivo', transferencia: '🏦 Transferencia', adelanto: '⏳ Adelanto', pendiente: '🕐 Por cobrar' };
+      const pagoLabel = t.metodo_pago ? (pMap[t.metodo_pago] || t.metodo_pago) : '—';
 
       let tC = 0, tV = 0;
       items.forEach(i => {
@@ -3488,7 +3488,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         const profit = (unitPrice - cost) * (i.cantidad || 1);
 
         return `<tr>
-      <td style="padding:9px 10px;border-bottom:1px solid var(--b);font-family:monospace;font-size:11.5px">${i.codigo_barras || i.barcode || 'â€”'}</td>
+      <td style="padding:9px 10px;border-bottom:1px solid var(--b);font-family:monospace;font-size:11.5px">${i.codigo_barras || i.barcode || '—'}</td>
       <td style="padding:9px 10px;border-bottom:1px solid var(--b);font-weight:500">${i.nombre} ${promo ? '<span class="st st-v" style="font-size:9px">PROMO</span>' : ''}</td>
       <td style="padding:9px 10px;border-bottom:1px solid var(--b);text-align:center">${i.cantidad || 1}</td>
       <td style="padding:9px 10px;border-bottom:1px solid var(--b)">
@@ -3499,7 +3499,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         <div style="display:flex;gap:4px;flex-wrap:nowrap">
           ${['pendiente', 'vendido', 'devuelto_completo', 'devuelto_vale'].map(st => {
             const isActive = i.estado === st;
-            const label = st === 'devuelto_completo' ? 'DevoluciÃ³n' : st === 'devuelto_vale' ? 'Vale' : elbl(st);
+            const label = st === 'devuelto_completo' ? 'Devolución' : st === 'devuelto_vale' ? 'Vale' : elbl(st);
             let activeCls = '';
             if (isActive) {
               activeCls = st === 'vendido' ? 'btn-rose' : st === 'devuelto_completo' ? 'btn-sage' : 'btn-gold';
@@ -3519,16 +3519,16 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
 
       const iHTML = items.length ? `
     <div style="margin-bottom:16px">
-      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">ðŸ“¦ ArtÃ­culos del Ticket (${items.length})</div>
+      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">📦 Artículos del Ticket (${items.length})</div>
       <div style="overflow-x:auto;border:1px solid var(--b);border-radius:var(--rs)">
         <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:600px">
           <thead>
             <tr>
-              <th style="${TH}">CÃ³digo</th>
+              <th style="${TH}">Código</th>
               <th style="${TH}">Nombre</th>
               <th style="${TH};text-align:center">Cant.</th>
               <th style="${TH}">P. Unit</th>
-              <th style="${TH}">Estado ArtÃ­culo</th>
+              <th style="${TH}">Estado Artículo</th>
               <th style="${TH};color:var(--sage)">Ganancia</th>
             </tr>
           </thead>
@@ -3548,47 +3548,47 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       // Dev banner base on ticket register date
       const devB = document.getElementById('det-dev-banner'); if (devB) devB.innerHTML = devBannerHTML(t);
 
-      document.getElementById('det-title').textContent = t.folio + ' â€” ' + (t.proveedor || 'Sin proveedor');
+      document.getElementById('det-title').textContent = t.folio + ' — ' + (t.proveedor || 'Sin proveedor');
       document.getElementById('det-body').innerHTML = `
     <div class="dg" style="margin-bottom:16px">
       <div class="df">
         <div class="dl">Folio / Ticket</div>
         <div class="dv" style="font-family:monospace;display:flex;align-items:center;gap:8px">
           <span>${t.folio}</span>
-          <button class="btn btn-out" style="padding:2px 6px;font-size:10px;height:auto;border-color:rgba(0,0,0,0.1)" onclick="updateFolio('${t.id}')">âœï¸ Editar</button>
+          <button class="btn btn-out" style="padding:2px 6px;font-size:10px;height:auto;border-color:rgba(0,0,0,0.1)" onclick="updateFolio('${t.id}')">✏️ Editar</button>
         </div>
       </div>
       <div class="df">
         <div class="dl">Proveedor</div>
         <div class="dv" style="display:flex;align-items:center;gap:8px">
-          <span>${t.proveedor || 'â€”'}</span>
-          <button class="btn btn-out" style="padding:2px 6px;font-size:10px;height:auto;border-color:rgba(0,0,0,0.1)" onclick="updateProvider('${t.id}')">âœï¸ Editar</button>
+          <span>${t.proveedor || '—'}</span>
+          <button class="btn btn-out" style="padding:2px 6px;font-size:10px;height:auto;border-color:rgba(0,0,0,0.1)" onclick="updateProvider('${t.id}')">✏️ Editar</button>
         </div>
       </div>
-      <div class="df"><div class="dl">Temporada</div><div class="dv">${sEmoji(t.temporada)} ${t.temporada || 'â€”'}</div></div>
+      <div class="df"><div class="dl">Temporada</div><div class="dv">${sEmoji(t.temporada)} ${t.temporada || '—'}</div></div>
       <div class="df"><div class="dl">Registrado por</div><div class="dv" style="font-weight:600;color:var(--gold)">${t.vendedor ? (t.vendedor.charAt(0).toUpperCase() + t.vendedor.slice(1)) : 'Sistema'}</div></div>
       <div class="df"><div class="dl">Estado General</div><div class="dv">${stBadge(t.estado)}</div></div>
-      <div class="df"><div class="dl">MÃ©todo de pago</div><div class="dv">${pagoLabel}</div></div>
+      <div class="df"><div class="dl">Método de pago</div><div class="dv">${pagoLabel}</div></div>
       <div class="df"><div class="dl">Fecha Registro</div><div class="dv">${fDate(t.fecha_registro ? t.fecha_registro + 'T00:00:00' : t.created_at)}</div></div>
       ${t.notas ? `<div class="df" style="grid-column:1/-1"><div class="dl">Notas del ticket</div><div class="dv" style="font-size:13.5px">${t.notas}</div></div>` : ''}
     </div>
     ${iHTML}
     <div style="margin-top:8px;padding-top:12px;border-top:1px solid var(--b)">
-      <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:8px">Acciones RÃ¡pidas Ticket</label>
+      <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:8px">Acciones Rápidas Ticket</label>
       <div style="display:flex;gap:7px;flex-wrap:wrap">
-        <button class="btn btn-xs btn-out" onclick="showQR('${t.id}')">ðŸ–¨ï¸ Imprimir Etiquetas</button>
-        <button class="btn btn-xs btn-out" onclick="patch('${t.id}',{estado:'archivado'}); cm('m-det');">ðŸ“¦ Archivar Ticket</button>
+        <button class="btn btn-xs btn-out" onclick="showQR('${t.id}')">🖨️ Imprimir Etiquetas</button>
+        <button class="btn btn-xs btn-out" onclick="patch('${t.id}',{estado:'archivado'}); cm('m-det');">📦 Archivar Ticket</button>
       </div>
     </div>`;
 
       document.getElementById('det-foot').innerHTML = `
         <button class="btn btn-out" onclick="curDetId=null; cm('m-det')">Cerrar</button>
-        <button class="btn btn-gold" onclick="openEditTicket('${t.id}')">âœï¸ Editar Ticket</button>
+        <button class="btn btn-gold" onclick="openEditTicket('${t.id}')">✏️ Editar Ticket</button>
       `;
       om('m-det');
     }
 
-    // â•â• DEVOLUCIONES PAGE â•â•
+    // ══ DEVOLUCIONES PAGE ══
     function renderDev() {
       const te = document.getElementById('dev-temp')?.value || '';
       const tb = document.getElementById('dev-body'); if (!tb) return;
@@ -3620,20 +3620,20 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       const expired = allArts.filter(a => a.ds.days <= 0).length;
 
       const sumEl = document.getElementById('dev-summary');
-      if (sumEl) sumEl.innerHTML = `<span style="color:var(--rose);font-weight:600">${expired} vencidos</span> Â· <span style="color:var(--warn);font-weight:600">${urgent} urgentes (â‰¤7 dÃ­as)</span> Â· ${allArts.length} art. total`;
+      if (sumEl) sumEl.innerHTML = `<span style="color:var(--rose);font-weight:600">${expired} vencidos</span> · <span style="color:var(--warn);font-weight:600">${urgent} urgentes (≤7 días)</span> · ${allArts.length} art. total`;
 
       if (!allArts.length) {
-        tb.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="ei">ðŸ”„</div><h3>Sin devoluciones pendientes</h3><p>No hay artÃ­culos pendientes de devoluciÃ³n.</p></div></td></tr>`;
+        tb.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="ei">🔄</div><h3>Sin devoluciones pendientes</h3><p>No hay artículos pendientes de devolución.</p></div></td></tr>`;
         return;
       }
 
       tb.innerHTML = allArts.map(a => {
         const ds = a.ds;
         const daysBadge = ds.days > 7
-          ? `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;background:#d4edda;color:var(--sage);font-weight:700;font-size:12.5px">âœ… ${ds.days} dÃ­as</span>`
+          ? `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;background:#d4edda;color:var(--sage);font-weight:700;font-size:12.5px">✅ ${ds.days} días</span>`
           : ds.days > 0
-            ? `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;background:#fff3cd;color:#856404;font-weight:700;font-size:12.5px">âš ï¸ ${ds.days} dÃ­as</span>`
-            : `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;background:var(--rose-p);color:var(--rose);font-weight:700;font-size:12.5px">ðŸ”´ VenciÃ³</span>`;
+            ? `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;background:#fff3cd;color:#856404;font-weight:700;font-size:12.5px">⚠️ ${ds.days} días</span>`
+            : `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;background:var(--rose-p);color:var(--rose);font-weight:700;font-size:12.5px">🔴 Venció</span>`;
 
         const regStr = fDate(a.ticket.fecha_registro ? a.ticket.fecha_registro + 'T00:00:00' : a.ticket.created_at);
         const limStr = fDate(ds.limDate.toISOString());
@@ -3641,22 +3641,22 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         return `
       <tr style="${ds.days <= 0 ? 'background:rgba(196,97,74,.06)' : ds.days <= 7 ? 'background:rgba(212,130,10,.06)' : ''}">
         <td><span class="fo">${a.ticket.folio}</span></td>
-        <td><span class="an">${a.nombre}</span> <br> <small style="color:var(--muted);font-family:monospace">${a.codigo_barras || 'â€”'}</small></td>
-        <td><span class="sbadge">${sEmoji(a.ticket.temporada)} ${a.ticket.temporada || 'â€”'}</span></td>
+        <td><span class="an">${a.nombre}</span> <br> <small style="color:var(--muted);font-family:monospace">${a.codigo_barras || '—'}</small></td>
+        <td><span class="sbadge">${sEmoji(a.ticket.temporada)} ${a.ticket.temporada || '—'}</span></td>
         <td style="font-size:12.5px;color:var(--muted)">${regStr}</td>
         <td style="font-size:12.5px;${ds.days <= 0 ? 'color:var(--rose);font-weight:600' : ds.days <= 7 ? 'color:var(--warn);font-weight:600' : 'color:var(--muted)'}">${limStr}</td>
         <td>${daysBadge}</td>
         <td>${stBadge(a.estado)}</td>
         <td><div style="display:flex;gap:5px;flex-wrap:wrap">
-          <button class="btn btn-xs btn-out" style="border-color:rgba(16,185,129,.4);color:var(--sage)" onclick="patchArticulo('${a.id}',{estado:'devuelto_completo'})">âœ“ Devuelto</button>
-          <button class="btn btn-xs btn-out" style="border-color:rgba(59,130,246,.35);color:var(--cobalt)" onclick="patchArticulo('${a.id}',{estado:'devuelto_vale'})">ðŸ“„ Vale</button>
+          <button class="btn btn-xs btn-out" style="border-color:rgba(16,185,129,.4);color:var(--sage)" onclick="patchArticulo('${a.id}',{estado:'devuelto_completo'})">✓ Devuelto</button>
+          <button class="btn btn-xs btn-out" style="border-color:rgba(59,130,246,.35);color:var(--cobalt)" onclick="patchArticulo('${a.id}',{estado:'devuelto_vale'})">📄 Vale</button>
           <button class="btn btn-xs btn-out" onclick="openDet('${a.ticket.id}')">Ver</button>
         </div></td>
       </tr>`;
       }).join('');
     }
 
-    // â•â• QR & LABELS â•â•
+    // ══ QR & LABELS ══
     async function showQR(id) {
       const t = tickets.find(t => t.id === id); if (!t) return;
       curQR = t;
@@ -3668,7 +3668,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       infoEl.innerHTML = `
     <div>
       <div style="font-weight:600;font-size:14px">${t.proveedor || 'Sin proveedor'}</div>
-      <div style="font-size:12px;color:var(--muted)">${t.folio} Â· ${t.items.length} artÃ­culos</div>
+      <div style="font-size:12px;color:var(--muted)">${t.folio} · ${t.items.length} artículos</div>
     </div>
     <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700">$${(t.items.reduce((s, i) => s + ((+i.precio_unitario || 0) * (+i.cantidad || 1)), 0)).toFixed(2)}</div>
   `;
@@ -3712,7 +3712,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
 
     function printLbl() { if (!curQR) return; window.print(); }
 
-    // â•â• ITEM HELPERS â•â•
+    // ══ ITEM HELPERS ══
     const _IS = 'padding:6px 8px;font-size:12.5px;border:1px solid var(--bs);border-radius:var(--rx);background:#1f2333;color:#3b82f6;font-weight:600;width:100%;outline:none;';
     
     function onFolioInput(inp) {
@@ -3744,7 +3744,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       const tr = document.createElement('tr');
       tr.innerHTML = `
     <td style="padding:5px 6px;border-bottom:1px solid var(--b)">
-      <input type="text" placeholder="CÃ³digo o HL-precio" 
+      <input type="text" placeholder="Código o HL-precio" 
         style="${_IS}min-width:110px;font-family:monospace;"
         oninput="onBarcodeInput(this)">
     </td>
@@ -3753,7 +3753,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
     <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><input type="number" value="0" min="0" step="0.5" oninput="calcItemRow(this,'${totId}')" style="${_IS}width:85px"></td>
     <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><input type="number" value="0" min="0" step="0.5" oninput="calcItemRow(this,'${totId}')" style="${_IS}width:85px"></td>
     <td class="gc" style="padding:5px 10px;border-bottom:1px solid var(--b);font-weight:700;color:var(--sage);white-space:nowrap;min-width:70px">$0.00</td>
-    <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><button onclick="removeItemRow(this,'${totId}')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:2px 5px">âœ•</button></td>`;
+    <td style="padding:5px 6px;border-bottom:1px solid var(--b)"><button onclick="removeItemRow(this,'${totId}')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:2px 5px">✕</button></td>`;
       tb.appendChild(tr);
       calcTotals(totId, bodyId);
       // Focus barcode input of the new row
@@ -3788,7 +3788,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       const g = tV - tC;
       const el = document.getElementById(totId); if (!el) return;
       el.innerHTML = `<div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--b)">
-        <div style="text-align:right"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">ArtÃ­culos Totales</div><div style="font-size:16px;font-weight:700">${tQ} und.</div></div>
+        <div style="text-align:right"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Artículos Totales</div><div style="font-size:16px;font-weight:700">${tQ} und.</div></div>
         <div style="text-align:right"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Total costo</div><div style="font-size:16px;font-weight:700">$${tC.toFixed(2)}</div></div>
         <div style="text-align:right"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Total venta</div><div style="font-size:16px;font-weight:700">$${tV.toFixed(2)}</div></div>
         <div style="text-align:right;background:var(--sage-p);border-radius:var(--rs);padding:6px 12px;border:1px solid rgba(74,122,90,.2)">
@@ -3816,13 +3816,13 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       }).filter(Boolean);
     }
 
-    // â•â• BARCODE SCANNER (lector USB) â•â•
+    // ══ BARCODE SCANNER (lector USB) ══
     let _barcodeBuffer = '', _barcodeTimer = null;
 
     function initBarcodeListeners() {
-      // Captura global: el lector de barras envÃ­a chars rÃ¡pido + Enter
+      // Captura global: el lector de barras envía chars rápido + Enter
       document.addEventListener('keydown', (e) => {
-        // Ignora si el foco estÃ¡ en un input normal (excepto los de bÃºsqueda)
+        // Ignora si el foco está en un input normal (excepto los de búsqueda)
         const tag = document.activeElement?.tagName;
         const id = document.activeElement?.id;
         const isScanInput = ['pf-in', 'mf-in'].includes(id);
@@ -3833,7 +3833,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
             const codigo = _barcodeBuffer.trim().toUpperCase();
             _barcodeBuffer = '';
 
-            // Si el modal de bÃºsqueda rÃ¡pida estÃ¡ abierto, buscar ahÃ­
+            // Si el modal de búsqueda rápida está abierto, buscar ahí
             const scanRapido = document.getElementById('m-scan-rapido');
             if (scanRapido && scanRapido.classList.contains('on')) {
               const inp = document.getElementById('sr-input');
@@ -3858,14 +3858,14 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
 
     // Auto-search cuando el input recibe Enter del lector
     function autoSearch(input, ctx) {
-      // El lector envÃ­a chars + Enter casi simultÃ¡neamente;
+      // El lector envía chars + Enter casi simultáneamente;
       // el evento 'input' no captura Enter, pero el keydown global lo atrapa.
-      // Esta funciÃ³n es backup si el usuario escribe manualmente.
+      // Esta función es backup si el usuario escribe manualmente.
     }
 
     function findByFolio(raw) {
       const f = (raw || '').trim().toUpperCase();
-      if (!f) { toast('Ingresa un folio o cÃ³digo', 'err'); return; }
+      if (!f) { toast('Ingresa un folio o código', 'err'); return; }
 
       // Clear inputs
       const mfIn = document.getElementById('mf-in'); if (mfIn) mfIn.value = '';
@@ -3898,26 +3898,26 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
 
       toast('No encontrado: ' + f, 'err');
       const sr = document.getElementById('scan-result');
-      if (sr) sr.innerHTML = `<div style="text-align:center;padding:16px;background:var(--rose-p);border-radius:var(--rs);color:var(--rose)">âŒ CÃ³digo <strong>${f}</strong> no encontrado</div>`;
+      if (sr) sr.innerHTML = `<div style="text-align:center;padding:16px;background:var(--rose-p);border-radius:var(--rs);color:var(--rose)">❌ Código <strong>${f}</strong> no encontrado</div>`;
     }
 
     function showArticlePopup(art, ticket) {
       const popup = document.getElementById('scan-popup');
       const banner = document.getElementById('sp-banner');
 
-      document.getElementById('sp-folio').textContent = ticket.folio + ' Â· ' + (ticket.temporada || 'â€”');
+      document.getElementById('sp-folio').textContent = ticket.folio + ' · ' + (ticket.temporada || '—');
       document.getElementById('sp-name').textContent = art.nombre;
 
       const stMap = {
-        pendiente:        { cls: 'dev-ok',   icon: 'ðŸ“¦', label: 'En Bodega',  sub: 'ArtÃ­culo disponible en inventario' },
-        vendido:          { cls: 'dev-ok',   icon: 'âœ…',    label: 'Vendido',   sub: 'Este artÃ­culo ya fue vendido' },
-        devuelto_completo:{ cls: 'dev-warn', icon: 'ðŸ”„',    label: 'Devuelto', sub: 'DevoluciÃ³n completa procesada' },
-        devuelto_vale:    { cls: 'dev-warn', icon: 'ðŸ“„',    label: 'Vale',     sub: 'Se entregÃ³ vale al cliente' },
-        descuento:        { cls: 'dev-warn', icon: 'ðŸ’¸',    label: 'Descuento',sub: 'ArtÃ­culo con precio promocional' },
-        apartado:         { cls: 'dev-ok',   icon: 'ðŸ”’',    label: 'Apartado', sub: 'ArtÃ­culo reservado para cliente' }
+        pendiente:        { cls: 'dev-ok',   icon: '📦', label: 'En Bodega',  sub: 'Artículo disponible en inventario' },
+        vendido:          { cls: 'dev-ok',   icon: '✅',    label: 'Vendido',   sub: 'Este artículo ya fue vendido' },
+        devuelto_completo:{ cls: 'dev-warn', icon: '🔄',    label: 'Devuelto', sub: 'Devolución completa procesada' },
+        devuelto_vale:    { cls: 'dev-warn', icon: '📄',    label: 'Vale',     sub: 'Se entregó vale al cliente' },
+        descuento:        { cls: 'dev-warn', icon: '💸',    label: 'Descuento',sub: 'Artículo con precio promocional' },
+        apartado:         { cls: 'dev-ok',   icon: '🔒',    label: 'Apartado', sub: 'Artículo reservado para cliente' }
       };
 
-      const info = stMap[art.estado] || { cls: 'dev-warn', icon: 'ðŸ·ï¸', label: elbl(art.estado), sub: '' };
+      const info = stMap[art.estado] || { cls: 'dev-warn', icon: '🏷️', label: elbl(art.estado), sub: '' };
       banner.className = 'sc-banner ' + info.cls;
       document.getElementById('sp-icon').textContent = info.icon;
       document.getElementById('sp-status').textContent = info.label;
@@ -3951,14 +3951,14 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       const qty = +art.cantidad || 1;
       extraEl.innerHTML = `
         <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
-          ${bc ? `<span style="font-family:monospace;font-size:11.5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:4px 10px;border-radius:8px;color:#9ca3af">ðŸ” ${bc}</span>` : ''}
-          <span style="font-size:11.5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:4px 10px;border-radius:8px;color:#9ca3af">ðŸ“¦ Cant: ${qty}</span>
+          ${bc ? `<span style="font-family:monospace;font-size:11.5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:4px 10px;border-radius:8px;color:#9ca3af">🔍 ${bc}</span>` : ''}
+          <span style="font-size:11.5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:4px 10px;border-radius:8px;color:#9ca3af">📦 Cant: ${qty}</span>
           <span style="font-size:11.5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:4px 10px;border-radius:8px;color:#9ca3af">${sEmoji(ticket.temporada)} ${ticket.temporada || 'General'}</span>
         </div>`;
 
       // Dev deadline
       const ds = calcDevStatus(ticket);
-      document.getElementById('sp-dates').innerHTML = `ðŸ“… LÃ­mite devoluciÃ³n: <strong>${fDate(ds.limDate.toISOString())}</strong> &nbsp;Â·&nbsp; ${ds.days > 0 ? ds.days + ' dÃ­as restantes' : '<span style="color:#ef4444">VenciÃ³</span>'}`;
+      document.getElementById('sp-dates').innerHTML = `📅 Límite devolución: <strong>${fDate(ds.limDate.toISOString())}</strong> &nbsp;·&nbsp; ${ds.days > 0 ? ds.days + ' días restantes' : '<span style="color:#ef4444">Venció</span>'}`;
 
       // Quick Actions
       const actions = document.querySelector('.sc-actions');
@@ -3966,12 +3966,12 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       const ticketId = ticket.id;
       if (['pendiente', 'apartado'].includes(art.estado)) {
         actions.innerHTML = `
-          <button class="btn btn-out btn-sm" style="border-color:rgba(16,185,129,.4);color:var(--sage)" onclick="patchArticulo('${artId}',{estado:'devuelto_completo'}); document.getElementById('scan-popup').classList.remove('on')">ðŸ”„ Es DevoluciÃ³n</button>
+          <button class="btn btn-out btn-sm" style="border-color:rgba(16,185,129,.4);color:var(--sage)" onclick="patchArticulo('${artId}',{estado:'devuelto_completo'}); document.getElementById('scan-popup').classList.remove('on')">🔄 Es Devolución</button>
           <button class="btn btn-out btn-sm" onclick="document.getElementById('scan-popup').classList.remove('on'); setTimeout(()=>openDet('${ticketId}'),100)">Ver Ticket</button>
         `;
       } else if (art.estado === 'vendido') {
         actions.innerHTML = `
-          <button class="btn btn-out btn-sm" style="border-color:rgba(239,68,68,.4);color:#ef4444" onclick="patchArticulo('${artId}',{estado:'devuelto_completo'}); document.getElementById('scan-popup').classList.remove('on')">ðŸ”„ Procesar DevoluciÃ³n</button>
+          <button class="btn btn-out btn-sm" style="border-color:rgba(239,68,68,.4);color:#ef4444" onclick="patchArticulo('${artId}',{estado:'devuelto_completo'}); document.getElementById('scan-popup').classList.remove('on')">🔄 Procesar Devolución</button>
           <button class="btn btn-out btn-sm" onclick="document.getElementById('scan-popup').classList.remove('on')">Cerrar</button>
         `;
       } else {
@@ -3987,26 +3987,26 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
     function showScanPopup(t) {
       const ds = ['pendiente', 'apartado'].includes(t.estado) ? calcDevStatus(t) : null;
 
-      document.getElementById('sp-folio').textContent = t.folio + ' Â· ' + (t.temporada || 'â€”');
-      document.getElementById('sp-name').textContent = t.proveedor || (t.items.length + ' artÃ­culos') || 'Ticket';
+      document.getElementById('sp-folio').textContent = t.folio + ' · ' + (t.temporada || '—');
+      document.getElementById('sp-name').textContent = t.proveedor || (t.items.length + ' artículos') || 'Ticket';
 
       const banner = document.getElementById('sp-banner');
       if (ds) {
         banner.className = 'sc-banner ' + ds.cls;
         document.getElementById('sp-icon').textContent = ds.icon;
         document.getElementById('sp-status').textContent = ds.label;
-        document.getElementById('sp-sub').textContent = t.items.map(i => i.nombre).join(', ').substring(0, 60) || 'Ticket sin artÃ­culos';
+        document.getElementById('sp-sub').textContent = t.items.map(i => i.nombre).join(', ').substring(0, 60) || 'Ticket sin artículos';
         const regStr = fDate(t.fecha_registro ? t.fecha_registro + 'T00:00:00' : t.created_at);
-        document.getElementById('sp-dates').innerHTML = `ðŸ“… Registro: <strong>${regStr}</strong> &nbsp;Â·&nbsp; LÃ­mite: <strong>${fDate(ds.limDate.toISOString())}</strong>`;
+        document.getElementById('sp-dates').innerHTML = `📅 Registro: <strong>${regStr}</strong> &nbsp;·&nbsp; Límite: <strong>${fDate(ds.limDate.toISOString())}</strong>`;
       } else {
         const stMap = {
-          vendido:           { cls: 'dev-ok',   icon: 'âœ…',    label: 'Vendido',           sub: 'Ticket completamente vendido' },
-          completado:        { cls: 'dev-ok',   icon: 'âœ…',    label: 'Completado',        sub: 'Todos los artÃ­culos vendidos' },
-          devuelto_completo: { cls: 'dev-ok',   icon: 'âœ…',    label: 'Devuelto â€” Completo', sub: 'DevoluciÃ³n recibida' },
-          devuelto_vale:     { cls: 'dev-warn', icon: 'ðŸ“„',    label: 'Devuelto â€” Vale',    sub: 'Cliente recibiÃ³ vale' },
-          parcial:           { cls: 'dev-warn', icon: 'ðŸ”„',    label: 'Parcial',           sub: 'Algunos artÃ­culos pendientes' }
+          vendido:           { cls: 'dev-ok',   icon: '✅',    label: 'Vendido',           sub: 'Ticket completamente vendido' },
+          completado:        { cls: 'dev-ok',   icon: '✅',    label: 'Completado',        sub: 'Todos los artículos vendidos' },
+          devuelto_completo: { cls: 'dev-ok',   icon: '✅',    label: 'Devuelto — Completo', sub: 'Devolución recibida' },
+          devuelto_vale:     { cls: 'dev-warn', icon: '📄',    label: 'Devuelto — Vale',    sub: 'Cliente recibió vale' },
+          parcial:           { cls: 'dev-warn', icon: '🔄',    label: 'Parcial',           sub: 'Algunos artículos pendientes' }
         };
-        const info = stMap[t.estado] || { cls: 'dev-warn', icon: 'ðŸ·ï¸', label: elbl(t.estado), sub: '' };
+        const info = stMap[t.estado] || { cls: 'dev-warn', icon: '🏷️', label: elbl(t.estado), sub: '' };
         banner.className = 'sc-banner ' + info.cls;
         document.getElementById('sp-icon').textContent = info.icon;
         document.getElementById('sp-status').textContent = info.label;
@@ -4040,11 +4040,11 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         </div>`;
 
       // Extra info: article count + pago
-      const pMap = { efectivo: 'ðŸ’µ Efectivo', transferencia: 'ðŸ¦ Transferencia', adelanto: 'â³ Adelanto', pendiente: 'ðŸ• Por cobrar' };
+      const pMap = { efectivo: '💵 Efectivo', transferencia: '🏦 Transferencia', adelanto: '⏳ Adelanto', pendiente: '🕐 Por cobrar' };
       const extraEl = document.getElementById('sp-extra');
       extraEl.innerHTML = `
         <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
-          <span style="font-size:11.5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:4px 10px;border-radius:8px;color:#9ca3af">ðŸ“¦ ${t.items.length} artÃ­culos</span>
+          <span style="font-size:11.5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:4px 10px;border-radius:8px;color:#9ca3af">📦 ${t.items.length} artículos</span>
           ${t.metodo_pago ? `<span style="font-size:11.5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:4px 10px;border-radius:8px;color:#9ca3af">${pMap[t.metodo_pago] || t.metodo_pago}</span>` : ''}
           <span style="font-size:11.5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:4px 10px;border-radius:8px;color:#9ca3af">${sEmoji(t.temporada)} ${t.temporada || 'General'}</span>
         </div>`;
@@ -4079,7 +4079,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
             t.folio,
             t.proveedor || 'N/A',
             i.nombre,
-            i.codigo_barras || 'â€”',
+            i.codigo_barras || '—',
             t.temporada || 'General',
             +i.precio_compra || 0,
             +i.precio_unitario || 0,
@@ -4097,7 +4097,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         ['DELIRIUM DECOR - REPORTE DE INVENTARIO Y VENTAS'],
         ['Fecha de reporte:', new Date().toLocaleString(), '', 'Filtros:', (te || 'Todas') + ' / ' + (es || 'Todos')],
         [],
-        ['FOLIO', 'PROVEEDOR', 'ARTÃCULO', 'CÃ“DIGO', 'TEMPORADA', 'COSTO U.', 'VENTA U.', 'CANT', 'SUBTOTAL', 'UTILIDAD', 'ESTADO', 'FECHA']
+        ['FOLIO', 'PROVEEDOR', 'ARTÍCULO', 'CÓDIGO', 'TEMPORADA', 'COSTO U.', 'VENTA U.', 'CANT', 'SUBTOTAL', 'UTILIDAD', 'ESTADO', 'FECHA']
       ];
 
       const footer = [
@@ -4117,7 +4117,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Reporte Detallado');
       XLSX.writeFile(wb, 'DeliriumDecor_Reporte_' + new Date().toISOString().slice(0, 10) + '.xlsx');
-      toast('âœ“ Excel Detallado exportado', 'ok');
+      toast('✓ Excel Detallado exportado', 'ok');
     }
 
     function exportUnsold() {
@@ -4130,8 +4130,8 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
             const finalPrice = promo ? +promo.precio_promocional : (+i.precio_unitario || 0);
             rows.push({ 
               Folio: t.folio, 
-              ArtÃ­culo: i.nombre + (promo ? ' (PROMO)' : ''), 
-              CÃ³digo: i.codigo_barras || '', 
+              Artículo: i.nombre + (promo ? ' (PROMO)' : ''), 
+              Código: i.codigo_barras || '', 
               Temporada: t.temporada || '', 
               'Precio Original': +i.precio_unitario || 0,
               'Precio Final': finalPrice,
@@ -4143,7 +4143,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       });
       const ws = XLSX.utils.json_to_sheet(rows); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'No_Vendidos');
       XLSX.writeFile(wb, 'DeliriumDecor_NoVendidosDetailed_' + new Date().toISOString().slice(0, 10) + '.xlsx');
-      toast('âœ“ Excel No Vendidos exportado', 'ok');
+      toast('✓ Excel No Vendidos exportado', 'ok');
     }
 
     function exportSeason() {
@@ -4172,7 +4172,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       const ws = XLSX.utils.json_to_sheet(rows); ws['!cols'] = [{ wch: 20 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 12 }];
       const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Resumen_Temporadas');
       XLSX.writeFile(wb, 'DeliriumDecor_ResumenTemporadas_' + new Date().toISOString().slice(0, 10) + '.xlsx');
-      toast('âœ“ Resumen exportado', 'ok');
+      toast('✓ Resumen exportado', 'ok');
     }
 
     function exportDev() {
@@ -4182,16 +4182,16 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         const ds = calcDevStatus(t);
         (t.items || []).forEach(i => {
           if (['pendiente', 'apartado'].includes(i.estado)) {
-            rows.push({ Folio: t.folio, ArtÃ­culo: i.nombre, Temporada: t.temporada || '', 'Fecha Registro': fDate(t.fecha_registro || t.created_at), 'Fecha LÃ­mite': fDate(ds.limDate.toISOString()), 'DÃ­as': ds.days, Urgencia: ds.days > 7 ? 'OK' : ds.days > 0 ? 'PRÃ“XIMO' : 'VENCIDO' });
+            rows.push({ Folio: t.folio, Artículo: i.nombre, Temporada: t.temporada || '', 'Fecha Registro': fDate(t.fecha_registro || t.created_at), 'Fecha Límite': fDate(ds.limDate.toISOString()), 'Días': ds.days, Urgencia: ds.days > 7 ? 'OK' : ds.days > 0 ? 'PRÓXIMO' : 'VENCIDO' });
           }
         });
       });
       const ws = XLSX.utils.json_to_sheet(rows); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Devoluciones');
       XLSX.writeFile(wb, 'DeliriumDecor_ReporteDevoluciones_' + new Date().toISOString().slice(0, 10) + '.xlsx');
-      toast('âœ“ Reporte Devoluciones exportado', 'ok');
+      toast('✓ Reporte Devoluciones exportado', 'ok');
     }
 
-    // â•â• VENTAS GRANDES â•â•
+    // ══ VENTAS GRANDES ══
 
     function openVentaGrande() {
       document.getElementById('vg-fecha').value = new Date().toISOString().slice(0, 10);
@@ -4234,7 +4234,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       const S = 'padding:6px 8px;font-size:12.5px;border:1px solid var(--bs);border-radius:var(--rx);background:#1f2333;color:#3b82f6;font-weight:600;width:100%;outline:none;';
       tr.innerHTML = `
         <td style="padding:5px 6px;border-bottom:1px solid var(--b)">
-          <input type="text" list="vg-productos-dl" placeholder="Nombre del productoâ€¦"
+          <input type="text" list="vg-productos-dl" placeholder="Nombre del producto…"
             style="${S}min-width:170px" oninput="onVGProductoInput(this)" onkeydown="onVGKey(event, this)">
           <div class="vg-art-ref" style="font-size:10px;color:var(--muted);margin-top:2px;display:none"></div>
         </td>
@@ -4247,9 +4247,9 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         <td style="padding:5px 6px;border-bottom:1px solid var(--b)">
           <input type="number" value="0" min="0" step="0.5" style="${S}width:80px" oninput="calcVGRow(this)">
         </td>
-        <td class="vg-stock" style="padding:5px 10px;border-bottom:1px solid var(--b)">â€”</td>
+        <td class="vg-stock" style="padding:5px 10px;border-bottom:1px solid var(--b)">—</td>
         <td style="padding:5px 6px;border-bottom:1px solid var(--b)">
-          <button onclick="this.closest('tr').remove();calcVGTotals()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:2px 5px">âœ•</button>
+          <button onclick="this.closest('tr').remove();calcVGTotals()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:2px 5px">✕</button>
         </td>`;
       tb.appendChild(tr);
       tr.querySelector('input[type=text]').focus();
@@ -4281,34 +4281,33 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
 
       if (!query) {
         delete tr.dataset.artId;
-        stockCell.innerHTML = '<span style="color:var(--muted);font-size:12px">â€”</span>';
+        stockCell.innerHTML = '<span style="color:var(--muted);font-size:12px">—</span>';
         refDiv.style.display = 'none';
         return;
       }
 
-      // Buscar en el Ã­ndice (O(1) lookup)
+      // Buscar en el índice (O(1) lookup)
       const found = inventoryIndex.byBarcode[query] || inventoryIndex.byName[query];
 
       if (found) {
         const foundTicket = found.ticket;
-        // No sobrescribir el valor mientras escriben, solo si es bÃºsqueda por Enter o ya terminÃ³
-        // refDiv ahora muestra AMBOS cÃ³digos: Ticket y Producto
+        // No sobrescribir el valor mientras escriben
         costInput.value = +found.precio_compra || 0;
         saleInput.value = +found.precio_unitario || +found.precio_venta || 0;
 
-        const cant = found.cantidad == null ? 'âˆž' : +found.cantidad;
+        const cant = found.cantidad == null ? '∞' : +found.cantidad;
         const isLow = typeof cant === 'number' && cant <= 2;
         tr.dataset.artId = found.id;
         stockCell.innerHTML = `<span class="inv-badge${isLow ? ' low' : ''}">${cant} disp.</span>`;
         refDiv.style.display = 'block';
         refDiv.innerHTML = `
-          <div style="color:var(--cobalt);font-weight:600">Ticket: ${foundTicket ? foundTicket.folio : 'â€”'}</div>
-          <div style="color:var(--muted)">CÃ³digo: ${found.codigo_barras || 'â€”'}</div>
+          <div style="color:var(--cobalt);font-weight:600">Ticket: ${foundTicket ? foundTicket.folio : '—'}</div>
+          <div style="color:var(--muted)">Código: ${found.codigo_barras || '—'}</div>
         `;
         calcVGRow(costInput);
       } else {
         delete tr.dataset.artId;
-        stockCell.innerHTML = '<span style="color:var(--muted);font-size:12px">â€”</span>';
+        stockCell.innerHTML = '<span style="color:var(--muted);font-size:12px">—</span>';
         refDiv.style.display = 'none';
       }
     }
@@ -4376,13 +4375,13 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
 
     // Descuenta inventario unidad por unidad
     async function descontarInventario(artId, cantidadVendida) {
-      if (!artId || artId === 'undefined') return { ok: false, msg: 'ArtÃ­culo no identificado o sin ID vÃ¡lido' };
+      if (!artId || artId === 'undefined') return { ok: false, msg: 'Artículo no identificado o sin ID válido' };
       let foundTicket = null, foundArt = null;
       for (const t of tickets) {
         const art = t.items.find(i => String(i.id) === String(artId));
         if (art) { foundTicket = t; foundArt = art; break; }
       }
-      if (!foundArt) return { ok: false, msg: 'ArtÃ­culo no encontrado' };
+      if (!foundArt) return { ok: false, msg: 'Artículo no encontrado' };
 
       const cantActual = foundArt.cantidad == null ? 1 : +foundArt.cantidad;
       if (cantActual < cantidadVendida) {
@@ -4399,11 +4398,11 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
           const { error } = await DB.from('articulos').update({ cantidad: 0, estado: 'vendido' }).eq('id', artId);
           if (error) return { ok: false, msg: error.message };
         }
-        // OPCIÃ“N ALTERNATIVA (dejar comentada): marcar como agotado en lugar de vendido
+        // OPCIÓN ALTERNATIVA (dejar comentada): marcar como agotado en lugar de vendido
         // foundArt.estado = 'agotado';
         // await DB.from('articulos').update({ cantidad: 0, estado: 'agotado' }).eq('id', artId);
       } else {
-        // Reducir cantidad â€” artÃ­culo sigue en listado con stock actualizado
+        // Reducir cantidad — artículo sigue en listado con stock actualizado
         foundArt.cantidad = nuevaCant;
         if (DB) {
           const { error } = await DB.from('articulos').update({ cantidad: nuevaCant }).eq('id', artId);
@@ -4437,10 +4436,10 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
 
       if (btn) {
         btn.disabled = true;
-        btn.innerHTML = 'âŒ› Guardando...';
+        btn.innerHTML = '⌛ Guardando...';
       }
 
-      // Validar stock disponible para todos los artÃ­culos antes de guardar
+      // Validar stock disponible para todos los artículos antes de guardar
       for (const item of items) {
         if (item.artId && item.artId !== 'undefined') {
           let foundArt = null;
@@ -4448,7 +4447,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
           if (foundArt) {
             const cantActual = foundArt.cantidad == null ? 1 : +foundArt.cantidad;
             if (cantActual < item.cantidad) {
-              toast(`âš ï¸ Stock insuficiente: "${item.nombre}" â€” solo ${cantActual} disponible(s)`, 'err');
+              toast(`⚠️ Stock insuficiente: "${item.nombre}" — solo ${cantActual} disponible(s)`, 'err');
               if (btn) { btn.disabled = false; btn.innerHTML = originalText; }
               return;
             }
@@ -4456,7 +4455,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         }
       }
 
-      // Procesar cada artÃ­culo con un ID de venta Ãºnico para agruparlos luego
+      // Procesar cada artículo con un ID de venta único para agruparlos luego
       const ventaId = crypto.randomUUID();
       let guardados = 0;
       
@@ -4465,8 +4464,8 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
           // 1. Descontar inventario
           if (item.artId && item.artId !== 'undefined') {
             const res = await descontarInventario(item.artId, item.cantidad);
-            if (!res.ok) { toast('âš ï¸ ' + res.msg, 'err'); continue; }
-            if (res.nuevaCant === 0) toast(`"${item.nombre}" agotado â€” retirado del listado`, 'ok');
+            if (!res.ok) { toast('⚠️ ' + res.msg, 'err'); continue; }
+            if (res.nuevaCant === 0) toast(`"${item.nombre}" agotado — retirado del listado`, 'ok');
           }
 
           // 2. Guardar en Supabase / demo
@@ -4499,11 +4498,11 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
 
         if (guardados > 0) {
           cm('m-ventas');
-          toast(`âœ“ Venta Grande registrada â€” ${guardados} producto(s)`, 'ok');
+          toast(`✓ Venta Grande registrada — ${guardados} producto(s)`, 'ok');
           render();
         }
       } catch (e) {
-        toast('Error crÃ­tico al guardar venta: ' + e.message, 'err');
+        toast('Error crítico al guardar venta: ' + e.message, 'err');
       } finally {
         if (btn) {
           btn.disabled = false;
@@ -4576,7 +4575,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         metricsEl.innerHTML = `
           <div class="mc gold"><div class="ml">Ingresos Filtrados</div>
             <div class="mv" style="font-size:20px">$${totalVenta.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</div>
-            <div class="ms">del perÃ­odo seleccionado</div></div>
+            <div class="ms">del período seleccionado</div></div>
           <div class="mc sage"><div class="ml">Ganancia Neta (Filtro)</div>
             <div class="mv" 
               style="font-size:20px;color:var(--sage)">$${totalGan.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</div>
@@ -4586,15 +4585,15 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       }
 
       if (!filtered.length) {
-        tb.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="ei">ðŸ’¼</div><h3>Sin ventas</h3><p>No se encontraron resultados para los filtros seleccionados.</p></div></td></tr>`;
+        tb.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="ei">💼</div><h3>Sin ventas</h3><p>No se encontraron resultados para los filtros seleccionados.</p></div></td></tr>`;
         return;
       }
 
       const pagoMap = {
-        efectivo: ['st st-v', 'ðŸ’µ Efectivo'],
-        transferencia: ['st st-dc', 'ðŸ¦ Transferencia'],
-        adelanto: ['st st-p', 'â³ Adelanto'],
-        pendiente: ['st st-a', 'ðŸ• Por cobrar']
+        efectivo: ['st st-v', '💵 Efectivo'],
+        transferencia: ['st st-dc', '🏦 Transferencia'],
+        adelanto: ['st st-p', '⏳ Adelanto'],
+        pendiente: ['st st-a', '🕐 Por cobrar']
       };
 
       tb.innerHTML = filtered.map(g => {
@@ -4603,7 +4602,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         const gN = tV - (tC * 1.0875);
         
         const fechaStr = g.fecha ? fDate(g.fecha + 'T12:00:00') : fDate(g.created_at);
-        const [pagoCls, pagoLabel] = pagoMap[g.metodo_pago] || ['st st-a', 'â€”'];
+        const [pagoCls, pagoLabel] = pagoMap[g.metodo_pago] || ['st st-a', '—'];
         const cColor = getClientColor(g.cliente);
         
         return `<tr>
@@ -4615,8 +4614,8 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
           <td><span class="${pagoCls}">${pagoLabel}</span></td>
           <td>
             <div style="display:flex;gap:5px">
-              <button class="btn btn-xs btn-out" onclick="openVGDet('${g.venta_id}')">ðŸ“„ Ver</button>
-              <button class="btn btn-xs btn-rose" onclick="deleteVentaGrande('${g.venta_id}')">âœ•</button>
+              <button class="btn btn-xs btn-out" onclick="openVGDet('${g.venta_id}')">📄 Ver</button>
+              <button class="btn btn-xs btn-rose" onclick="deleteVentaGrande('${g.venta_id}')">✕</button>
             </div>
           </td>
         </tr>`;
@@ -4696,7 +4695,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
 
       const cliente = itemsToDelete[0].cliente;
       
-      askConf(`Â¿EstÃ¡s seguro de eliminar la venta de "${cliente}"? Los productos volverÃ¡n al inventario.`, async () => {
+      askConf(`¿Estás seguro de eliminar la venta de "${cliente}"? Los productos volverán al inventario.`, async () => {
         try {
           // 1. Restaurar inventario
           for (const item of itemsToDelete) {
@@ -4718,7 +4717,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
           });
 
           render();
-          toast('âœ“ Venta eliminada y stock restaurado', 'ok');
+          toast('✓ Venta eliminada y stock restaurado', 'ok');
         } catch (e) {
           toast('Error al eliminar venta: ' + e.message, 'err');
         }
@@ -4736,7 +4735,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       const nuevaCant = (+foundArt.cantidad || 0) + (+cantidad);
       foundArt.cantidad = nuevaCant;
       
-      // Si estaba vendido (porque llegÃ³ a 0), volver a pendiente
+      // Si estaba vendido (porque llegó a 0), volver a pendiente
       if (foundArt.estado === 'vendido' && nuevaCant > 0) {
         foundArt.estado = 'pendiente';
       }
@@ -4762,7 +4761,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
     function exportarVentasGrandesExcel() {
       if (!ventasGrandes.length) { toast('No hay ventas grandes para exportar', 'err'); return; }
       const headers = [
-        ['DELIRIUM DECOR â€” VENTAS GRANDES / PEDIDOS MAYORISTAS'],
+        ['DELIRIUM DECOR — VENTAS GRANDES / PEDIDOS MAYORISTAS'],
         ['Fecha de reporte:', new Date().toLocaleString()],
         [],
         ['CLIENTE', 'PRODUCTO', 'CANTIDAD', 'PRECIO COMPRA', 'PRECIO VENTA', 'GANANCIA/UNIT', 'TOTAL GANANCIA', 'FECHA']
@@ -4779,10 +4778,10 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Ventas Grandes');
       XLSX.writeFile(wb, 'DeliriumDecor_VentasGrandes_' + new Date().toISOString().slice(0, 10) + '.xlsx');
-      toast('âœ“ Excel Ventas Grandes exportado', 'ok');
+      toast('✓ Excel Ventas Grandes exportado', 'ok');
     }
 
-    // â•â• CIERRE MENSUAL â•â•
+    // ══ CIERRE MENSUAL ══
     const MESES = ['', 'Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
     function generarCierre() {
@@ -4790,7 +4789,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       const anio = +document.getElementById('cierre-anio').value;
       const mesLabel = MESES[mes];
 
-      // Filtrar artÃ­culos vendidos de tickets en ese mes/aÃ±o
+      // Filtrar artículos vendidos de tickets en ese mes/año
       const artsVendidos = [];
       tickets.forEach(t => {
         (t.items || []).forEach(i => {
@@ -4799,14 +4798,14 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
             if (ref) {
               const d = new Date(ref);
               if (d.getMonth() + 1 === mes && d.getFullYear() === anio) {
-                artsVendidos.push({ ...i, temporada: t.temporada || 'â€”', folio: t.folio });
+                artsVendidos.push({ ...i, temporada: t.temporada || '—', folio: t.folio });
               }
             }
           }
         });
       });
 
-      // Filtrar ventas grandes del mes/aÃ±o
+      // Filtrar ventas grandes del mes/año
       const vgMes = ventasGrandes.filter(v => {
         const ref = v.fecha ? v.fecha + 'T12:00:00' : v.created_at;
         if (!ref) return false;
@@ -4814,7 +4813,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         return d.getMonth() + 1 === mes && d.getFullYear() === anio;
       });
 
-      // Calcular mÃ©tricas
+      // Calcular métricas
       const ingresosArts = artsVendidos.reduce((s, i) => s + (+i.precio_venta || 0) * (+i.cantidad || 1), 0);
       const costosArts   = artsVendidos.reduce((s, i) => s + (+i.precio_compra || 0) * (+i.cantidad || 1), 0);
       const ingresosVG   = vgMes.reduce((s, v) => s + (+v.precio_venta || 0) * (+v.cantidad || 1), 0);
@@ -4823,10 +4822,10 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       const totalCostos   = costosArts + costosVG;
       const ganancia      = totalIngresos - totalCostos;
 
-      // Agrupar artÃ­culos por temporada
+      // Agrupar artículos por temporada
       const porTemp = {};
       artsVendidos.forEach(i => {
-        const t = i.temporada || 'â€”';
+        const t = i.temporada || '—';
         if (!porTemp[t]) porTemp[t] = { cant: 0, ingresos: 0, costos: 0 };
         porTemp[t].cant     += (+i.cantidad || 1);
         porTemp[t].ingresos += (+i.precio_venta || 0) * (+i.cantidad || 1);
@@ -4840,15 +4839,15 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       // Metric cards
       html += `<div class="mg" style="margin-bottom:20px">
         <div class="mc sage"><div class="ml">Total Ingresos</div><div class="mv">${fmt(totalIngresos)}</div><div class="ms">venta + mayoreo</div></div>
-        <div class="mc"><div class="ml">Total Costos</div><div class="mv">${fmt(totalCostos)}</div><div class="ms">compras del perÃ­odo</div></div>
+        <div class="mc"><div class="ml">Total Costos</div><div class="mv">${fmt(totalCostos)}</div><div class="ms">compras del período</div></div>
         <div class="mc gold"><div class="ml">Ganancia Neta</div><div class="mv" style="color:${ganancia>=0?'var(--sage)':'var(--rose)'}">${fmt(ganancia)}</div><div class="ms">utilidad</div></div>
-        <div class="mc"><div class="ml">ArtÃ­culos Vendidos</div><div class="mv">${artsVendidos.length}</div><div class="ms">unidades</div></div>
+        <div class="mc"><div class="ml">Artículos Vendidos</div><div class="mv">${artsVendidos.length}</div><div class="ms">unidades</div></div>
         <div class="mc"><div class="ml">Ventas</div><div class="mv">${vgMes.length}</div><div class="ms">pedidos mayoristas</div></div>
       </div>`;
 
       // Tabla ventas grandes del mes
       if (vgMes.length) {
-        html += `<p style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">ðŸ’¼ Ventas del mes</p>`;
+        html += `<p style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">💼 Ventas del mes</p>`;
         html += `<div class="tw" style="margin-bottom:18px"><table><thead><tr><th>Cliente</th><th>Producto</th><th>Cant.</th><th>P.Venta</th><th>Ganancia</th><th>Fecha</th></tr></thead><tbody>`;
         vgMes.forEach(v => {
           const ganU = v.ganancia_unit != null ? +v.ganancia_unit : (+v.precio_venta - +v.precio_compra);
@@ -4859,9 +4858,9 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         html += `</tbody></table></div>`;
       }
 
-      // Tabla artÃ­culos por temporada
+      // Tabla artículos por temporada
       if (artsVendidos.length) {
-        html += `<p style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">ðŸ“¦ ArtÃ­culos vendidos por temporada</p>`;
+        html += `<p style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">📦 Artículos vendidos por temporada</p>`;
         html += `<div class="tw" style="margin-bottom:18px"><table><thead><tr><th>Temporada</th><th>Cant.</th><th>Ingresos</th><th>Costos</th><th>Ganancia</th></tr></thead><tbody>`;
         Object.entries(porTemp).forEach(([temp, d]) => {
           const g = d.ingresos - d.costos;
@@ -4871,7 +4870,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       }
 
       if (!artsVendidos.length && !vgMes.length) {
-        html += `<div class="empty"><div class="ei">ðŸ“…</div><h3>Sin datos para este mes</h3><p>No hay ventas registradas en ${mesLabel} ${anio}.</p></div>`;
+        html += `<div class="empty"><div class="ei">📅</div><h3>Sin datos para este mes</h3><p>No hay ventas registradas en ${mesLabel} ${anio}.</p></div>`;
       } else {
         // Total final resaltado
         html += `<div style="text-align:right;background:var(--sage-p);border:1px solid rgba(16,185,129,.2);border-radius:var(--rs);padding:14px 18px;margin-top:8px">
@@ -4896,7 +4895,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
             if (ref) {
               const d = new Date(ref);
               if (d.getMonth() + 1 === mes && d.getFullYear() === anio) {
-                artsVendidos.push({ ...i, temporada: t.temporada || 'â€”', folio: t.folio });
+                artsVendidos.push({ ...i, temporada: t.temporada || '—', folio: t.folio });
               }
             }
           }
@@ -4911,7 +4910,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       });
 
       const header = [
-        [`DELIRIUM DECOR â€” CIERRE MENSUAL ${mesLabel.toUpperCase()} ${anio}`],
+        [`DELIRIUM DECOR — CIERRE MENSUAL ${mesLabel.toUpperCase()} ${anio}`],
         ['Generado:', new Date().toLocaleString()],
         []
       ];
@@ -4929,7 +4928,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       ] : [];
 
       const secArts = artsVendidos.length ? [
-        ['--- ARTÃCULOS VENDIDOS ---'],
+        ['--- ARTÍCULOS VENDIDOS ---'],
         ['Folio','Nombre','Temporada','Cantidad','P.Compra','P.Venta','Ganancia'],
         ...artsVendidos.map(i => {
           const cant = +i.cantidad || 1;
@@ -4940,30 +4939,30 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       ] : [];
 
       const rows = [...header, ...secVG, ...secArts];
-      if (!rows.length || rows.length <= 3) { toast('Sin datos para exportar en este perÃ­odo', 'err'); return; }
+      if (!rows.length || rows.length <= 3) { toast('Sin datos para exportar en este período', 'err'); return; }
 
       const ws = XLSX.utils.aoa_to_sheet(rows);
       ws['!cols'] = [{wch:20},{wch:30},{wch:10},{wch:12},{wch:12},{wch:14},{wch:14}];
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, `Cierre ${mesLabel} ${anio}`);
       XLSX.writeFile(wb, `DeliriumDecor_Cierre_${mesLabel}${anio}.xlsx`);
-      toast(`âœ“ Cierre ${mesLabel} ${anio} exportado`, 'ok');
+      toast(`✓ Cierre ${mesLabel} ${anio} exportado`, 'ok');
     }
 
-    // â•â• DEMO â•â•
+    // ══ DEMO ══
     function loadDemo() {
       const d = (offset) => new Date(Date.now() - 86400000 * offset).toISOString();
       tickets = [
         { id: 'd1', folio: 'TKT-0001', nombre: 'Taza Halloween calavera, Plato renos', temporada: 'Halloween', estado: 'vendido', precio: 430, notas: '', created_at: d(5), fecha_registro: null, items: [{ id: 'i1', ticket_id: 'd1', nombre: 'Taza Halloween calavera', categoria: 'Tazas', cantidad: 1, precio_compra: 80, precio_venta: 180 }, { id: 'i2', ticket_id: 'd1', nombre: 'Plato renos', categoria: 'Platos', cantidad: 1, precio_compra: 100, precio_venta: 250 }] },
-        { id: 'd2', folio: 'TKT-0002', nombre: 'Figura DÃ­a de Muertos', temporada: 'DÃ­a de Muertos', estado: 'pendiente', precio: 320, notas: '', created_at: d(28), fecha_registro: null, items: [{ id: 'i3', ticket_id: 'd2', nombre: 'Figura DÃ­a de Muertos', categoria: 'Figuras', cantidad: 2, precio_compra: 120, precio_venta: 320 }] },
-        { id: 'd3', folio: 'TKT-0003', nombre: 'Taza San ValentÃ­n', temporada: 'San ValentÃ­n', estado: 'apartado', precio: 165, notas: 'Reservado Sra. GarcÃ­a', created_at: d(25), fecha_registro: null, items: [{ id: 'i4', ticket_id: 'd3', nombre: 'Taza San ValentÃ­n corazones', categoria: 'Tazas', cantidad: 1, precio_compra: 70, precio_venta: 165 }] },
-        { id: 'd4', folio: 'TKT-0004', nombre: 'Adorno Navidad Ã¡rbol', temporada: 'Navidad', estado: 'descuento', precio: 95, notas: '50% descuento', created_at: d(1), fecha_registro: null, items: [{ id: 'i5', ticket_id: 'd4', nombre: 'Adorno Navidad Ã¡rbol', categoria: 'Adornos', cantidad: 3, precio_compra: 20, precio_venta: 95 }] },
+        { id: 'd2', folio: 'TKT-0002', nombre: 'Figura Día de Muertos', temporada: 'Día de Muertos', estado: 'pendiente', precio: 320, notas: '', created_at: d(28), fecha_registro: null, items: [{ id: 'i3', ticket_id: 'd2', nombre: 'Figura Día de Muertos', categoria: 'Figuras', cantidad: 2, precio_compra: 120, precio_venta: 320 }] },
+        { id: 'd3', folio: 'TKT-0003', nombre: 'Taza San Valentín', temporada: 'San Valentín', estado: 'apartado', precio: 165, notas: 'Reservado Sra. García', created_at: d(25), fecha_registro: null, items: [{ id: 'i4', ticket_id: 'd3', nombre: 'Taza San Valentín corazones', categoria: 'Tazas', cantidad: 1, precio_compra: 70, precio_venta: 165 }] },
+        { id: 'd4', folio: 'TKT-0004', nombre: 'Adorno Navidad árbol', temporada: 'Navidad', estado: 'descuento', precio: 95, notas: '50% descuento', created_at: d(1), fecha_registro: null, items: [{ id: 'i5', ticket_id: 'd4', nombre: 'Adorno Navidad árbol', categoria: 'Adornos', cantidad: 3, precio_compra: 20, precio_venta: 95 }] },
         { id: 'd5', folio: 'TKT-0005', nombre: 'Jarra Pascua conejitos', temporada: 'Pascua', estado: 'pendiente', precio: 210, notas: '', created_at: d(32), fecha_registro: null, items: [{ id: 'i6', ticket_id: 'd5', nombre: 'Jarra Pascua conejitos', categoria: 'Jarras', cantidad: 1, precio_compra: 90, precio_venta: 210 }] },
-        { id: 'd6', folio: 'TKT-0006', nombre: 'Servilletero Halloween murciÃ©lago', temporada: 'Halloween', estado: 'pendiente', precio: 185, notas: '', created_at: d(10), fecha_registro: null, items: [{ id: 'i7', ticket_id: 'd6', nombre: 'Servilletero murciÃ©lago', categoria: 'Servilleteros', cantidad: 1, precio_compra: 60, precio_venta: 185 }] },
+        { id: 'd6', folio: 'TKT-0006', nombre: 'Servilletero Halloween murciélago', temporada: 'Halloween', estado: 'pendiente', precio: 185, notas: '', created_at: d(10), fecha_registro: null, items: [{ id: 'i7', ticket_id: 'd6', nombre: 'Servilletero murciélago', categoria: 'Servilleteros', cantidad: 1, precio_compra: 60, precio_venta: 185 }] },
       ];
     }
 
-    // â•â• BÃšSQUEDA RÃPIDA (FAB) â•â•
+    // ══ BÚSQUEDA RÁPIDA (FAB) ══
     function abrirScanRapido() {
       document.getElementById('sr-input').value = '';
       document.getElementById('sr-results').innerHTML = '';
@@ -5003,7 +5002,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       if (!resultados.length) {
         el.innerHTML = `
           <div style="text-align:center;padding:20px;background:var(--rose-p);border-radius:var(--rs)">
-            <div style="font-size:28px;margin-bottom:8px">ðŸ”</div>
+            <div style="font-size:28px;margin-bottom:8px">🔍</div>
             <div style="color:var(--rose);font-weight:600;font-size:14px">No encontrado</div>
             <div style="color:var(--muted);font-size:12px;margin-top:4px">"${query}"</div>
           </div>`;
@@ -5029,12 +5028,20 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
               <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
                 <div style="flex:1;min-width:0">
                   <div style="font-weight:600;font-size:14.5px;margin-bottom:3px">${art.nombre}</div>
-                  <div style="font-size:11.5px;color:var(--muted)">${ticket.folio} Â· ${sEmoji(ticket.temporada)} ${ticket.temporada || 'â€”'}</div>
+                  <div style="font-size:11.5px;color:var(--muted)">${ticket.folio} · ${sEmoji(ticket.temporada)} ${ticket.temporada || '—'}</div>
                   ${art.codigo_barras ? `<div style="font-family:monospace;font-size:11px;color:var(--cobalt);margin-top:2px">${art.codigo_barras}</div>` : ''}
                 </div>
                 <div>${stBadge(art.estado)}</div>
               </div>
               <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+                <div style="background:#0f1117;border-radius:var(--rs);padding:8px 10px">
+                  <div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Costo</div>
+                  <div style="font-weight:700;font-size:14px">$${(+art.precio_compra || 0).toFixed(2)}</div>
+                </div>
+                <div style="background:#0f1117;border-radius:var(--rs);padding:8px 10px">
+                  <div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Venta</div>
+                  <div style="font-weight:700;font-size:14px;color:var(--gold)">$${precio.toFixed(2)}</div>
+                </div>
                 <div style="background:#0f1117;border-radius:var(--rs);padding:8px 10px">
                   <div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Ganancia</div>
                   <div style="font-weight:700;font-size:14px;color:${ganancia >= 0 ? 'var(--sage)' : 'var(--rose)'}">$${Math.abs(ganancia).toFixed(2)}</div>
@@ -5043,12 +5050,12 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
               <div style="display:flex;gap:7px;flex-wrap:wrap">
                 ${esVendible ? `
                   <button class="btn btn-sage btn-sm" style="flex:1"
-                    onclick="patchArticulo('${art.id}',{estado:'vendido'}); cerrarScanRapido(); toast('âœ“ ${art.nombre.replace(/'/g, "\\'")} marcado como vendido','ok')">
-                    âœ… Marcar vendido
+                    onclick="patchArticulo('${art.id}',{estado:'vendido'}); cerrarScanRapido(); toast('✓ ${art.nombre.replace(/'/g, "'")} marcado como vendido','ok')">
+                    ✅ Marcar vendido
                   </button>
                   <button class="btn btn-rose btn-sm"
-                    onclick="patchArticulo('${art.id}',{estado:'devuelto_completo'}); cerrarScanRapido(); toast('ðŸ”„ DevoluciÃ³n registrada','ok')">
-                    ðŸ”„ Devolver
+                    onclick="patchArticulo('${art.id}',{estado:'devuelto_completo'}); cerrarScanRapido(); toast('🔄 Devolución registrada','ok')">
+                    🔄 Devolver
                   </button>
                 ` : ''}
                 <button class="btn btn-out btn-sm"
@@ -5058,25 +5065,25 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
               </div>
             </div>`;
         }).join('')}
-        ${resultados.length > 8 ? `<div style="text-align:center;font-size:12px;color:var(--muted);padding:8px">+${resultados.length - 8} resultados mÃ¡s â€” escribe mÃ¡s para filtrar</div>` : ''}
+        ${resultados.length > 8 ? `<div style="text-align:center;font-size:12px;color:var(--muted);padding:8px">+${resultados.length - 8} resultados más — escribe más para filtrar</div>` : ''}
       `;
     }
   </script>
   <script src="js/promos.js"></script>
 
-  <!-- MODAL: BÃºsqueda RÃ¡pida -->
+  <!-- MODAL: Búsqueda Rápida -->
   <div class="mo" id="m-scan-rapido">
     <div class="md" style="max-width:460px">
       <div class="mh">
-        <h2>ðŸ” Buscar artÃ­culo</h2>
-        <button class="mx" onclick="cerrarScanRapido()">âœ•</button>
+        <h2>🔍 Buscar artículo</h2>
+        <button class="mx" onclick="cerrarScanRapido()">✕</button>
       </div>
       <div class="mb">
         <div style="background:var(--gold-p);border:1px solid rgba(201,168,76,0.25);border-radius:var(--rs);padding:11px 14px;margin-bottom:14px;font-size:12.5px;color:var(--ink2);line-height:1.6">
-          Escanea el cÃ³digo de barras del artÃ­culo <strong>o escribe su nombre</strong> para encontrarlo en bodega.
+          Escanea el código de barras del artículo <strong>o escribe su nombre</strong> para encontrarlo en bodega.
         </div>
         <input type="text" id="sr-input"
-          placeholder="Escanea o escribe nombre del artÃ­culo..."
+          placeholder="Escanea o escribe nombre del artículo..."
           autocomplete="off"
           oninput="busquedaRapida(this.value)"
           style="font-size:15px;padding:12px 14px;margin-bottom:12px;letter-spacing:.02em">
@@ -5085,7 +5092,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
     </div>
   </div>
 
-  <!-- FAB: BotÃ³n flotante de escaneo -->
+  <!-- FAB: Botón flotante de escaneo -->
   <button id="fab-scan" onclick="abrirScanRapido()" style="
     position: fixed;
     bottom: 28px;
@@ -5100,14 +5107,13 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
     cursor: pointer;
     z-index: 300;
     box-shadow: 0 4px 20px rgba(201,168,76,0.4);
-    display: flex;
+        display: flex;
     align-items: center;
     justify-content: center;
     transition: transform .15s, box-shadow .15s;
-  " title="Escanear artÃ­culo">ðŸ”</button>
-
+  " title="Escanear artículo">🔍</button>
   <script>
-    // â•â• PERDIDAS LOGIC â•â•
+    // ══ PERDIDAS LOGIC ══
     async function pullPerdidas() {
       if (!DB) return;
       const { data, error } = await DB.from('perdidas').select('*').order('created_at', { ascending: false });
@@ -5119,7 +5125,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
     function renderPerdidas() {
       const tb = document.getElementById('perdidas-body'); if (!tb) return;
       if (!perdidas.length) {
-        tb.innerHTML = `<tr><td colspan="6"><div class="empty"><div class="ei">ðŸ“‰</div><p>No hay pÃ©rdidas registradas</p></div></td></tr>`;
+        tb.innerHTML = `<tr><td colspan="6"><div class="empty"><div class="ei">📉</div><p>No hay pérdidas registradas</p></div></td></tr>`;
         return;
       }
       tb.innerHTML = perdidas.map(p => `
@@ -5127,15 +5133,15 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
           <td>${fDate(p.fecha)}</td>
           <td><strong>${p.producto}</strong></td>
           <td style="text-align:center">${p.cantidad}</td>
-          <td style="color:var(--muted)">${p.motivo || 'â€”'}</td>
-          <td><span class="st st-a">${p.vendedor || 'â€”'}</span></td>
-          <td><button class="btn btn-xs btn-rose" onclick="deletePerdida('${p.id}')">âœ•</button></td>
+          <td style="color:var(--muted)">${p.motivo || '—'}</td>
+          <td><span class="st st-a">${p.vendedor || '—'}</span></td>
+          <td><button class="btn btn-xs btn-rose" onclick="deletePerdida('${p.id}')">✕</button></td>
         </tr>
       `).join('');
     }
 
     function openNewPerdida() {
-      const p = prompt('Â¿QuÃ© producto se perdiÃ³/daÃ±Ã³? (Nombre o CÃ³digo):');
+      const p = prompt('¿Qué producto se perdió/dañó? (Nombre o Código):');
       if (!p) return;
       const query = p.trim().toLowerCase();
       const found = inventoryIndex.byBarcode[query] || inventoryIndex.byName[query];
@@ -5147,9 +5153,9 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
 
       const cant = prompt(`Cantidad de "${found.nombre}" a dar de baja (Disponible: ${found.cantidad}):`, '1');
       if (!cant || isNaN(cant) || +cant <= 0) return;
-      if (+cant > found.cantidad) { toast('No puedes dar de baja mÃ¡s de lo que hay', 'err'); return; }
+      if (+cant > found.cantidad) { toast('No puedes dar de baja más de lo que hay', 'err'); return; }
 
-      const motivo = prompt('Motivo (opcional):', 'DaÃ±ado/Roto');
+      const motivo = prompt('Motivo (opcional):', 'Dañado/Roto');
       
       confirmarPerdida(found, +cant, motivo);
     }
@@ -5166,7 +5172,7 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
       };
 
       try {
-        // 1. Descontar inventario (usamos negativo para restar)
+        // 1. Descontar inventario
         await reponerInventario(art.id, -cant);
 
         // 2. Guardar en DB
@@ -5179,14 +5185,14 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         }
 
         renderPerdidas();
-        toast('âœ“ PÃ©rdida registrada y descontada', 'ok');
+        toast('✓ Pérdida registrada y descontada', 'ok');
       } catch (e) {
         toast('Error: ' + e.message, 'err');
       }
     }
 
     async function deletePerdida(id) {
-      askConf('Â¿Eliminar registro de pÃ©rdida? Esto NO devolverÃ¡ el producto al inventario automÃ¡ticamente.', async () => {
+      askConf('¿Eliminar registro de pérdida? Esto NO devolverá el producto al inventario automáticamente.', async () => {
         if (DB) {
           const { error } = await DB.from('perdidas').delete().eq('id', id);
           if (error) { toast('Error: ' + error.message, 'err'); return; }
@@ -5198,4 +5204,5 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
     }
   </script>
 </body>
+
 </html>
