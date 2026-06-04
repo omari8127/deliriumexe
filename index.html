@@ -3824,11 +3824,16 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
     function initBarcodeListeners() {
       // Captura global: el lector de barras envía chars rápido + Enter
       document.addEventListener('keydown', (e) => {
-        // Ignora si el foco está en un input normal (excepto los de búsqueda)
         const tag = document.activeElement?.tagName;
         const id = document.activeElement?.id;
         const isScanInput = ['pf-in', 'mf-in'].includes(id);
-        if ((tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') && !isScanInput) return;
+
+        // Detectar si el foco está en un input de producto de Nueva Venta
+        const isVGProductoInput = (tag === 'INPUT') &&
+          document.activeElement?.closest('#vg-body') !== null &&
+          document.activeElement?.type === 'text';
+
+        if ((tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') && !isScanInput && !isVGProductoInput) return;
 
         if (e.key === 'Enter') {
           if (_barcodeBuffer.length >= 3) {
@@ -3840,6 +3845,14 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
             if (scanRapido && scanRapido.classList.contains('on')) {
               const inp = document.getElementById('sr-input');
               if (inp) { inp.value = codigo; busquedaRapida(codigo); }
+              return;
+            }
+
+            // Si el modal de Nueva Venta está abierto y el foco es un input de producto, rellenar el producto
+            const mVentas = document.getElementById('m-ventas');
+            if (mVentas && mVentas.classList.contains('on') && isVGProductoInput) {
+              const activeInp = document.activeElement;
+              fillVGProductoByBarcode(activeInp, codigo);
               return;
             }
 
@@ -3856,6 +3869,19 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
           _barcodeTimer = setTimeout(() => { _barcodeBuffer = ''; }, 80);
         }
       });
+    }
+
+    // Rellena una fila de Nueva Venta usando el código de barras escaneado
+    function fillVGProductoByBarcode(inp, barcode) {
+      const query = barcode.toLowerCase();
+      const found = inventoryIndex.byBarcode[query];
+      if (found) {
+        inp.value = found.nombre;
+        processVGProductoInput(inp);
+      } else {
+        inp.value = barcode;
+        toast('⚠️ Código ' + barcode + ' no encontrado en bodega', 'err');
+      }
     }
 
     // Auto-search cuando el input recibe Enter del lector
@@ -4272,7 +4298,8 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
     }
 
     function processVGProductoInput(inp) {
-      const query = inp.value.trim().toLowerCase();
+      const rawValue = inp.value.trim();
+      const query = rawValue.toLowerCase();
       const tr = inp.closest('tr');
       if (!tr) return;
       const refDiv = tr.querySelector('.vg-art-ref');
@@ -4288,12 +4315,21 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         return;
       }
 
-      // Buscar en el índice (O(1) lookup)
-      const found = inventoryIndex.byBarcode[query] || inventoryIndex.byName[query];
+      // Buscar en el índice: primero por código de barras (exacto), luego por nombre exacto, luego por nombre parcial
+      let found = inventoryIndex.byBarcode[query] || inventoryIndex.byName[query];
+
+      // Búsqueda parcial por nombre si no hay match exacto
+      if (!found) {
+        const entries = Object.values(inventoryIndex.byName);
+        found = entries.find(i => i.nombre.toLowerCase().includes(query) || query.includes(i.nombre.toLowerCase()));
+      }
 
       if (found) {
         const foundTicket = found.ticket;
-        // No sobrescribir el valor mientras escriben
+        // Si el input tiene un código de barras, reemplazar con el nombre del producto
+        if (found.codigo_barras && rawValue.toUpperCase() === found.codigo_barras.toUpperCase()) {
+          inp.value = found.nombre;
+        }
         costInput.value = +found.precio_compra || 0;
         saleInput.value = +found.precio_unitario || +found.precio_venta || 0;
 
@@ -4303,8 +4339,8 @@ CREATE INDEX idx_articulos_ticket ON articulos(ticket_id);
         stockCell.innerHTML = `<span class="inv-badge${isLow ? ' low' : ''}">${cant} disp.</span>`;
         refDiv.style.display = 'block';
         refDiv.innerHTML = `
-          <div style="color:var(--cobalt);font-weight:600">Ticket: ${foundTicket ? foundTicket.folio : '—'}</div>
-          <div style="color:var(--muted)">Código: ${found.codigo_barras || '—'}</div>
+          <div style="color:var(--cobalt);font-weight:600">📦 ${found.nombre}</div>
+          <div style="color:var(--muted)">Ticket: ${foundTicket ? foundTicket.folio : '—'} · Cód: ${found.codigo_barras || '—'}</div>
         `;
         calcVGRow(costInput);
       } else {
